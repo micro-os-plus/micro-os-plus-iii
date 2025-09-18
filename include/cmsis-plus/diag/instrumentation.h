@@ -21,6 +21,8 @@
 
 #endif // defined(INSTRUMENTATION)
 
+// ----------------------------------------------------------------------------
+
 #define OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_SWITCH (1u)
 #define OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_CLOCK (2u)
 #define OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_THREAD_FLAGS (3u)
@@ -330,6 +332,74 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 93u)
 
 // 126
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 94u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN_OFLAGS \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 294u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 95u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 96u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_CLOSE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 97u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_READ \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 98u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_WRITE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 99u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_WRITEV \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 100u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_VFCNTL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 101u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_ISATTY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 102u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_FSTAT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 103u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_LSEEK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 104u)
+
+// 137
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 105u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 106u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VOPEN \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 107u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VOPEN_OFLAGS \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 108u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_CLOSE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 109u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VIOCTL \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 110u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_SYNC \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 111u)
+
+// 144
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_READ_BLOCK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 112u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_WRITE_BLOCK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 113u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_VIOCTL_BLOCK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 114u)
+
+// 147
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_PARTITION_CONFIGURE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 115u)
+
+// 148
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 116u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 117u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_CLOSE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 118u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FTRUNCATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 119u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FSYNC \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 120u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FSTATVFS \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 121u)
+
+// 154
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
@@ -954,6 +1024,171 @@ namespace os
       void
       callback_return (os::rtos::timer* timer);
     } // namespace timer
+
+    namespace posix
+    {
+      void
+      vopen (const char* path, int oflags);
+
+      void
+      vopen_retval (void* io, const char* path = nullptr);
+
+      namespace io
+      {
+        void
+        create (void* io, unsigned int t);
+
+        void
+        destroy (void* io);
+
+        void
+        close (void* io);
+
+        void
+        close_retval (void* io, int res);
+
+        void
+        read (void* io, const void* buf, std::size_t nbyte);
+
+        void
+        read_retval (void* io, ssize_t res);
+
+        void
+        write (void* io, const void* buf, std::size_t nbyte);
+
+        void
+        write_retval (void* io, ssize_t res);
+
+        void
+        writev (void* io, const void* iov, int iovcnt);
+
+        void
+        writev_retval (void* io, ssize_t res);
+
+        void
+        vfcntl (void* io, int cmd);
+
+        void
+        vfcntl_retval (void* io, int res);
+
+        void
+        isatty (void* io);
+
+        void
+        isatty_retval (void* io, int res);
+
+        void
+        fstat (void* io, void* buf);
+
+        void
+        fstat_retval (void* io, int res);
+
+        void
+        lseek (void* io, off_t offset, int whence);
+
+        void
+        lseek_retval (void* io, off_t offset);
+
+      } // namespace io
+
+      namespace device
+      {
+        void
+        create (void* device, unsigned int t);
+
+        void
+        destroy (void* device);
+
+        void
+        vopen (void* device, const char* path, int oflags);
+
+        void
+        vopen_retval (void* device, int res);
+
+        void
+        close (void* device);
+
+        void
+        close_retval (void* device, int res);
+
+        void
+        vioctl (void* device, int request);
+
+        void
+        vioctl_retval (void* device, int res);
+
+        void
+        sync (void* device);
+
+        void
+        sync_return (void* device);
+      } // namespace device
+
+      namespace block_device
+      {
+        void
+        read_block (void* bdev, void* buf, std::size_t block,
+                    std::size_t nblocks);
+
+        void
+        read_block_retval (void* bdev, ssize_t res);
+
+        void
+        write_block (void* bdev, const void* buf, std::size_t block,
+                     std::size_t nblocks);
+
+        void
+        write_block_retval (void* bdev, ssize_t res);
+
+        void
+        vioctl (void* bdev, int request);
+
+        void
+        vioctl_retval (void* bdev, int res);
+      } // namespace block_device
+
+      namespace block_device_partition
+      {
+        void
+        configure (void* partition, std::size_t offset, std::size_t nblocks);
+
+        void
+        configure_return (void* partition);
+      } // namespace block_device_partition
+
+      namespace file
+      {
+        void
+        create (void* file, unsigned int t);
+
+        void
+        destroy (void* file);
+
+        void
+        close (void* file);
+
+        void
+        close_retval (void* file, int res);
+
+        void
+        ftruncate (void* file, off_t length);
+
+        void
+        ftruncate_retval (void* file, int res);
+
+        void
+        fsync (void* file);
+
+        void
+        fsync_retval (void* file, int res);
+
+        void
+        fstatvfs (void* file, void* buf);
+
+        void
+        fstatvfs_retval (void* file, int res);
+      } // namespace file
+    } // namespace posix
 
     // ------------------------------------------------------------------------
 
@@ -1937,6 +2172,268 @@ namespace os
       {
       }
     } // namespace timer
+
+    namespace posix
+    {
+      static void inline __attribute__ ((__always_inline__))
+      vopen (const char* path, int oflags)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      vopen_retval (void* io, const char* path = nullptr)
+      {
+      }
+
+      namespace io
+      {
+        static void inline __attribute__ ((__always_inline__))
+        create (void* io, unsigned int t)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        destroy (void* io)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        close (void* io)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        close_retval (void* io, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        read (void* io, const void* buf, std::size_t nbyte)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        read_retval (void* io, ssize_t res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        write (void* io, const void* buf, std::size_t nbyte)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        write_retval (void* io, ssize_t res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        writev (void* io, const void* iov, int iovcnt)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        writev_retval (void* io, ssize_t res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vfcntl (void* io, int cmd)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vfcntl_retval (void* io, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        isatty (void* io)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        isatty_retval (void* io, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        fstat (void* io, void* buf)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        fstat_retval (void* io, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        lseek (void* io, off_t offset, int whence)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        lseek_retval (void* io, off_t offset)
+        {
+        }
+      } // namespace io
+
+      namespace device
+      {
+        static void inline __attribute__ ((__always_inline__))
+        create (void* device, unsigned int t)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        destroy (void* device)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vopen (void* device, const char* path, int oflags)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vopen_retval (void* device, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        close (void* device)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        close_retval (void* device, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vioctl (void* device, int request)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vioctl_retval (void* device, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        sync (void* device)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        sync_return (void* device)
+        {
+        }
+      } // namespace device
+
+      namespace block_device
+      {
+        static void inline __attribute__ ((__always_inline__))
+        read_block (void* bdev, void* buf, std::size_t block,
+                    std::size_t nblocks)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        read_block_retval (void* bdev, ssize_t res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        write_block (void* bdev, const void* buf, std::size_t block,
+                     std::size_t nblocks)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        write_block_retval (void* bdev, ssize_t res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vioctl (void* bdev, int request)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vioctl_retval (void* bdev, int res)
+        {
+        }
+
+      } // namespace block_device
+
+      namespace block_device_partition
+      {
+        static void inline __attribute__ ((__always_inline__))
+        configure (void* partition, std::size_t offset, std::size_t nblocks)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        configure_return (void* partition)
+        {
+        }
+      } // namespace block_device_partition
+
+      namespace file
+      {
+        static void inline __attribute__ ((__always_inline__))
+        create (void* file, unsigned int t)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        destroy (void* file)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        close (void* file)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        close_retval (void* file, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        ftruncate (void* file, off_t length)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        ftruncate_retval (void* file, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        fsync (void* file)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        fsync_retval (void* file, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        fstatvfs (void* file, void* buf)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        fstatvfs_retval (void* file, int res)
+        {
+        }
+      } // namespace file
+
+    } // namespace posix
 
     // ------------------------------------------------------------------------
 

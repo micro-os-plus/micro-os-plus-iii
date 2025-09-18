@@ -16,6 +16,9 @@
 #include <cmsis-plus/posix-io/file.h>
 #include <cmsis-plus/posix-io/file-system.h>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 #include <cerrno>
@@ -36,6 +39,9 @@ namespace os
 
     file::file (file_impl& impl) : io{ impl, type::file }
     {
+      instrumentation::posix::file::create (
+          this, static_cast<unsigned int> (type::file));
+
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s()=%p\n", __func__, this);
 #endif
@@ -43,6 +49,8 @@ namespace os
 
     file::~file ()
     {
+      instrumentation::posix::file::destroy (this);
+
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
 #endif
@@ -53,6 +61,8 @@ namespace os
     int
     file::close (void)
     {
+      instrumentation::posix::file::close (this);
+
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
 #endif
@@ -65,12 +75,15 @@ namespace os
       // It will be deallocated at the next open.
       get_file_system ().add_deferred_file (this);
 
+      instrumentation::posix::file::close_retval (this, ret);
       return ret;
     }
 
     int
     file::ftruncate (off_t length)
     {
+      instrumentation::posix::file::ftruncate (this, length);
+
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s(%u) @%p\n", __func__, length, this);
 #endif
@@ -78,18 +91,25 @@ namespace os
       if (length < 0)
         {
           errno = EINVAL;
+
+          instrumentation::posix::file::ftruncate_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_ftruncate (length);
+      int ret = impl ().do_ftruncate (length);
+
+      instrumentation::posix::file::ftruncate_retval (this, ret);
+      return ret;
     }
 
     int
     file::fsync (void)
     {
+      instrumentation::posix::file::fsync (this);
+
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s() @%p\n", __func__, this);
 #endif
@@ -97,12 +117,17 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_fsync ();
+      int ret = impl ().do_fsync ();
+
+      instrumentation::posix::file::fsync_retval (this, ret);
+      return ret;
     }
 
     int
     file::fstatvfs (struct statvfs* buf)
     {
+      instrumentation::posix::file::fstatvfs (this, buf);
+
 #if defined(OS_TRACE_POSIX_IO_FILE)
       trace::printf ("file::%s(%p) @%p\n", __func__, buf, this);
 #endif
@@ -110,7 +135,10 @@ namespace os
       errno = 0;
 
       // Execute the file system code. Might be locked there.
-      return get_file_system ().statvfs (buf);
+      int ret = get_file_system ().statvfs (buf);
+
+      instrumentation::posix::file::fstatvfs_retval (this, ret);
+      return ret;
     }
 
     // ========================================================================

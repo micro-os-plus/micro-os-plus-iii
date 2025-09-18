@@ -16,6 +16,9 @@
 #include <cmsis-plus/posix-io/device.h>
 #include <cmsis-plus/posix/sys/ioctl.h>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cstring>
 #include <cassert>
 #include <cerrno>
@@ -40,6 +43,9 @@ namespace os
         : io{ impl, t }, //
           name_ (name)
     {
+      instrumentation::posix::device::create (this,
+                                              static_cast<unsigned int> (t));
+
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(\"%s\")=%p\n", __func__, name_, this);
 #endif
@@ -47,6 +53,8 @@ namespace os
 
     device::~device ()
     {
+      instrumentation::posix::device::destroy (this);
+
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
 #endif
@@ -73,6 +81,8 @@ namespace os
     int
     device::vopen (const char* path, int oflag, std::va_list args)
     {
+      instrumentation::posix::device::vopen (this, path, oflag);
+
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(\"%s\") @%p\n", __func__, path ? path : "",
                      this);
@@ -88,12 +98,14 @@ namespace os
           if (ret < 0)
             {
               // Open failed.
+              instrumentation::posix::device::vopen_retval (this, -1);
               return -1;
             }
 
           auto iop = alloc_file_descriptor ();
           if (iop == nullptr)
             {
+              instrumentation::posix::device::vopen_retval (this, -1);
               return -1;
             }
         }
@@ -104,12 +116,15 @@ namespace os
                      path ? path : "", this, ret);
 #endif
 
+      instrumentation::posix::device::vopen_retval (this, ret);
       return ret;
     }
 
     int
     device::close (void)
     {
+      instrumentation::posix::device::close (this);
+
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
 #endif
@@ -128,6 +143,7 @@ namespace os
           --(impl ().open_count_);
         }
 
+      instrumentation::posix::device::close_retval (this, ret);
       return ret;
     }
 
@@ -151,6 +167,8 @@ namespace os
     int
     device::vioctl (int request, std::va_list args)
     {
+      instrumentation::posix::device::vioctl (this, request);
+
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s(%d) @%p\n", __func__, request, this);
 #endif
@@ -158,18 +176,25 @@ namespace os
       if (impl ().open_count_ == 0)
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::device::vioctl_retval (this, -1);
+
           return -1;
         }
 
       errno = 0;
 
-      return impl ().do_vioctl (request, args);
+      int ret = impl ().do_vioctl (request, args);
+
+      instrumentation::posix::device::vioctl_retval (this, ret);
+      return ret;
     }
 #pragma GCC diagnostic pop
 
     void
     device::sync (void)
     {
+      instrumentation::posix::device::sync (this);
+
 #if defined(OS_TRACE_POSIX_IO_DEVICE)
       trace::printf ("device::%s() @%p\n", __func__, this);
 #endif
@@ -177,10 +202,13 @@ namespace os
       if (impl ().open_count_ == 0)
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::device::sync_return (this);
           return;
         }
 
       impl ().do_sync ();
+
+      instrumentation::posix::device::sync_return (this);
     }
 
     // ------------------------------------------------------------------------

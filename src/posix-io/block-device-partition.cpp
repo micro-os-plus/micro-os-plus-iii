@@ -15,6 +15,9 @@
 
 #include <cmsis-plus/posix-io/block-device-partition.h>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cmsis-plus/diag/trace.h>
 
 // ----------------------------------------------------------------------------
@@ -54,12 +57,17 @@ namespace os
     void
     block_device_partition::configure (blknum_t offset, blknum_t nblocks)
     {
+      instrumentation::posix::block_device_partition::configure (this, offset,
+                                                                 nblocks);
+
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE_PARTITION)
       trace::printf ("block_device_partition::%s(%u,%u) @%p\n", __func__,
                      offset, nblocks, this);
 #endif
 
       impl ().configure (offset, nblocks);
+
+      instrumentation::posix::block_device_partition::configure_return (this);
     }
 
     // ========================================================================

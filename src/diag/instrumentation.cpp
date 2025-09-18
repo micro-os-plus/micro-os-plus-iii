@@ -18,6 +18,9 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/instrumentation.h>
 
+#include <cmsis-plus/posix-io/io.h>
+#include <cmsis-plus/posix-io/device.h>
+
 // ----------------------------------------------------------------------------
 
 namespace os
@@ -1826,6 +1829,446 @@ namespace os
             OS_INTEGER_INSTRUMENTATION_ID_TIMER_CALLBACK);
       }
     } // namespace timer
+
+    namespace posix
+    {
+      void
+      vopen (const char* path, int oflags)
+      {
+        SEGGER_SYSVIEW_RecordString (OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN,
+                                     path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN_OFLAGS,
+            static_cast<U32> (oflags));
+      }
+
+      void
+      vopen_retval (void* io, const char* path)
+      {
+        if (io != nullptr && path != nullptr)
+          {
+            SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (io), path);
+          }
+
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN);
+      }
+
+      namespace io
+      {
+        void
+        create (void* io, unsigned int t)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_CREATE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              static_cast<U32> (t));
+        }
+
+        void
+        destroy (void* io)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_DESTROY,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)));
+        }
+
+        void
+        close (void* io)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_CLOSE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)));
+        }
+
+        void
+        close_retval (void* io, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_CLOSE,
+              static_cast<U32> (res));
+        }
+
+        void
+        read (void* io, const void* buf, std::size_t nbyte)
+        {
+          SEGGER_SYSVIEW_RecordU32x3 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_READ,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              reinterpret_cast<U32> (buf), static_cast<U32> (nbyte));
+        }
+
+        void
+        read_retval (void* io, ssize_t res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_READ,
+              static_cast<U32> (res));
+        }
+
+        void
+        write (void* io, const void* buf, std::size_t nbyte)
+        {
+          SEGGER_SYSVIEW_RecordU32x3 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_WRITE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              reinterpret_cast<U32> (buf), static_cast<U32> (nbyte));
+        }
+
+        void
+        write_retval (void* io, ssize_t res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_WRITE,
+              static_cast<U32> (res));
+        }
+
+        void
+        writev (void* io, const void* iov, int iovcnt)
+        {
+          SEGGER_SYSVIEW_RecordU32x3 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_WRITEV,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              reinterpret_cast<U32> (iov), static_cast<U32> (iovcnt));
+        }
+
+        void
+        writev_retval (void* io, ssize_t res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_WRITEV,
+              static_cast<U32> (res));
+        }
+
+        void
+        vfcntl (void* io, int cmd)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_VFCNTL,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              static_cast<U32> (cmd));
+        }
+
+        void
+        vfcntl_retval (void* io, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_VFCNTL,
+              static_cast<U32> (res));
+        }
+
+        void
+        isatty (void* io)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_ISATTY,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)));
+        }
+
+        void
+        isatty_retval (void* io, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_ISATTY,
+              static_cast<U32> (res));
+        }
+
+        void
+        fstat (void* io, void* buf)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_FSTAT,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              reinterpret_cast<U32> (buf));
+        }
+
+        void
+        fstat_retval (void* io, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_FSTAT,
+              static_cast<U32> (res));
+        }
+
+        void
+        lseek (void* io, off_t offset, int whence)
+        {
+          SEGGER_SYSVIEW_RecordU32x3 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_LSEEK,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (io)),
+              static_cast<U32> (offset), static_cast<U32> (whence));
+        }
+
+        void
+        lseek_retval (void* io, off_t offset)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_LSEEK,
+              static_cast<U32> (offset));
+        }
+      } // namespace io
+
+      namespace device
+      {
+        void
+        create (void* device, unsigned int t)
+        {
+          os::posix::device* dev
+              = reinterpret_cast<os::posix::device*> (device);
+
+          SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (device),
+                                       dev->name ());
+
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_CREATE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (device)),
+              static_cast<U32> (t));
+        }
+
+        void
+        destroy (void* device)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_DESTROY,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (device)));
+        }
+
+        void
+        vopen (void* device, const char* path, int oflags)
+        {
+          if (path != nullptr && path[0] != '\0')
+            {
+              SEGGER_SYSVIEW_RecordString (
+                  OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VOPEN, path);
+            }
+
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VOPEN_OFLAGS,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (device)),
+              static_cast<U32> (oflags));
+        }
+
+        void
+        vopen_retval (void* device, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VOPEN,
+              static_cast<U32> (res));
+        }
+
+        void
+        close (void* device)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_CLOSE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (device)));
+        }
+
+        void
+        close_retval (void* device, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_CLOSE,
+              static_cast<U32> (res));
+        }
+
+        void
+        vioctl (void* device, int request)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VIOCTL,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (device)),
+              static_cast<U32> (request));
+        }
+
+        void
+        vioctl_retval (void* device, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_VIOCTL,
+              static_cast<U32> (res));
+        }
+
+        void
+        sync (void* device)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_SYNC,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (device)));
+        }
+
+        void
+        sync_return (void* device)
+        {
+          SEGGER_SYSVIEW_RecordEndCall (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_DEVICE_SYNC);
+        }
+      } // namespace device
+
+      namespace block_device
+      {
+        void
+        read_block (void* bdev, void* buf, std::size_t block,
+                    std::size_t nblocks)
+        {
+          SEGGER_SYSVIEW_RecordU32x4 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_READ_BLOCK,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (bdev)),
+              reinterpret_cast<U32> (buf), static_cast<U32> (block),
+              static_cast<U32> (nblocks));
+        }
+
+        void
+        read_block_retval (void* bdev, ssize_t res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_READ_BLOCK,
+              static_cast<U32> (res));
+        }
+
+        void
+        write_block (void* bdev, const void* buf, std::size_t block,
+                     std::size_t nblocks)
+        {
+          SEGGER_SYSVIEW_RecordU32x4 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_WRITE_BLOCK,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (bdev)),
+              reinterpret_cast<U32> (buf), static_cast<U32> (block),
+              static_cast<U32> (nblocks));
+        }
+
+        void
+        write_block_retval (void* bdev, ssize_t res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_WRITE_BLOCK,
+              static_cast<U32> (res));
+        }
+
+        void
+        vioctl (void* bdev, int request)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_VIOCTL_BLOCK,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (bdev)),
+              static_cast<U32> (request));
+        }
+
+        void
+        vioctl_retval (void* bdev, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_VIOCTL_BLOCK,
+              static_cast<U32> (res));
+        }
+      } // namespace block_device
+
+      namespace block_device_partition
+      {
+        void
+        configure (void* partition, std::size_t offset, std::size_t nblocks)
+        {
+          SEGGER_SYSVIEW_RecordU32x3 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_PARTITION_CONFIGURE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (partition)),
+              static_cast<U32> (offset), static_cast<U32> (nblocks));
+        }
+
+        void
+        configure_return (void* partition)
+        {
+          SEGGER_SYSVIEW_RecordEndCall (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_BLOCK_DEVICE_PARTITION_CONFIGURE);
+        }
+      } // namespace block_device_partition
+
+      namespace file
+      {
+        void
+        create (void* file, unsigned int t)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_CREATE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (file)),
+              static_cast<U32> (t));
+        }
+
+        void
+        destroy (void* file)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_DESTROY,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (file)));
+        }
+
+        void
+        close (void* file)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_CLOSE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (file)));
+        }
+
+        void
+        close_retval (void* file, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_CLOSE,
+              static_cast<U32> (res));
+        }
+
+        void
+        ftruncate (void* file, off_t length)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FTRUNCATE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (file)),
+              static_cast<U32> (length));
+        }
+
+        void
+        ftruncate_retval (void* file, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FTRUNCATE,
+              static_cast<U32> (res));
+        }
+
+        void
+        fsync (void* file)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FSYNC,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (file)));
+        }
+
+        void
+        fsync_retval (void* file, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FSYNC,
+              static_cast<U32> (res));
+        }
+
+        void
+        fstatvfs (void* file, void* buf)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FSTATVFS,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (file)),
+              reinterpret_cast<U32> (buf));
+        }
+
+        void
+        fstatvfs_retval (void* file, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_FSTATVFS,
+              static_cast<U32> (res));
+        }
+      } // namespace file
+
+    } // namespace posix
 
     // ------------------------------------------------------------------------
 

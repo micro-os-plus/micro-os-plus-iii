@@ -23,6 +23,9 @@
 
 #include <cmsis-plus/diag/trace.h>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cassert>
 #include <cerrno>
 #include <cstdarg>
@@ -65,6 +68,8 @@ namespace os
     io*
     vopen (const char* path, int oflag, std::va_list args)
     {
+      instrumentation::posix::vopen (path, oflag);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(\"%s\")\n", __func__, path ? path : "");
 #endif
@@ -72,18 +77,24 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+
+          instrumentation::posix::vopen_retval (nullptr);
           return nullptr;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+
+          instrumentation::posix::vopen_retval (nullptr);
           return nullptr;
         }
 
       errno = 0;
 
       os::posix::io* io;
+      const char* adjusted_path = path;
+
       while (true)
         {
           // Check if path is a device.
@@ -95,6 +106,8 @@ namespace os
               if (oret < 0)
                 {
                   // Open failed.
+
+                  instrumentation::posix::vopen_retval (nullptr);
                   return nullptr;
                 }
 
@@ -103,7 +116,7 @@ namespace os
             }
 
           // Check if a regular file.
-          auto adjusted_path = path;
+          adjusted_path = path;
           auto* const fs
               = os::posix::file_system::identify_mounted (&adjusted_path);
 
@@ -112,6 +125,7 @@ namespace os
           if (fs == nullptr)
             {
               errno = EBADF;
+              instrumentation::posix::vopen_retval (nullptr);
               return nullptr;
             }
 
@@ -121,6 +135,7 @@ namespace os
           if (io == nullptr)
             {
               // Open failed.
+              instrumentation::posix::vopen_retval (nullptr);
               return nullptr;
             }
 
@@ -133,6 +148,8 @@ namespace os
       trace::printf ("io::%s(\"%s\")=%p fd=%d\n", __func__, path, io,
                      io->file_descriptor ());
 #endif
+
+      instrumentation::posix::vopen_retval (io, adjusted_path);
       return io;
     }
 
@@ -142,6 +159,8 @@ namespace os
         : impl_ (impl), //
           type_ (static_cast<type_t> (t))
     {
+      instrumentation::posix::io::create (this, static_cast<unsigned int> (t));
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s()=%p\n", __func__, this);
 #endif
@@ -151,6 +170,8 @@ namespace os
 
     io::~io ()
     {
+      instrumentation::posix::io::destroy (this);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s() @%p\n", __func__, this);
 #endif
@@ -163,6 +184,8 @@ namespace os
     int
     io::close (void)
     {
+      instrumentation::posix::io::close (this);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s() @%p\n", __func__, this);
 #endif
@@ -170,6 +193,8 @@ namespace os
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::close_retval (this, -1);
           return -1;
         }
 
@@ -182,6 +207,7 @@ namespace os
       file_descriptors_manager::deallocate (file_descriptor_);
       file_descriptor_ = no_file_descriptor;
 
+      instrumentation::posix::io::close_retval (this, ret);
       return ret;
     }
 
@@ -216,6 +242,8 @@ namespace os
     ssize_t
     io::read (void* buf, std::size_t nbyte)
     {
+      instrumentation::posix::io::read (this, buf, nbyte);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %u) @%p\n", __func__, buf, nbyte, this);
 #endif
@@ -223,18 +251,24 @@ namespace os
       if (buf == nullptr)
         {
           errno = EFAULT;
+
+          instrumentation::posix::io::read_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::read_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
+
+          instrumentation::posix::io::read_retval (this, -1);
           return -1;
         }
 
@@ -247,6 +281,7 @@ namespace os
       // the read() function shall return zero and have no other results.
       if (nbyte == 0)
         {
+          instrumentation::posix::io::read_retval (this, 0);
           return 0; // Nothing to do.
         }
 
@@ -261,12 +296,16 @@ namespace os
       trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte,
                      this, ret);
 #endif
+
+      instrumentation::posix::io::read_retval (this, ret);
       return ret;
     }
 
     ssize_t
     io::write (const void* buf, std::size_t nbyte)
     {
+      instrumentation::posix::io::write (this, buf, nbyte);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %u) @%p\n", __func__, buf, nbyte, this);
 #endif
@@ -274,18 +313,24 @@ namespace os
       if (buf == nullptr)
         {
           errno = EFAULT;
+
+          instrumentation::posix::io::write_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::write_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
+
+          instrumentation::posix::io::write_retval (this, -1);
           return -1;
         }
 
@@ -300,6 +345,7 @@ namespace os
       // not a regular file, the results are unspecified.
       if (nbyte == 0)
         {
+          instrumentation::posix::io::write_retval (this, 0);
           return 0; // Nothing to do.
         }
 
@@ -314,12 +360,16 @@ namespace os
       trace::printf ("io::%s(0x0%X, %u) @%p n=%d\n", __func__, buf, nbyte,
                      this, ret);
 #endif
+
+      instrumentation::posix::io::write_retval (this, 0);
       return ret;
     }
 
     ssize_t
     io::writev (const /* struct */ iovec* iov, int iovcnt)
     {
+      instrumentation::posix::io::writev (this, iov, iovcnt);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(0x0%X, %d) @%p\n", __func__, iov, iovcnt, this);
 #endif
@@ -327,24 +377,31 @@ namespace os
       if (iov == nullptr)
         {
           errno = EFAULT;
+
+          instrumentation::posix::io::writev_retval (this, -1);
           return -1;
         }
 
       if (iovcnt <= 0)
         {
           errno = EINVAL;
+
+          instrumentation::posix::io::writev_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::writev_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
+          instrumentation::posix::io::writev_retval (this, -1);
           return -1;
         }
 
@@ -356,6 +413,8 @@ namespace os
         {
           impl ().offset_ += ret;
         }
+
+      instrumentation::posix::io::writev_retval (this, ret);
       return ret;
     }
 
@@ -379,6 +438,8 @@ namespace os
     int
     io::vfcntl (int cmd, std::va_list args)
     {
+      instrumentation::posix::io::vfcntl (this, cmd);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(%d) @%p\n", __func__, cmd, this);
 #endif
@@ -386,35 +447,49 @@ namespace os
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::vfcntl_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
+
+          instrumentation::posix::io::vfcntl_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_vfcntl (cmd, args);
+      int ret = impl ().do_vfcntl (cmd, args);
+
+      instrumentation::posix::io::vfcntl_retval (this, ret);
+      return ret;
     }
 #pragma GCC diagnostic pop
 
     int
     io::isatty (void)
     {
+      instrumentation::posix::io::isatty (this);
+
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_isatty ();
+      int ret = impl ().do_isatty ();
+
+      instrumentation::posix::io::isatty_retval (this, ret);
+      return ret;
     }
 
     // fstat() on a socket returns a zero'd buffer.
     int
     io::fstat (struct stat* buf)
     {
+      instrumentation::posix::io::fstat (this, buf);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(%p) @%p\n", __func__, buf, this);
 #endif
@@ -422,30 +497,41 @@ namespace os
       if (buf == nullptr)
         {
           errno = EFAULT;
+
+          instrumentation::posix::io::fstat_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::fstat_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_connected ())
         {
           errno = EIO; // Not opened.
+
+          instrumentation::posix::io::fstat_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_fstat (buf);
+      int ret = impl ().do_fstat (buf);
+
+      instrumentation::posix::io::fstat_retval (this, ret);
+      return ret;
     }
 
     off_t
     io::lseek (off_t offset, int whence)
     {
+      instrumentation::posix::io::lseek (this, offset, whence);
+
 #if defined(OS_TRACE_POSIX_IO_IO)
       trace::printf ("io::%s(%d, %d) @%p\n", __func__, offset, whence, this);
 #endif
@@ -453,13 +539,18 @@ namespace os
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::io::lseek_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_lseek (offset, whence);
+      int ret = impl ().do_lseek (offset, whence);
+
+      instrumentation::posix::io::lseek_retval (this, ret);
+      return ret;
     }
 
     // ========================================================================

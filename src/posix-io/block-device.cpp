@@ -16,6 +16,9 @@
 #include <cmsis-plus/posix-io/block-device.h>
 #include <cmsis-plus/posix-io/device-registry.h>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cmsis-plus/posix/sys/ioctl.h>
 
 #include <cstring>
@@ -63,6 +66,8 @@ namespace os
     ssize_t
     block_device::read_block (void* buf, blknum_t blknum, std::size_t nblocks)
     {
+      instrumentation::posix::block_device::read_block (this, buf, blknum,
+                                                        nblocks);
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
@@ -71,22 +76,31 @@ namespace os
       if (blknum + nblocks > impl ().num_blocks_)
         {
           errno = EINVAL;
+
+          instrumentation::posix::block_device::read_block_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::block_device::read_block_retval (this, -1);
           return -1;
         }
 
-      return impl ().do_read_block (buf, blknum, nblocks);
+      int ret = impl ().do_read_block (buf, blknum, nblocks);
+
+      instrumentation::posix::block_device::read_block_retval (this, ret);
+      return ret;
     }
 
     ssize_t
     block_device::write_block (const void* buf, blknum_t blknum,
                                std::size_t nblocks)
     {
+      instrumentation::posix::block_device::write_block (this, buf, blknum,
+                                                         nblocks);
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%p, %u, %u) @%p\n", __func__, buf,
                      blknum, nblocks, this);
@@ -95,21 +109,30 @@ namespace os
       if (blknum + nblocks > impl ().num_blocks_)
         {
           errno = EINVAL;
+
+          instrumentation::posix::block_device::write_block_retval (this, -1);
           return -1;
         }
 
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::block_device::write_block_retval (this, -1);
           return -1;
         }
 
-      return impl ().do_write_block (buf, blknum, nblocks);
+      int ret = impl ().do_write_block (buf, blknum, nblocks);
+
+      instrumentation::posix::block_device::write_block_retval (this, ret);
+      return ret;
     }
 
     int
     block_device::vioctl (int request, std::va_list args)
     {
+      instrumentation::posix::block_device::vioctl (this, request);
+
 #if defined(OS_TRACE_POSIX_IO_BLOCK_DEVICE)
       trace::printf ("block_device::%s(%d) @%p\n", __func__, request, this);
 #endif
@@ -117,6 +140,8 @@ namespace os
       if (!impl ().do_is_opened ())
         {
           errno = EBADF; // Not opened.
+
+          instrumentation::posix::block_device::vioctl_retval (this, -1);
           return -1;
         }
 
@@ -131,10 +156,14 @@ namespace os
             if (sz == nullptr || impl ().block_logical_size_bytes_ != 0)
               {
                 errno = EINVAL;
+
+                instrumentation::posix::block_device::vioctl_retval (this, -1);
                 return -1;
               }
 
             *sz = impl ().block_logical_size_bytes_;
+
+            instrumentation::posix::block_device::vioctl_retval (this, 0);
             return 0;
           }
 
@@ -145,10 +174,14 @@ namespace os
             if (sz == nullptr || impl ().block_physical_size_bytes_ != 0)
               {
                 errno = EINVAL;
+
+                instrumentation::posix::block_device::vioctl_retval (this, -1);
                 return -1;
               }
 
             *sz = impl ().block_physical_size_bytes_;
+
+            instrumentation::posix::block_device::vioctl_retval (this, 0);
             return 0;
           }
 
@@ -159,6 +192,8 @@ namespace os
             if (sz == nullptr || impl ().num_blocks_ != 0)
               {
                 errno = EINVAL;
+
+                instrumentation::posix::block_device::vioctl_retval (this, -1);
                 return -1;
               }
 
@@ -171,13 +206,17 @@ namespace os
                 impl ().num_blocks_ * impl ().block_logical_size_bytes_));
 #pragma GCC diagnostic pop
 
+            instrumentation::posix::block_device::vioctl_retval (this, 0);
             return 0;
           }
 
         default:
 
           // Execute the implementation specific code.
-          return impl ().do_vioctl (request, args);
+          int ret = impl ().do_vioctl (request, args);
+
+          instrumentation::posix::block_device::vioctl_retval (this, ret);
+          return ret;
         }
     }
 
