@@ -1093,12 +1093,18 @@
         },
         "actions": {
           "link-deps": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm @xpack-segger/rtt --config {{ configuration.name }}"
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm @xpack-segger/rtt @xpack-segger/system-view --config {{ configuration.name }}"
           ]
         },
         "devDependencies": {
           "@xpack-segger/rtt": {
-            "specifier": "github:xpack-segger/rtt#v8.56.1-1",
+            "specifier": "github:xpack-3rd-party/segger-rtt-xpack#v8.56.1-2",
+            "local": "link",
+            "platforms": "all"
+          },
+          "@xpack-segger/system-view": {
+            "$specifier": "github:xpack-3rd-party/segger-system-view-xpack#v3.60.5-1",
+            "specifier": "github:xpack-3rd-party/segger-system-view-xpack",
             "local": "link",
             "platforms": "all"
           }
