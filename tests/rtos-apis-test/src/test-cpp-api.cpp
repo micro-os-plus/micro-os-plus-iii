@@ -208,7 +208,7 @@ test_cpp_api (void)
     char arena[60];
 
     // The basic object, with explicit separate arena.
-    os::memory::block_pool bp1{ "bp2", 2, sizeof (my_blk_t), arena,
+    os::memory::block_pool bp1{ "bp1", 2, sizeof (my_blk_t), arena,
                                 sizeof (arena) };
 
     void* b1;
@@ -450,6 +450,8 @@ test_cpp_api (void)
     message_queue cq2{ "cq2", 3, sizeof (my_msg_t) };
 
     cq2.send (&msg_out, sizeof (my_msg_t));
+
+    cq2.reset();
   }
 
   // --------------------------------------------------------------------------
@@ -614,6 +616,8 @@ test_cpp_api (void)
 
     blk = static_cast<my_blk_t*> (cp1.timed_alloc (1));
     cp1.free (blk);
+
+    cp1.reset();
 
     memory_pool cp2{ "cp2", 3, sizeof (my_blk_t) };
 
@@ -784,6 +788,7 @@ test_cpp_api (void)
 
     condition_variable cv2{ "cv2" };
     cv2.signal ();
+    cv2.broadcast ();
   }
 
   {
@@ -1044,6 +1049,8 @@ test_cpp_api (void)
 
     sp.post ();
     sp.timed_wait (0xFFFFFFFF);
+
+    sp.reset();
   }
 
   {
@@ -1193,6 +1200,11 @@ test_cpp_api (void)
 
     sysclock.sleep_for (2);
     tm2->stop ();
+  }
+
+  {
+    scheduler::preemptive (false);
+    scheduler::preemptive (true);
   }
 
   // ==========================================================================
