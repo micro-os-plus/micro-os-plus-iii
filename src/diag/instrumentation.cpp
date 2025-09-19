@@ -2268,6 +2268,23 @@ namespace os
         }
       } // namespace file
 
+      void
+      mkdir (const char* path, unsigned int mode)
+      {
+        SEGGER_SYSVIEW_RecordString (OS_INTEGER_INSTRUMENTATION_ID_POSIX_MKDIR,
+                                     path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_MKDIR_MORE,
+            static_cast<U32> (mode));
+      }
+
+      void
+      mkdir_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_MKDIR, static_cast<U32> (res));
+      }
+
     } // namespace posix
 
     // ------------------------------------------------------------------------

@@ -89,207 +89,207 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 28u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 228u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 328u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 29u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TRY_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 229u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 329u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 30u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_TIMED_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 230u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 330u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 31u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_RAISE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 231u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 331u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 32u)
 #define OS_INTEGER_INSTRUMENTATION_ID_THREAD_FLAGS_CLEAR_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 232u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 332u)
 
 // 63
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 33u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 233u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 333u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 34u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 35u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_LOCK_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 235u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 335u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 36u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TRY_LOCK_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 236u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 336u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 37u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_TIMED_LOCK_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 237u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 337u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCK \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 38u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_UNLOCK_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 238u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 338u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_RESET \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 39u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_RESET_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 239u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 339u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 40u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MUTEX_PRIO_CEILING_SET_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 240u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 340u)
 
 // 73
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 41u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 241u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 341u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 42u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_DESTROY_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 242u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 342u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POST \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 43u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_POST_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 243u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 343u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 44u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 244u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 344u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 45u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TRY_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 245u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 345u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 46u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_TIMED_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 246u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 346u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 47u)
 #define OS_INTEGER_INSTRUMENTATION_ID_SEMAPHORE_RESET_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 247u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 347u)
 
 // 80
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 48u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 248u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 348u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 49u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_DESTROY_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 249u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 349u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_SEND \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 50u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_SEND_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 250u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 350u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_SEND \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 51u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_SEND_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 251u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 351u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_SEND \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 52u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_SEND_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 252u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 352u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RECEIVE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 53u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RECEIVE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 253u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 353u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_RECEIVE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 54u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TRY_RECEIVE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 254u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 354u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_RECEIVE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 55u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_TIMED_RECEIVE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 255u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 355u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 56u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_RESET_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 256u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 356u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 57u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 257u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 357u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 58u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_ALLOCATED_DESTROY_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 258u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 358u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_INCLUSIVE_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 59u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MESSAGE_QUEUE_INCLUSIVE_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 259u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 359u)
 
 // 92
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 60u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 260u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 360u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 61u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_DESTROY_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 261u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 361u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOC \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 62u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOC_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 262u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 362u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TRY_ALLOC \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 63u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TRY_ALLOC_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 263u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 363u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TIMED_ALLOC \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 64u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_TIMED_ALLOC_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 264u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 364u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_FREE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 65u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_FREE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 265u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 365u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 66u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_RESET_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 266u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 366u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 67u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE_ALLOCATED_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 267u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 367u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 68u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_ALLOCATED_DESTROY_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 268u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 368u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_INCLUSIVE_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 69u)
 #define OS_INTEGER_INSTRUMENTATION_ID_MEMORY_POOL_CREATE_INCLUSIVE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 269u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 369u)
 
 // 102
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 70u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CREATE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 270u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 370u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_DESTROY \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 71u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_DESTROY_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 271u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 371u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 72u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 272u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 372u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TRY_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 73u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TRY_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 273u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 373u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TIMED_WAIT \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 74u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_TIMED_WAIT_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 274u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 374u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 75u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_RAISE_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 275u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 375u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 76u)
 #define OS_INTEGER_INSTRUMENTATION_ID_EVENT_FLAGS_CLEAR_VALUES \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 276u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 376u)
 
 // 109
 #define OS_INTEGER_INSTRUMENTATION_ID_CLOCK_CREATE \
@@ -335,7 +335,7 @@
 #define OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 94u)
 #define OS_INTEGER_INSTRUMENTATION_ID_POSIX_VOPEN_OFLAGS \
-  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 294u)
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 394u)
 #define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_CREATE \
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 95u)
 #define OS_INTEGER_INSTRUMENTATION_ID_POSIX_IO_DESTROY \
@@ -400,6 +400,103 @@
   (OS_INTEGER_INSTRUMENTATION_ID_BASE + 121u)
 
 // 154
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_MKDIR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 122u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_MKDIR_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 123u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_RMDIR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 124u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_SYNC \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 125u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_CHMOD \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 126u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_CHMOD_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 127u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_STAT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 128u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_STAT_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 129u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_TRUNCATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 130u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_TRUNCATE_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 131u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_RENAME \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 132u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_RENAME_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 133u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_UNLINK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 134u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_UTIME \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 135u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_UTIME_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 136u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_STATVFS \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 137u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_STATVFS_MORE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 138u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_OPENDIR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 139u)
+
+// 172
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CREATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 140u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_DESTROY \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 141u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMKFS \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 142u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMOUNT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 143u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UMOUNT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 144u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VOPEN \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 145u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VOPEN_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 146u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_OPENDIR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 147u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_OPENDIR_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 148u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_MKDIR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 149u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_MKDIR_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 150u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RMDIR \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 151u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RMDIR_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 152u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_SYNC \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 153u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CHMOD \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 154u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CHMOD_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 155u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STAT \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 156u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STAT_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 157u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_TRUNCATE \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 158u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_TRUNCATE_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 159u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 160u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 161u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME_PATH2 \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 162u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UNLINK \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 163u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UNLINK_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 164u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UTIME \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 165u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UTIME_PATH \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 166u)
+#define OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STATVFS \
+  (OS_INTEGER_INSTRUMENTATION_ID_BASE + 167u)
+
+// 200
+
 // ----------------------------------------------------------------------------
 
 #if defined(OS_INCLUDE_INSTRUMENTATION)
@@ -1188,6 +1285,173 @@ namespace os
         void
         fstatvfs_retval (void* file, int res);
       } // namespace file
+
+      void
+      mkdir (const char* path, unsigned int mode);
+
+      void
+      mkdir_retval (int res);
+
+      void
+      rmdir (const char* path);
+
+      void
+      rmdir_retval (int res);
+
+      void
+      sync (void);
+
+      void
+      sync_return ();
+
+      void
+      chmod (const char* path, unsigned int mode);
+
+      void
+      chmod_retval (int res);
+
+      void
+      stat (const char* path, void* buf);
+
+      void
+      stat_retval (int res);
+
+      void
+      truncate (const char* path, int length);
+
+      void
+      truncate_retval (int res);
+
+      void
+      rename (const char* existing, const char* _new);
+
+      void
+      rename_retval (int res);
+
+      void
+      unlink (const char* path);
+
+      void
+      unlink_retval (int res);
+
+      void
+      utime (const char* path, const void* times);
+
+      void
+      utime_retval (int res);
+
+      void
+      statvfs (const char* path, void* buf);
+
+      void
+      statvfs_retval (int res);
+
+      void
+      opendir (const char* dirpath);
+
+      void
+      opendir_retval (void* dirp);
+
+      namespace file_system
+      {
+        void
+        create (void* fs);
+
+        void
+        destroy (void* fs);
+
+        void
+        vmkfs (void* fs, int args);
+
+        void
+        vmkfs_retval (void* fs, int res);
+
+        void
+        vmount (void* fs, const char* path, unsigned int flags);
+
+        void
+        vmount_retval (void* fs, int res);
+
+        void
+        umount (void* fs, unsigned int flags);
+
+        void
+        umount_retval (void* fs, int res);
+
+        void
+        vopen (void* fs, const char* path, int oflags);
+
+        void
+        vopen_retval (void* fs, void* ptr);
+
+        void
+        opendir (void* fs, const char* path);
+
+        void
+        opendir_retval (void* fs, void* dirp);
+
+        void
+        mkdir (void* fs, const char* path, unsigned int mode);
+
+        void
+        mkdir_retval (void* fs, int res);
+
+        void
+        rmdir (void* fs, const char* path);
+
+        void
+        rmdir_retval (void* fs, int res);
+
+        void
+        sync (void* fs);
+
+        void
+        sync_return (void* fs);
+
+        void
+        chmod (void* fs, const char* path, unsigned int mode);
+
+        void
+        chmod_retval (void* fs, int res);
+
+        void
+        stat (void* fs, const char* path, void* buf);
+
+        void
+        stat_retval (void* fs, int res);
+
+        void
+        truncate (void* fs, const char* path, int length);
+
+        void
+        truncate_retval (void* fs, int res);
+
+        void
+        rename (void* fs, const char* existing, const char* _new);
+
+        void
+        rename_retval (void* fs, int res);
+
+        void
+        unlink (void* fs, const char* path);
+
+        void
+        unlink_retval (void* fs, int res);
+
+        void
+        utime (void* fs, const char* path, const void* times);
+
+        void
+        utime_retval (void* fs, int res);
+
+        void
+        statvfs (void* fs, void* buf);
+
+        void
+        statvfs_retval (void* fs, int res);
+
+      } // namespace file_system
+
     } // namespace posix
 
     // ------------------------------------------------------------------------
@@ -2432,6 +2696,280 @@ namespace os
         {
         }
       } // namespace file
+
+      static void inline __attribute__ ((__always_inline__))
+      mkdir (const char* path, unsigned int mode)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      mkdir_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      rmdir (const char* path)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      rmdir_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sync (void)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      sync_return (void)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      chmod (const char* path, unsigned int mode)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      chmod_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      stat (const char* path, void* buf)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      stat_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      truncate (const char* path, int length)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      truncate_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      rename (const char* existing, const char* _new)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      rename_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      unlink (const char* path)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      unlink_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      utime (const char* path, const void* times)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      utime_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      statvfs (const char* path, void* buf)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      statvfs_retval (int res)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      opendir (const char* dirpath)
+      {
+      }
+
+      static void inline __attribute__ ((__always_inline__))
+      opendir_retval (void* dirp)
+      {
+      }
+
+      namespace file_system
+      {
+        static void inline __attribute__ ((__always_inline__))
+        create (void* fs)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        destroy (void* fs)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vmkfs (void* fs, int args)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vmkfs_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vmount (void* fs, const char* path, unsigned int flags)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vmount_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        umount (void* fs, unsigned int flags)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        umount_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vopen (void* fs, const char* path, int oflags)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        vopen_retval (void* fs, void* ptr)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        opendir (void* fs, const char* path)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        opendir_retval (void* fs, void* dirp)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        mkdir (void* fs, const char* path, unsigned int mode)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        mkdir_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        rmdir (void* fs, const char* path)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        rmdir_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        sync (void* fs)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        sync_return (void* fs)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        chmod (void* fs, const char* path, unsigned int mode)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        chmod_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        stat (void* fs, const char* path, void* buf)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        stat_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        truncate (void* fs, const char* path, int length)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        truncate_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        rename (void* fs, const char* existing, const char* _new)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        rename_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        unlink (void* fs, const char* path)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        unlink_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        utime (void* fs, const char* path, const void* times)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        utime_retval (void* fs, int res)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        statvfs (void* fs, void* buf)
+        {
+        }
+
+        static void inline __attribute__ ((__always_inline__))
+        statvfs_retval (void* fs, int res)
+        {
+        }
+
+      } // namespace file_system
 
     } // namespace posix
 

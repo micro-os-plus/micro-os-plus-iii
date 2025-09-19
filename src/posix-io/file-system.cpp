@@ -17,6 +17,9 @@
 #include <cmsis-plus/posix-io/block-device.h>
 #include <cmsis-plus/posix-io/device-registry.h>
 
+#include <cmsis-plus/rtos/os.h>
+#include <cmsis-plus/diag/instrumentation.h>
+
 #include <cerrno>
 #include <cassert>
 #include <cstring>
@@ -61,6 +64,8 @@ namespace os
     int
     mkdir (const char* path, mode_t mode)
     {
+      instrumentation::posix::mkdir (path, mode);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
 #endif
@@ -68,12 +73,14 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::mkdir_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::mkdir_retval (-1);
           return -1;
         }
 
@@ -83,16 +90,22 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::mkdir_retval (-1);
           return -1;
         }
 
       // Execute the implementation specific code.
-      return fs->mkdir (adjusted_path, mode);
+      int ret = fs->mkdir (adjusted_path, mode);
+
+      instrumentation::posix::mkdir_retval (ret);
+      return ret;
     }
 
     int
     rmdir (const char* path)
     {
+      instrumentation::posix::rmdir (path);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")\n", __func__, path);
 #endif
@@ -100,12 +113,14 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::rmdir_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::rmdir_retval (-1);
           return -1;
         }
 
@@ -115,16 +130,22 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::rmdir_retval (-1);
           return -1;
         }
 
       // Execute the implementation specific code.
-      return fs->rmdir (adjusted_path);
+      int ret = fs->rmdir (adjusted_path);
+
+      instrumentation::posix::rmdir_retval (ret);
+      return ret;
     }
 
     void
     sync (void)
     {
+      instrumentation::posix::sync ();
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s()\n", __func__);
 #endif
@@ -145,6 +166,8 @@ namespace os
         {
           file_system::mounted_root__->sync ();
         }
+
+      instrumentation::posix::sync_return ();
     }
 
     // ------------------------------------------------------------------------
@@ -154,6 +177,8 @@ namespace os
     int
     chmod (const char* path, mode_t mode)
     {
+      instrumentation::posix::chmod (path, mode);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %u)\n", __func__, path, mode);
 #endif
@@ -161,12 +186,14 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::chmod_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::chmod_retval (-1);
           return -1;
         }
 
@@ -176,15 +203,21 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::chmod_retval (-1);
           return -1;
         }
 
-      return fs->chmod (adjusted_path, mode);
+      int ret = fs->chmod (adjusted_path, mode);
+
+      instrumentation::posix::chmod_retval (ret);
+      return ret;
     }
 
     int
     stat (const char* path, struct stat* buf)
     {
+      instrumentation::posix::stat (path, buf);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
 #endif
@@ -192,12 +225,14 @@ namespace os
       if ((path == nullptr) || (buf == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::stat_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::stat_retval (-1);
           return -1;
         }
 
@@ -207,15 +242,21 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::stat_retval (-1);
           return -1;
         }
 
-      return fs->stat (adjusted_path, buf);
+      int ret = fs->stat (adjusted_path, buf);
+
+      instrumentation::posix::stat_retval (ret);
+      return ret;
     }
 
     int
     truncate (const char* path, off_t length)
     {
+      instrumentation::posix::truncate (path, length);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %u)\n", __func__, path, length);
 #endif
@@ -223,12 +264,14 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::truncate_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::truncate_retval (-1);
           return -1;
         }
 
@@ -238,21 +281,28 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::truncate_retval (-1);
           return -1;
         }
 
       if (length < 0)
         {
           errno = EINVAL;
+          instrumentation::posix::truncate_retval (-1);
           return -1;
         }
 
-      return fs->truncate (adjusted_path, length);
+      int ret = fs->truncate (adjusted_path, length);
+
+      instrumentation::posix::truncate_retval (ret);
+      return ret;
     }
 
     int
     rename (const char* existing, const char* _new)
     {
+      instrumentation::posix::rename (existing, _new);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\",\"%s\")\n", __func__, existing, _new);
 #endif
@@ -260,12 +310,14 @@ namespace os
       if ((existing == nullptr) || (_new == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::rename_retval (-1);
           return -1;
         }
 
       if ((*existing == '\0') || (*_new == '\0'))
         {
           errno = ENOENT;
+          instrumentation::posix::rename_retval (-1);
           return -1;
         }
 
@@ -277,15 +329,21 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::rename_retval (-1);
           return -1;
         }
 
-      return fs->rename (adjusted_existing, adjusted_new);
+      int ret = fs->rename (adjusted_existing, adjusted_new);
+
+      instrumentation::posix::rename_retval (ret);
+      return ret;
     }
 
     int
     unlink (const char* path)
     {
+      instrumentation::posix::unlink (path);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")\n", __func__, path);
 #endif
@@ -293,12 +351,14 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::unlink_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::unlink_retval (-1);
           return -1;
         }
 
@@ -308,15 +368,21 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::unlink_retval (-1);
           return -1;
         }
 
-      return fs->unlink (adjusted_path);
+      int ret = fs->unlink (adjusted_path);
+
+      instrumentation::posix::unlink_retval (ret);
+      return ret;
     }
 
     int
     utime (const char* path, const /* struct */ utimbuf* times)
     {
+      instrumentation::posix::utime (path, times);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %p)\n", __func__, path, times);
 #endif
@@ -324,12 +390,14 @@ namespace os
       if ((path == nullptr) || (times == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::utime_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::utime_retval (-1);
           return -1;
         }
 
@@ -339,15 +407,21 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::utime_retval (-1);
           return -1;
         }
 
-      return fs->utime (adjusted_path, times);
+      int ret = fs->utime (adjusted_path, times);
+
+      instrumentation::posix::utime_retval (ret);
+      return ret;
     }
 
     int
     statvfs (const char* path, struct statvfs* buf)
     {
+      instrumentation::posix::statvfs (path, buf);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\", %p)\n", __func__, path, buf);
 #endif
@@ -355,12 +429,14 @@ namespace os
       if ((path == nullptr) || (buf == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::statvfs_retval (-1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::statvfs_retval (-1);
           return -1;
         }
 
@@ -370,15 +446,21 @@ namespace os
       if (fs == nullptr)
         {
           errno = ENOENT;
+          instrumentation::posix::statvfs_retval (-1);
           return -1;
         }
 
-      return fs->statvfs (buf);
+      int ret = fs->statvfs (buf);
+
+      instrumentation::posix::statvfs_retval (ret);
+      return ret;
     }
 
     directory*
     opendir (const char* dirpath)
     {
+      instrumentation::posix::opendir (dirpath);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")\n", __func__, dirpath);
 #endif
@@ -386,12 +468,14 @@ namespace os
       if (dirpath == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::opendir_retval (nullptr);
           return nullptr;
         }
 
       if (*dirpath == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::opendir_retval (nullptr);
           return nullptr;
         }
 
@@ -407,6 +491,7 @@ namespace os
           if (io != nullptr)
             {
               // Cannot list devices (for now).
+              instrumentation::posix::opendir_retval (nullptr);
               return nullptr;
             }
 
@@ -420,6 +505,7 @@ namespace os
           if (fs == nullptr)
             {
               errno = EBADF;
+              instrumentation::posix::opendir_retval (nullptr);
               return nullptr;
             }
 
@@ -429,6 +515,7 @@ namespace os
           if (dir == nullptr)
             {
               // Open failed.
+              instrumentation::posix::opendir_retval (nullptr);
               return nullptr;
             }
 
@@ -441,6 +528,8 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("%s(\"%s\")=%p\n", __func__, dirpath, dir);
 #endif
+
+      instrumentation::posix::opendir_retval (dir);
       return dir;
     }
 
@@ -450,6 +539,8 @@ namespace os
         : name_ (name), //
           impl_ (impl)
     {
+      instrumentation::posix::file_system::create (this);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")=%p\n", __func__, name_, this);
 #endif
@@ -459,6 +550,8 @@ namespace os
 
     file_system::~file_system ()
     {
+      instrumentation::posix::file_system::destroy (this);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s() @%p %s\n", __func__, this, name_);
 #endif
@@ -481,6 +574,8 @@ namespace os
     int
     file_system::vmkfs (int options, std::va_list args)
     {
+      instrumentation::posix::file_system::vmkfs (this, options);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(%u) @%p\n", __func__, options, this);
 #endif
@@ -489,6 +584,7 @@ namespace os
         {
           // File system already mounted.
           errno = EBUSY;
+          instrumentation::posix::file_system::vmkfs_retval (this, -1);
           return -1;
         }
 
@@ -497,6 +593,7 @@ namespace os
       int ret;
       ret = impl ().do_vmkfs (options, args);
 
+      instrumentation::posix::file_system::vmkfs_retval (this, ret);
       return ret;
     }
 
@@ -516,6 +613,8 @@ namespace os
     file_system::vmount (const char* path, unsigned int flags,
                          std::va_list args)
     {
+      instrumentation::posix::file_system::vmount (this, path, flags);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u) @%p\n", __func__,
                      path ? path : "nullptr", flags, this);
@@ -525,6 +624,7 @@ namespace os
         {
           // File system already mounted.
           errno = EBUSY;
+          instrumentation::posix::file_system::vmount_retval (this, -1);
           return -1;
         }
 
@@ -544,6 +644,8 @@ namespace os
                   trace::printf ("Path \"%s\" already mounted.", path);
 
                   errno = EBUSY;
+                  instrumentation::posix::file_system::vmount_retval (this,
+                                                                      -1);
                   return -1;
                 }
             }
@@ -563,6 +665,7 @@ namespace os
       int ret = impl ().do_vmount (flags, args);
       if (ret < 0)
         {
+          instrumentation::posix::file_system::vmount_retval (this, -1);
           return -1;
         }
 
@@ -577,6 +680,7 @@ namespace os
           mounted_path_ = path;
         }
 
+      instrumentation::posix::file_system::vmount_retval (this, 0);
       return 0;
     }
 
@@ -586,8 +690,10 @@ namespace os
      * unmounted if other mount points exists.
      */
     int
-    file_system::umount (int unsigned flags)
+    file_system::umount (unsigned int flags)
     {
+      instrumentation::posix::file_system::umount (this, flags);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(%u) @%p\n", __func__, flags, this);
 #endif
@@ -600,6 +706,7 @@ namespace os
           if (!mounted_list__.empty ())
             {
               errno = EBUSY;
+              instrumentation::posix::file_system::umount_retval (this, -1);
               return -1;
             }
 
@@ -609,11 +716,14 @@ namespace os
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::umount_retval (this, -1);
           return -1;
         }
 
       impl ().do_sync ();
       int ret = impl ().do_umount (flags);
+
+      instrumentation::posix::file_system::umount_retval (this, ret);
       return ret;
     }
 
@@ -688,6 +798,8 @@ namespace os
     file*
     file_system::vopen (const char* path, int oflag, std::va_list args)
     {
+      instrumentation::posix::file_system::vopen (this, path, oflag);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, oflag);
 #endif
@@ -695,6 +807,7 @@ namespace os
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::vopen_retval (this, nullptr);
           return nullptr;
         }
 
@@ -706,18 +819,22 @@ namespace os
       file* fil = impl ().do_vopen (*this, path, oflag, args);
       if (fil == nullptr)
         {
+          instrumentation::posix::file_system::vopen_retval (this, nullptr);
           return nullptr;
         }
 
       // If successful, allocate a file descriptor.
       fil->alloc_file_descriptor ();
 
+      instrumentation::posix::file_system::vopen_retval (this, fil);
       return fil;
     }
 
     directory*
     file_system::opendir (const char* dirpath)
     {
+      instrumentation::posix::file_system::opendir (this, dirpath);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, dirpath);
 #endif
@@ -725,6 +842,7 @@ namespace os
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::opendir_retval (this, nullptr);
           return nullptr;
         }
 
@@ -736,9 +854,11 @@ namespace os
       directory* dir = impl ().do_opendir (*this, dirpath);
       if (dir == nullptr)
         {
+          instrumentation::posix::file_system::opendir_retval (this, nullptr);
           return nullptr;
         }
 
+      instrumentation::posix::file_system::opendir_retval (this, dir);
       return dir;
     }
 
@@ -747,6 +867,7 @@ namespace os
     int
     file_system::mkdir (const char* path, mode_t mode)
     {
+      instrumentation::posix::file_system::mkdir (this, path, mode);
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, mode);
 #endif
@@ -754,29 +875,37 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::mkdir_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::mkdir_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::mkdir_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
-      return impl ().do_mkdir (path, mode);
+      int ret = impl ().do_mkdir (path, mode);
+
+      instrumentation::posix::file_system::mkdir_retval (this, ret);
+      return ret;
     }
 
     int
     file_system::rmdir (const char* path)
     {
+      instrumentation::posix::file_system::rmdir (this, path);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, path);
 #endif
@@ -784,29 +913,37 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::rmdir_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::rmdir_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::rmdir_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
-      return impl ().do_rmdir (path);
+      int ret = impl ().do_rmdir (path);
+
+      instrumentation::posix::file_system::rmdir_retval (this, ret);
+      return ret;
     }
 
     void
     file_system::sync (void)
     {
+      instrumentation::posix::file_system::sync (this);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s() @%p\n", __func__, this);
 #endif
@@ -814,12 +951,15 @@ namespace os
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::sync_return (this);
           return;
         }
 
       errno = 0;
 
       impl ().do_sync ();
+
+      instrumentation::posix::file_system::sync_return (this);
     }
 
     // ------------------------------------------------------------------------
@@ -827,6 +967,8 @@ namespace os
     int
     file_system::chmod (const char* path, mode_t mode)
     {
+      instrumentation::posix::file_system::chmod (this, path, mode);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, mode);
 #endif
@@ -834,30 +976,38 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::chmod_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::chmod_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::chmod_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_chmod (path, mode);
+      int ret = impl ().do_chmod (path, mode);
+
+      instrumentation::posix::file_system::chmod_retval (this, ret);
+      return ret;
     }
 
     int
     file_system::stat (const char* path, struct stat* buf)
     {
+      instrumentation::posix::file_system::stat (this, path, buf);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, buf);
 #endif
@@ -865,30 +1015,38 @@ namespace os
       if ((path == nullptr) || (buf == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::stat_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::stat_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::stat_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_stat (path, buf);
+      int ret = impl ().do_stat (path, buf);
+
+      instrumentation::posix::file_system::stat_retval (this, ret);
+      return ret;
     }
 
     int
     file_system::truncate (const char* path, off_t length)
     {
+      instrumentation::posix::file_system::truncate (this, path, length);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %u)\n", __func__, path, length);
 #endif
@@ -896,30 +1054,38 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::truncate_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::truncate_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::truncate_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_truncate (path, length);
+      int ret = impl ().do_truncate (path, length);
+
+      instrumentation::posix::file_system::truncate_retval (this, ret);
+      return ret;
     }
 
     int
     file_system::rename (const char* existing, const char* _new)
     {
+      instrumentation::posix::file_system::rename (this, existing, _new);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\",\"%s\")\n", __func__, existing,
                      _new);
@@ -928,30 +1094,38 @@ namespace os
       if ((existing == nullptr) || (_new == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::rename_retval (this, -1);
           return -1;
         }
 
       if ((*existing == '\0') || (*_new == '\0'))
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::rename_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::rename_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_rename (existing, _new);
+      int ret = impl ().do_rename (existing, _new);
+
+      instrumentation::posix::file_system::rename_retval (this, ret);
+      return ret;
     }
 
     int
     file_system::unlink (const char* path)
     {
+      instrumentation::posix::file_system::unlink (this, path);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\")\n", __func__, path);
 #endif
@@ -959,31 +1133,39 @@ namespace os
       if (path == nullptr)
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::unlink_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::unlink_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::unlink_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       // Execute the implementation specific code.
-      return impl ().do_unlink (path);
+      int ret = impl ().do_unlink (path);
+
+      instrumentation::posix::file_system::unlink_retval (this, ret);
+      return ret;
     }
 
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/utime.html
     int
     file_system::utime (const char* path, const /* struct */ utimbuf* times)
     {
+      instrumentation::posix::file_system::utime (this, path, times);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(\"%s\", %p)\n", __func__, path, times);
 #endif
@@ -991,43 +1173,52 @@ namespace os
       if ((path == nullptr) || (times == nullptr))
         {
           errno = EFAULT;
+          instrumentation::posix::file_system::utime_retval (this, -1);
           return -1;
         }
 
       if (*path == '\0')
         {
           errno = ENOENT;
+          instrumentation::posix::file_system::utime_retval (this, -1);
           return -1;
         }
 
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::utime_retval (this, -1);
           return -1;
         }
 
       errno = 0;
 
       /* struct */ utimbuf tmp;
+      int ret;
       if (times == nullptr)
         {
           // If times is a null pointer, the access and modification times
           // of the file shall be set to the current time.
           tmp.actime = time (nullptr);
           tmp.modtime = tmp.actime;
-          return impl ().do_utime (path, &tmp);
+          ret = impl ().do_utime (path, &tmp);
         }
       else
         {
           // Execute the implementation specific code.
-          return impl ().do_utime (path, times);
+          ret = impl ().do_utime (path, times);
         }
+
+      instrumentation::posix::file_system::utime_retval (this, ret);
+      return ret;
     }
 
     // http://pubs.opengroup.org/onlinepubs/9699919799/functions/fstatvfs.html
     int
     file_system::statvfs (struct statvfs* buf)
     {
+      instrumentation::posix::file_system::statvfs (this, buf);
+
 #if defined(OS_TRACE_POSIX_IO_FILE_SYSTEM)
       trace::printf ("file_system::%s(%p)\n", __func__, buf);
 #endif
@@ -1035,10 +1226,14 @@ namespace os
       if (!device ().is_opened ())
         {
           errno = EBADF; // Not opened.
+          instrumentation::posix::file_system::statvfs_retval (this, -1);
           return -1;
         }
 
-      return impl ().do_statvfs (buf);
+      int ret = impl ().do_statvfs (buf);
+
+      instrumentation::posix::file_system::statvfs_retval (this, ret);
+      return ret;
     }
     // TODO: check if the file system should keep a static current path for
     // relative paths.
