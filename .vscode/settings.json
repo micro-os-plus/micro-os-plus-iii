@@ -296,7 +296,13 @@
         "config.h": "c",
         "cmsis_device.h": "c",
         "stm32f767xx.h": "c",
-        "trace.h": "c"
+        "trace.h": "c",
+        "__locale": "cpp",
+        "locale": "cpp",
+        "cassert": "cpp",
+        "__config": "cpp",
+        "cerrno": "cpp",
+        "ios": "cpp"
     },
     "lldb.displayFormat": "hex",
     "xpack.exclude": [
