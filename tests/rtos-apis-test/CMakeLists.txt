@@ -42,7 +42,7 @@ target_sources(test-rtos-apis-interface INTERFACE
   src/test-cpp-mem.cpp
   src/test-iso-api.cpp
   src/test-posix-io-api.cpp
-  src/SEGGER_SYSVIEW_Config.cpp
+  src/instrumentation-config.cpp
 )
 
 target_compile_definitions(test-rtos-apis-interface INTERFACE
