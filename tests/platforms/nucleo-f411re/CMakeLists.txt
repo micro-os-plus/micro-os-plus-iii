@@ -92,6 +92,73 @@ if(ENABLE_RTOS_APIS_TEST)
     -c "arm semihosting_cmdline rtos-apis-test"
     -c "reset"
   )
+
+  if(ENABLE_INSTRUMENTATION_TEST)
+    add_executable(rtos-apis-instrumentation-test)
+
+    set_target_properties(rtos-apis-instrumentation-test
+
+      PROPERTIES
+      OUTPUT_NAME "rtos-apis-instrumentation-test"
+    )
+
+    target_sources(rtos-apis-instrumentation-test PRIVATE
+    )
+
+    target_compile_definitions(rtos-apis-instrumentation-test PRIVATE
+
+      OS_HAS_SYSTEMCLOCK_CONFIG
+
+      # OS_USE_TRACE_SEGGER_RTT
+      OS_USE_TRACE_SEMIHOSTING_STDOUT
+
+      # OS_USE_TRACE_SEMIHOSTING_STDERR
+      # OS_USE_TRACE_SEMIHOSTING_ITM
+      OS_INCLUDE_INSTRUMENTATION
+
+      # OS_DISABLE_INSTRUMENTATION_AUTOSTART
+    )
+
+    # No other common compile or link options, all were defined in the
+    # libraries and will be inherited.
+    target_link_options(rtos-apis-instrumentation-test PRIVATE
+      -Wl,-Map,platform-bin/rtos-apis-instrumentation-test-map.txt
+
+      # -v
+    )
+
+    xpack_add_cross_custom_commands(rtos-apis-instrumentation-test)
+
+    target_link_libraries(rtos-apis-instrumentation-test PRIVATE
+
+      micro-os-plus::common-options
+
+      # Current test library.
+      test::rtos-apis
+
+      # Tested library.
+      micro-os-plus::iii
+
+      # Portable dependencies.
+      xpacks::chan-fatfs
+
+      # Other dependencies.
+      segger::rtt
+      segger::system-view
+
+      # Platform specific dependencies.
+      micro-os-plus::platform
+    )
+
+    if(COMMAND xpack_display_target_lists)
+      xpack_display_target_lists(rtos-apis-instrumentation-test)
+    endif()
+
+    message(VERBOSE "A> rtos-apis-instrumentation-test")
+
+    # There is no automated test, it requires manual invocation using SEGGER tools.
+  endif()
+
 endif()
 
 # -----------------------------------------------------------------------------
@@ -252,6 +319,8 @@ if(ENABLE_INSTRUMENTATION_TEST)
 
     # Tested library.
     micro-os-plus::iii
+
+    # Other dependencies.
     segger::rtt
     segger::system-view
 
