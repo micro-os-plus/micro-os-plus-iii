@@ -20,6 +20,7 @@
 
 #include <cmsis-plus/posix-io/io.h>
 #include <cmsis-plus/posix-io/device.h>
+#include <cmsis-plus/posix-io/file-system.h>
 
 // ----------------------------------------------------------------------------
 
@@ -2284,6 +2285,476 @@ namespace os
         SEGGER_SYSVIEW_RecordEndCallU32 (
             OS_INTEGER_INSTRUMENTATION_ID_POSIX_MKDIR, static_cast<U32> (res));
       }
+
+      void
+      rmdir (const char* path)
+      {
+        SEGGER_SYSVIEW_RecordString (OS_INTEGER_INSTRUMENTATION_ID_POSIX_RMDIR,
+                                     path);
+      }
+
+      void
+      rmdir_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_RMDIR, static_cast<U32> (res));
+      }
+
+      void
+      sync (void)
+      {
+        SEGGER_SYSVIEW_RecordVoid (OS_INTEGER_INSTRUMENTATION_ID_POSIX_SYNC);
+      }
+
+      void
+      sync_return ()
+      {
+        SEGGER_SYSVIEW_RecordEndCall (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_SYNC);
+      }
+
+      void
+      chmod (const char* path, unsigned int mode)
+      {
+        SEGGER_SYSVIEW_RecordString (OS_INTEGER_INSTRUMENTATION_ID_POSIX_CHMOD,
+                                     path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_CHMOD_MORE,
+            static_cast<U32> (mode));
+      }
+
+      void
+      chmod_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_CHMOD, static_cast<U32> (res));
+      }
+
+      void
+      stat (const char* path, void* buf)
+      {
+        SEGGER_SYSVIEW_RecordString (OS_INTEGER_INSTRUMENTATION_ID_POSIX_STAT,
+                                     path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_STAT_MORE,
+            reinterpret_cast<U32> (buf));
+      }
+
+      void
+      stat_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_STAT, static_cast<U32> (res));
+      }
+
+      void
+      truncate (const char* path, int length)
+      {
+        SEGGER_SYSVIEW_RecordString (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_TRUNCATE, path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_TRUNCATE_MORE,
+            static_cast<U32> (length));
+      }
+
+      void
+      truncate_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_TRUNCATE,
+            static_cast<U32> (res));
+      }
+
+      void
+      rename (const char* existing, const char* _new)
+      {
+        SEGGER_SYSVIEW_RecordString (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_RENAME, existing);
+        SEGGER_SYSVIEW_RecordString (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_RENAME_MORE, _new);
+      }
+
+      void
+      rename_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_RENAME,
+            static_cast<U32> (res));
+      }
+
+      void
+      unlink (const char* path)
+      {
+        SEGGER_SYSVIEW_RecordString (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_UNLINK, path);
+      }
+
+      void
+      unlink_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_UNLINK,
+            static_cast<U32> (res));
+      }
+
+      void
+      utime (const char* path, const void* times)
+      {
+        SEGGER_SYSVIEW_RecordString (OS_INTEGER_INSTRUMENTATION_ID_POSIX_UTIME,
+                                     path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_UTIME_MORE,
+            reinterpret_cast<U32> (times));
+      }
+
+      void
+      utime_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_UTIME, static_cast<U32> (res));
+      }
+
+      void
+      statvfs (const char* path, void* buf)
+      {
+        SEGGER_SYSVIEW_RecordString (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_STATVFS, path);
+        SEGGER_SYSVIEW_RecordU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_STATVFS_MORE,
+            reinterpret_cast<U32> (buf));
+      }
+
+      void
+      statvfs_retval (int res)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_STATVFS,
+            static_cast<U32> (res));
+      }
+
+      void
+      opendir (const char* dirpath)
+      {
+        SEGGER_SYSVIEW_RecordString (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_OPENDIR, dirpath);
+      }
+
+      void
+      opendir_retval (void* dirp)
+      {
+        SEGGER_SYSVIEW_RecordEndCallU32 (
+            OS_INTEGER_INSTRUMENTATION_ID_POSIX_OPENDIR,
+            reinterpret_cast<U32> (dirp));
+      }
+
+      namespace file_system
+      {
+        void
+        create (void* fs)
+        {
+          os::posix::file_system* fsys
+              = reinterpret_cast<os::posix::file_system*> (fs);
+          SEGGER_SYSVIEW_NameResource (reinterpret_cast<U32> (fs),
+                                       fsys->name ());
+
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CREATE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+        }
+
+        void
+        destroy (void* fs)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_DESTROY,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+        }
+
+        void
+        vmkfs (void* fs, int args)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMKFS,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (args));
+        }
+
+        void
+        vmkfs_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMKFS,
+              static_cast<U32> (res));
+        }
+
+        void
+        vmount (void* fs, const char* path, unsigned int flags)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMOUNT,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (flags));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMOUNT_PATH,
+              path);
+        }
+
+        void
+        vmount_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VMOUNT,
+              static_cast<U32> (res));
+        }
+
+        void
+        umount (void* fs, unsigned int flags)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UMOUNT,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (flags));
+        }
+
+        void
+        umount_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UMOUNT,
+              static_cast<U32> (res));
+        }
+
+        void
+        vopen (void* fs, const char* path, int oflags)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VOPEN,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (oflags));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VOPEN_PATH,
+              path);
+        }
+
+        void
+        vopen_retval (void* fs, void* ptr)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_VOPEN,
+              reinterpret_cast<U32> (ptr));
+        }
+
+        void
+        opendir (void* fs, const char* path)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_OPENDIR,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_OPENDIR_PATH,
+              path);
+        }
+
+        void
+        opendir_retval (void* fs, void* dirp)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_OPENDIR,
+              reinterpret_cast<U32> (dirp));
+        }
+
+        void
+        mkdir (void* fs, const char* path, unsigned int mode)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_MKDIR,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (mode));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_MKDIR_PATH,
+              path);
+        }
+
+        void
+        mkdir_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_MKDIR,
+              static_cast<U32> (res));
+        }
+
+        void
+        rmdir (void* fs, const char* path)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RMDIR,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RMDIR_PATH,
+              path);
+        }
+
+        void
+        rmdir_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RMDIR,
+              static_cast<U32> (res));
+        }
+
+        void
+        sync (void* fs)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_SYNC,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+        }
+
+        void
+        sync_return (void* fs)
+        {
+          SEGGER_SYSVIEW_RecordEndCall (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_SYNC);
+        }
+
+        void
+        chmod (void* fs, const char* path, unsigned int mode)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CHMOD,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (mode));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CHMOD_PATH,
+              path);
+        }
+
+        void
+        chmod_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_CHMOD,
+              static_cast<U32> (res));
+        }
+
+        void
+        stat (void* fs, const char* path, void* buf)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STAT,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              reinterpret_cast<U32> (buf));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STAT_PATH, path);
+        }
+
+        void
+        stat_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STAT,
+              static_cast<U32> (res));
+        }
+
+        void
+        truncate (void* fs, const char* path, int length)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_TRUNCATE,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              static_cast<U32> (length));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_TRUNCATE_PATH,
+              path);
+        }
+
+        void
+        truncate_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_TRUNCATE,
+              static_cast<U32> (res));
+        }
+
+        void
+        rename (void* fs, const char* existing, const char* _new)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME_PATH,
+              existing);
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME_PATH2,
+              _new);
+        }
+
+        void
+        rename_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_RENAME,
+              static_cast<U32> (res));
+        }
+
+        void
+        unlink (void* fs, const char* path)
+        {
+          SEGGER_SYSVIEW_RecordU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UNLINK,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UNLINK_PATH,
+              path);
+        }
+
+        void
+        unlink_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UNLINK,
+              static_cast<U32> (res));
+        }
+
+        void
+        utime (void* fs, const char* path, const void* times)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UTIME,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              reinterpret_cast<U32> (times));
+          SEGGER_SYSVIEW_RecordString (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UTIME_PATH,
+              path);
+        }
+
+        void
+        utime_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_UTIME,
+              static_cast<U32> (res));
+        }
+
+        void
+        statvfs (void* fs, void* buf)
+        {
+          SEGGER_SYSVIEW_RecordU32x2 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STATVFS,
+              SEGGER_SYSVIEW_ShrinkId (reinterpret_cast<U32> (fs)),
+              reinterpret_cast<U32> (buf));
+        }
+
+        void
+        statvfs_retval (void* fs, int res)
+        {
+          SEGGER_SYSVIEW_RecordEndCallU32 (
+              OS_INTEGER_INSTRUMENTATION_ID_POSIX_FILE_SYSTEM_STATVFS,
+              static_cast<U32> (res));
+        }
+
+      } // namespace file_system
 
     } // namespace posix
 
