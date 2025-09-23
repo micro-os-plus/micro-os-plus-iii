@@ -112,6 +112,26 @@ namespace os::instrumentation
     }
   } // namespace thread
 
+  namespace memory_resource
+  {
+    static void inline __attribute__ ((__always_inline__))
+    define (os::rtos::memory::memory_resource* heap, void* base,
+            std::size_t heap_size, std::size_t metadata_size)
+    {
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    allocated (os::rtos::memory::memory_resource* heap, void* user_data,
+               std::size_t size)
+    {
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    deallocated (os::rtos::memory::memory_resource* heap, void* user_data)
+    {
+    }
+  } // namespace memory_resource
+
   static void inline __attribute__ ((__always_inline__))
   exit (int exit_code)
   {
@@ -122,7 +142,8 @@ namespace os::instrumentation
 
 // ----------------------------------------------------------------------------
 
-#if !defined(OS_INCLUDE_INSTRUMENTATION)
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_SCHEDULER)
 
 namespace os::instrumentation
 {
@@ -150,7 +171,13 @@ namespace os::instrumentation
   } // namespace scheduler
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_SCHEDULER)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_THREAD)
 
 namespace os::instrumentation
 {
@@ -331,32 +358,13 @@ namespace os::instrumentation
   } // namespace thread
 } // namespace os::instrumentation
 
-// ----------------------------------------------------------------------------
-
-namespace os::instrumentation
-{
-  namespace memory_resource
-  {
-    static void inline __attribute__ ((__always_inline__))
-    define (os::rtos::memory::memory_resource* heap, void* base,
-            std::size_t heap_size, std::size_t metadata_size)
-    {
-    }
-
-    static void inline __attribute__ ((__always_inline__))
-    allocated (os::rtos::memory::memory_resource* heap, void* user_data,
-               std::size_t size)
-    {
-    }
-
-    static void inline __attribute__ ((__always_inline__))
-    deallocated (os::rtos::memory::memory_resource* heap, void* user_data)
-    {
-    }
-  } // namespace memory_resource
-} // namespace os::instrumentation
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_THREAD)
 
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_MUTEX)
 
 namespace os::instrumentation
 {
@@ -444,7 +452,13 @@ namespace os::instrumentation
   } // namespace mutex
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_MUTEX)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_SEMAPHORE)
 
 namespace os::instrumentation
 {
@@ -522,7 +536,13 @@ namespace os::instrumentation
   } // namespace semaphore
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_SEMAPHORE)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_MESSAGE_QUEUE)
 
 namespace os::instrumentation
 {
@@ -665,7 +685,13 @@ namespace os::instrumentation
   } // namespace message_queue_inclusive
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_MESSAGE_QUEUE)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_MEMORY_POOL)
 
 namespace os::instrumentation
 {
@@ -782,7 +808,13 @@ namespace os::instrumentation
   } // namespace memory_pool_inclusive
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_MEMORY_POOL)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_EVENT_FLAGS)
 
 namespace os::instrumentation
 {
@@ -862,7 +894,13 @@ namespace os::instrumentation
   } // namespace event_flags
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_EVENT_FLAGS)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_CLOCK)
 
 namespace os::instrumentation
 {
@@ -923,7 +961,13 @@ namespace os::instrumentation
   } // namespace adjustable_clock
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_CLOCK)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_CONDITION_VARIABLE)
 
 namespace os::instrumentation
 {
@@ -993,7 +1037,13 @@ namespace os::instrumentation
   } // namespace condition_variable
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_CONDITION_VARIABLE)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_TIMER)
 
 namespace os::instrumentation
 {
@@ -1051,7 +1101,13 @@ namespace os::instrumentation
   } // namespace timer
 } // namespace os::instrumentation
 
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_TIMER)
+
 // ----------------------------------------------------------------------------
+
+#if !defined(OS_INCLUDE_INSTRUMENTATION) \
+    || !defined(OS_INCLUDE_INSTRUMENTATION_POSIX_IO)
 
 namespace os::instrumentation
 {
@@ -1592,7 +1648,8 @@ namespace os::instrumentation
 
 // ----------------------------------------------------------------------------
 
-#endif // !defined(OS_INCLUDE_INSTRUMENTATION)
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
+       // !defined(OS_INCLUDE_INSTRUMENTATION_POSIX_IO)
 
 #endif // defined(__cplusplus)
 
