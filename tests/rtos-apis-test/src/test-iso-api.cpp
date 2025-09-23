@@ -486,6 +486,8 @@ test_iso_api (bool extra)
   estd::this_thread::sleep_for<estd::chrono::systick_clock> (4_ticks);
   estd::this_thread::sleep_for<estd::chrono::systick_clock> (4ms);
 
+#if !defined(OS_INCLUDE_INSTRUMENTATION)
+
 #if defined(OS_INCLUDE_RTC_TEST)
   printf ("sleep_for<chrono::realtime_clock> (1s)\n");
   estd::this_thread::sleep_for<estd::chrono::realtime_clock> (1s);
@@ -543,6 +545,7 @@ test_iso_api (bool extra)
                                       + 1min);
 #endif // defined(OS_INCLUDE_RTC_TEST)
     }
+#endif // !defined(OS_INCLUDE_INSTRUMENTATION)
 
 #pragma GCC diagnostic pop
 
