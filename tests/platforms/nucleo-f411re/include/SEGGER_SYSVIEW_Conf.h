@@ -9,14 +9,22 @@
  * be obtained from https://opensource.org/licenses/mit.
  */
 
-#ifndef SEGGER_RTT_CONF_H
-#define SEGGER_RTT_CONF_H
+#ifndef SEGGER_SYSVIEW_CONF_H
+#define SEGGER_SYSVIEW_CONF_H
 
 // ----------------------------------------------------------------------------
 
-// Match the µOS++ setting.
-#define SEGGER_RTT_MAX_INTERRUPT_PRIORITY (0x40)
+// The OS name must be a simple name, since it may be part of a file name.
+
+#define SEGGER_SYSVIEW_APP_NAME "Test Application"
+#define SEGGER_SYSVIEW_OS_NAME "micro-os-plus-iii"
+#define SEGGER_SYSVIEW_DEVICE_NAME "STM32F411RE"
+#define SEGGER_SYSVIEW_CORE_NAME "Cortex-M4"
+
+// In case there are extremely many events and the buffer overflows,
+// increase the buffer size (must be a power of 2).
+#define SEGGER_SYSVIEW_RTT_BUFFER_SIZE (1024 * 2)
 
 // ----------------------------------------------------------------------------
 
-#endif // SEGGER_RTT_CONF_H
+#endif // SEGGER_SYSVIEW_CONF_H
