@@ -60,6 +60,8 @@ namespace os
        */
       bool is_started_ = false;
 
+      bool is_reschedule_pending = false;
+
 #if 0
       /**
        * @details

@@ -51,6 +51,8 @@ namespace os
        */
       extern bool is_started_;
 
+      extern bool is_reschedule_pending;
+
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
       extern bool is_preemptive_;
       extern thread* volatile current_thread_;

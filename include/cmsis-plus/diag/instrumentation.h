@@ -71,14 +71,6 @@ namespace os::instrumentation
     }
   } // namespace interrupt
 
-  namespace scheduler
-  {
-    static void inline __attribute__ ((__always_inline__))
-    reschedule (void)
-    {
-    }
-  } // namespace scheduler
-
   namespace thread
   {
     static void inline __attribute__ ((__always_inline__))
@@ -166,6 +158,11 @@ namespace os::instrumentation
 
     static void inline __attribute__ ((__always_inline__))
     preemptive_set (bool state)
+    {
+    }
+
+    static void inline __attribute__ ((__always_inline__))
+    reschedule (void)
     {
     }
   } // namespace scheduler
