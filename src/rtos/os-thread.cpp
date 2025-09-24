@@ -1808,11 +1808,12 @@ namespace os
 
 #else
 
-        if (os::rtos::scheduler::ready_threads_list_.head ()
-            != os::rtos::scheduler::ready_threads_list_.tail ())
-          {
-            port::scheduler::reschedule ();
-          }
+        // TODO: further investigate why this fails on the native port.
+        // if (os::rtos::scheduler::ready_threads_list_.head ()
+        //     != os::rtos::scheduler::ready_threads_list_.tail ())
+        {
+          port::scheduler::reschedule ();
+        }
 
 #endif
 

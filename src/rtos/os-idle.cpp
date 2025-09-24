@@ -175,6 +175,7 @@ os_idle (thread::func_args_t args __attribute__ ((unused)))
     {
       os_rtos_idle_actions ();
 
+#if defined(OS_INCLUDE_INSTRUMENTATION)
       // If during sleep there were threads that were resumed,
       // the ready list may contain more than one entry.
       // Probably too conservative, normally awakened threads were
@@ -186,6 +187,9 @@ os_idle (thread::func_args_t args __attribute__ ((unused)))
         {
           this_thread::yield ();
         }
+#else
+      this_thread::yield ();
+#endif
     }
 }
 
