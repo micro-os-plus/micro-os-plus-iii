@@ -75,7 +75,7 @@ This source code library can be installed as a sub-folder below `xpacks` with:
 cd my-project
 xpm init # Add a package.json if not already present
 
-xpm install github:micro-os-plus/micro-os-plus-iii#v7.0.1 --save-dev --copy
+xpm install github:micro-os-plus/micro-os-plus-iii#v7.1.0 --save-dev --copy
 
 ls -l xpacks/@micro-os-plus/micro-os-plus-iii
 ```

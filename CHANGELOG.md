@@ -6,9 +6,155 @@ Please check
 [GitHub](https://github.com/micro-os-plus/micro-os-plus-iii-/issues)
 and close existing issues and pull requests.
 
+## 2025-09-24
+
+* v7.1.0 prepared
+* d1f6e815 package.json bump deps
+* 2a509c8a test instrumentation without more enables
+* 1d0d0877 revert empty list optimisation, it fails on native
+* 2ef1fd7a make compile natively
+* c6248578 Revert "#93: optimise reschedule()"
+* 0741834e #93: optimise reschedule()
+* ecd7b0c2 rename OS_ENABLE_INSTRUMENTATION_*
+* c922a715 test-iso-api.cpp skip clock tests when instrumented
+* e9b6b63e define is_reschedule_pending
+
+## 2025-09-23
+
+* 2bfd5b77 instrumentation.h: more granular includes
+* 1a062fd1 split instrumentation.h into namespaces
+* 912cde40 move SEGGER_*_Conf to platform 411
+* aa98c6d1 instrumentation split code with segger/system-view
+* 86cb3542 implement last file_system functions
+
+## 2025-09-19
+
+* f85c6aab .vscode/settings.json updates
+* 6eeab4f0 package.json updates
+* a0d96957 platform 411 add ozone launcher
+* 35388f90 platform 411 update CMakeLists.txt
+* daafb3e0 rename instrumentation-config.cpp
+* 69748b5a test-cpp-api.cpp add some more calls
+* af2f414b add partial file_system instrumentation
+
+## 2025-09-18
+
+* d8a00fa0 add block-device & file  instrumentation
+* a9dbae5e this_thread::suspend moved to non inline
+* fee1bf2e instrument yield and suspend
+
+## 2025-09-17
+
+* 94be212a instrumentation renumber events
+* 1d1b7f50 instrumentation fix exit_isr_to_scheduler logic
+* 7d5ca16b *THREAD_INTERNAL_EXIT
+* 720f88e9 add this_thread::flags_clear instrumentation
+* 15a2d535 move this_thread::flags_clear to non inline
+* 0433f0b3 add thread::internal_exit_ instrumentation
+* f816d807 add semaphore::reset instrumentation
+* 1b24cb87 add mutex::prio_ceiling_set instrumentation
+* adbbbca7 add mutex::reset() instrumentation
+* 214ae2d9 add scheduler::preemptive() set instrumentation
+* f7ffe480 add scheduler instrumentation
+
+## 2025-09-16
+
+* 146d41f4 move initial instrumentation to non inline
+* 48266ec0 add more thread instrumentation
+* c903acce add timer instrumentation
+* b8ae56b8 make scheduler lock/unlock to non inline
+* 7e43e0cb add condition_variable instrumentation
+* f55341da event_flags::clear() instrumented
+* 07fe4119 thread::flags_clear() not inlined and instrumented
+
+## 2025-09-15
+
+* 01d3da41 add instrumentation to mqueue & mempool templates
+
+## 2025-09-14
+
+* 11b59024 add instrumentation to rtos-api-test
+* 6f25ad98 instrumentation-test updates
+* 89b590f0 add clocks instrumentation
+* 32920e59 os-clocks.cpp: update clock names
+* 2e9eaea4 clock::clock() non inline
+
+## 2025-09-13
+
+* 5b2151fb instrumentation more explicit macro names
+* f4be6ede add thread flags instrumentation
+* 95754397 instrumentation.h base values with 200
+* 86014800 os-evflags.cpp instrumentation code reorder
+* f802b11a #92: add thread::flags_get()
+* 128c3536 separate SEGGER_SYSVIEW_RecordEndCall
+* 6eaa1fb4 #91: allow anonymous objects
+
+## 2025-09-12
+
+* 8d4102e0 top CMakeLists.txt: add instrumentation.cpp
+* 87cd6341 trace-segger-rtt.cpp: use SEGGER_RTT_HasData()
+* 5ea8464c initialise-free-store.cpp fix messages
+* faa8e428 exception_handlers.c add __disable_irq() in Reset_Handler
+* 2cbd20a0 add event_flags instrumentation
+* b6cfdad3 os-memory.h: cosmetise message
+* 169105c1 add instrumentation.jdebug
+* e8f5dd22 f411 cmake add instrumentation-test
+* 4a6360b3 f411 cleanups
+* cd2d12e9 f411 initialize-hardware with MX_GPIO_Init()
+* 60ccf55d f411 dependencies update with instrumentation * system-view
+* 2c8f836a f411re cubemx with main
+* 198d67b7 blink-test verbose ticks & cycles
+* 65faf635 extract instrumentation-test
+
+## 2025-09-11
+
+* 543da228 instrumentation rename memory_resource
+* a7c024ff instrumentation add timeout to mutex timed_locked
+* 440a982f make heaps & pools names more verbose
+
+## 2025-09-10
+
+* 50414365 add memory_pool instrumentation
+* a570a40b instrumentation semaphore updates
+* 696f1052 instrumentation message_queue update
+* 2058983c instrumentation mutex update
+* b086a47e instrumentation semaphore updates
+* 8b861cdb instrumentation.h rename OS_INTEGER_INSTRUMENTATION_ID_BASE
+* 90080439 add mquueue instrumentation
+
+## 2025-09-09
+
+* b82a7273 add semaphore instrumentation
+* fb09da34 move mutex instrumentation for destroyed to .cpp
+* adfb1762 instrumentation.cpp cleanups in exit()
+* 97aa5e68 add mutex instrumentation
+* bfdaa10e trace-segger-rtt.cpp use SEGGER_RTT_Write()
+* 697e7f0f #90: __disable_irq () on exit
+* 017e4745 #89: call SystemClock_Config() during early inits
+* c1a20d60 add heap instrumentation
+* 512f9b77 add thread instrumentation
+
+## 2025-09-08
+
+* cff15c27 add interrupt instrumentation
+* c77b6c46 os-idle.cpp: optimise call to yield()
+* 354464c5 os-idle.cpp OS_DISABLE_WAIT_FOR_INTERRUPT
+* e734e5a4 add basic instrumentation
+* 64fafbba add cause to suspends
+
+## 2025-09-05
+
+* 98b17a55 #88: optimise yield() to avoid unnecessary reschedule
+
+## 2025-09-04
+
+* bbfd0230 f411re cubemx update
+
+
 ## 2025-08-24 - 7.0.1
 
-* v7.0.1 prepared
+* 3026e1f2 7.0.1
+* 472377fa CHANGELOG update
 * 72ae5a4 package.json updates
 * 2cd5b53 package.json add git-log
 * baa451c tests/mutex compute sigma
