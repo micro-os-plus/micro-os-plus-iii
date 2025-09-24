@@ -1103,7 +1103,7 @@
             "platforms": "all"
           },
           "@xpack-segger/system-view": {
-            "specifier": "github:xpack-3rd-party/segger-system-view-xpack#v3.60.5-1",
+            "specifier": "github:xpack-3rd-party/segger-system-view-xpack#v3.60.5-2",
             "local": "link",
             "platforms": "all"
           }
