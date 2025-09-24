@@ -1,6 +1,6 @@
 {
   "name": "@micro-os-plus/micro-os-plus-iii",
-  "version": "7.1.0-pre",
+  "version": "7.1.0",
   "description": "A source code library with the portable part of µOS++ IIIe",
   "main": "",
   "scripts": {
