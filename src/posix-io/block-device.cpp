@@ -89,7 +89,7 @@ namespace os
           return -1;
         }
 
-      int ret = impl ().do_read_block (buf, blknum, nblocks);
+      ssize_t ret = impl ().do_read_block (buf, blknum, nblocks);
 
       instrumentation::posix::block_device::read_block_retval (this, ret);
       return ret;
@@ -122,7 +122,7 @@ namespace os
           return -1;
         }
 
-      int ret = impl ().do_write_block (buf, blknum, nblocks);
+      ssize_t ret = impl ().do_write_block (buf, blknum, nblocks);
 
       instrumentation::posix::block_device::write_block_retval (this, ret);
       return ret;

@@ -343,7 +343,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::event_flags::wait_retval (this, ENOTRECOVERABLE);
+      // instrumentation::event_flags::wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -564,7 +564,8 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::event_flags::timed_wait_retval (this, ENOTRECOVERABLE);
+      // instrumentation::event_flags::timed_wait_retval (this,
+      // ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif

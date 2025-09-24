@@ -1493,7 +1493,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::thread::flags_wait_retval (this, ENOTRECOVERABLE);
+      // instrumentation::thread::flags_wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 
@@ -1660,7 +1660,9 @@ namespace os
             }
         }
 
-      instrumentation::thread::flags_timed_wait_retval (this, ENOTRECOVERABLE);
+      /* NOTREACHED */
+      // instrumentation::thread::flags_timed_wait_retval (this,
+      // ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 

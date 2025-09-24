@@ -547,7 +547,7 @@ namespace os
       errno = 0;
 
       // Execute the implementation specific code.
-      int ret = impl ().do_lseek (offset, whence);
+      off_t ret = impl ().do_lseek (offset, whence);
 
       instrumentation::posix::io::lseek_retval (this, ret);
       return ret;

@@ -9,9 +9,9 @@
  * be obtained from https://opensource.org/licenses/mit.
  */
 
-#include <cmsis_device.h>
-
 #if defined(OS_INCLUDE_INSTRUMENTATION)
+
+#include <cmsis_device.h>
 
 #include "SEGGER_SYSVIEW.h"
 

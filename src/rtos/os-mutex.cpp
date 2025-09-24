@@ -1107,7 +1107,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::mutex::lock_retval (this, ENOTRECOVERABLE);
+      // instrumentation::mutex::lock_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1391,7 +1391,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::mutex::timed_lock_retval (this, ENOTRECOVERABLE);
+      // instrumentation::mutex::timed_lock_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif

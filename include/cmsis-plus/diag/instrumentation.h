@@ -34,6 +34,16 @@
 
 #endif // defined(OS_INCLUDE_INSTRUMENTATION)
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma clang diagnostic ignored "-Wpre-c++17-compat"
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
 #if defined(__cplusplus)
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION)
@@ -1419,7 +1429,7 @@ namespace os::instrumentation
     }
 
     static void inline __attribute__ ((__always_inline__))
-    truncate (const char* path, int length)
+    truncate (const char* path, off_t length)
     {
     }
 
@@ -1591,7 +1601,7 @@ namespace os::instrumentation
       }
 
       static void inline __attribute__ ((__always_inline__))
-      truncate (void* fs, const char* path, int length)
+      truncate (void* fs, const char* path, off_t length)
       {
       }
 
@@ -1691,6 +1701,8 @@ extern "C"
 #endif
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION)
+
+#pragma GCC diagnostic pop
 
 // ----------------------------------------------------------------------------
 

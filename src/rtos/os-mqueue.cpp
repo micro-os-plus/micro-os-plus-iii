@@ -1018,7 +1018,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::send_retval (this, ENOTRECOVERABLE);
+      // instrumentation::message_queue::send_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1265,8 +1265,8 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::timed_send_retval (this,
-                                                         ENOTRECOVERABLE);
+      // instrumentation::message_queue::timed_send_retval (this,
+      // ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1396,7 +1396,8 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::receive_retval (this, ENOTRECOVERABLE);
+      // instrumentation::message_queue::receive_retval (this,
+      // ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -1657,8 +1658,8 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::message_queue::timed_receive_retval (this,
-                                                            ENOTRECOVERABLE);
+      // instrumentation::message_queue::timed_receive_retval (this,
+      // ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif

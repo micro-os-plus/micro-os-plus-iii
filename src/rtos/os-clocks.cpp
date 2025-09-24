@@ -238,7 +238,8 @@ namespace os
             }
         }
 
-      instrumentation::clock::sleep_for_retval (this, ENOTRECOVERABLE);
+      /* NOTREACHED */
+      // instrumentation::clock::sleep_for_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 
@@ -284,7 +285,8 @@ namespace os
             }
         }
 
-      instrumentation::clock::sleep_until_retval (this, ENOTRECOVERABLE);
+      /* NOTREACHED */
+      // instrumentation::clock::sleep_until_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 
@@ -521,8 +523,9 @@ namespace os
             }
         }
 
-      instrumentation::adjustable_clock::sleep_until_retval (this,
-                                                             ENOTRECOVERABLE);
+      /* NOTREACHED */
+      // instrumentation::adjustable_clock::sleep_until_retval (this,
+      // ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
     }
 

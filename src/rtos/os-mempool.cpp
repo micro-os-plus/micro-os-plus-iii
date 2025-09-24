@@ -598,10 +598,6 @@ namespace os
               return nullptr;
             }
         }
-
-      /* NOTREACHED */
-      instrumentation::memory_pool::alloc_retval (this, nullptr);
-      return nullptr;
     }
 
     /**
@@ -798,10 +794,6 @@ namespace os
               return nullptr;
             }
         }
-
-      /* NOTREACHED */
-      instrumentation::memory_pool::timed_alloc_retval (this, nullptr);
-      return nullptr;
     }
 
     /**

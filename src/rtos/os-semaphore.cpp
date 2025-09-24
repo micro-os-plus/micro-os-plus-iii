@@ -516,7 +516,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::semaphore::wait_retval (this, ENOTRECOVERABLE);
+      // instrumentation::semaphore::wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
@@ -751,7 +751,7 @@ namespace os
         }
 
       /* NOTREACHED */
-      instrumentation::semaphore::timed_wait_retval (this, ENOTRECOVERABLE);
+      // instrumentation::semaphore::timed_wait_retval (this, ENOTRECOVERABLE);
       return ENOTRECOVERABLE;
 
 #endif
