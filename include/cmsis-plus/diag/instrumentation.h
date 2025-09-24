@@ -135,7 +135,7 @@ namespace os::instrumentation
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_SCHEDULER)
+    || !defined(OS_ENABLE_INSTRUMENTATION_SCHEDULER)
 
 namespace os::instrumentation
 {
@@ -169,12 +169,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_SCHEDULER)
+       // !defined(OS_ENABLE_INSTRUMENTATION_SCHEDULER)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_THREAD)
+    || !defined(OS_ENABLE_INSTRUMENTATION_THREAD)
 
 namespace os::instrumentation
 {
@@ -356,12 +356,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_THREAD)
+       // !defined(OS_ENABLE_INSTRUMENTATION_THREAD)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_MUTEX)
+    || !defined(OS_ENABLE_INSTRUMENTATION_MUTEX)
 
 namespace os::instrumentation
 {
@@ -450,12 +450,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_MUTEX)
+       // !defined(OS_ENABLE_INSTRUMENTATION_MUTEX)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_SEMAPHORE)
+    || !defined(OS_ENABLE_INSTRUMENTATION_SEMAPHORE)
 
 namespace os::instrumentation
 {
@@ -534,12 +534,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_SEMAPHORE)
+       // !defined(OS_ENABLE_INSTRUMENTATION_SEMAPHORE)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_MESSAGE_QUEUE)
+    || !defined(OS_ENABLE_INSTRUMENTATION_MESSAGE_QUEUE)
 
 namespace os::instrumentation
 {
@@ -683,12 +683,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_MESSAGE_QUEUE)
+       // !defined(OS_ENABLE_INSTRUMENTATION_MESSAGE_QUEUE)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_MEMORY_POOL)
+    || !defined(OS_ENABLE_INSTRUMENTATION_MEMORY_POOL)
 
 namespace os::instrumentation
 {
@@ -806,12 +806,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_MEMORY_POOL)
+       // !defined(OS_ENABLE_INSTRUMENTATION_MEMORY_POOL)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_EVENT_FLAGS)
+    || !defined(OS_ENABLE_INSTRUMENTATION_EVENT_FLAGS)
 
 namespace os::instrumentation
 {
@@ -892,12 +892,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_EVENT_FLAGS)
+       // !defined(OS_ENABLE_INSTRUMENTATION_EVENT_FLAGS)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_CLOCK)
+    || !defined(OS_ENABLE_INSTRUMENTATION_CLOCK)
 
 namespace os::instrumentation
 {
@@ -959,12 +959,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_CLOCK)
+       // !defined(OS_ENABLE_INSTRUMENTATION_CLOCK)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_CONDITION_VARIABLE)
+    || !defined(OS_ENABLE_INSTRUMENTATION_CONDITION_VARIABLE)
 
 namespace os::instrumentation
 {
@@ -1035,12 +1035,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_CONDITION_VARIABLE)
+       // !defined(OS_ENABLE_INSTRUMENTATION_CONDITION_VARIABLE)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_TIMER)
+    || !defined(OS_ENABLE_INSTRUMENTATION_TIMER)
 
 namespace os::instrumentation
 {
@@ -1099,12 +1099,12 @@ namespace os::instrumentation
 } // namespace os::instrumentation
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_TIMER)
+       // !defined(OS_ENABLE_INSTRUMENTATION_TIMER)
 
 // ----------------------------------------------------------------------------
 
 #if !defined(OS_INCLUDE_INSTRUMENTATION) \
-    || !defined(OS_INCLUDE_INSTRUMENTATION_POSIX_IO)
+    || !defined(OS_ENABLE_INSTRUMENTATION_POSIX_IO)
 
 namespace os::instrumentation
 {
@@ -1646,7 +1646,7 @@ namespace os::instrumentation
 // ----------------------------------------------------------------------------
 
 #endif // !defined(OS_INCLUDE_INSTRUMENTATION) ||
-       // !defined(OS_INCLUDE_INSTRUMENTATION_POSIX_IO)
+       // !defined(OS_ENABLE_INSTRUMENTATION_POSIX_IO)
 
 #endif // defined(__cplusplus)
 
