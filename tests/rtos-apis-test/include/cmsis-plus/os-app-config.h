@@ -131,7 +131,7 @@
 
 // ----------------------------------------------------------------------------
 
-#define OS_ENABLE_INSTRUMENTATION_SCHEDULER
+// #define OS_ENABLE_INSTRUMENTATION_SCHEDULER
 // #define OS_ENABLE_INSTRUMENTATION_THREAD
 // #define OS_ENABLE_INSTRUMENTATION_MUTEX
 // #define OS_ENABLE_INSTRUMENTATION_SEMAPHORE
