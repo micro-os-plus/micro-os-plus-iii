@@ -3,7 +3,7 @@
 Releases in reverse chronological order.
 
 Please check
-[GitHub](https://github.com/micro-os-plus/micro-os-plus-iii-/issues)
+[GitHub](https://github.com/micro-os-plus/micro-os-plus-iii/issues)
 and close existing issues and pull requests.
 
 ## 2025-09-24
