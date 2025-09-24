@@ -82,7 +82,10 @@ os_systick_handler (void)
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
-  port::scheduler::reschedule ();
+  if (scheduler::is_reschedule_pending)
+    {
+      port::scheduler::reschedule ();
+    }
 
 #endif /* !defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
