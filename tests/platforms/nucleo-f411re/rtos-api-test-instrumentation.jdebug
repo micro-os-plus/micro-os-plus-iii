@@ -31,7 +31,7 @@ void OnProjectLoad (void) {
   //
   // User settings
   //
-  Edit.SysVar (VAR_BREAK_AT_THIS_SYMBOL, "os_main");
+  Edit.SysVar (VAR_BREAK_AT_THIS_SYMBOL, "_start");
   File.Open ("../../build/nucleo-f411re-cmake-debug/platform-bin/rtos-apis-instrumentation-test.elf");
 
 }
