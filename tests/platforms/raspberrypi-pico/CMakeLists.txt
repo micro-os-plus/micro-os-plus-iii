@@ -20,7 +20,8 @@ message(VERBOSE "Processing 'tests/platforms/raspberrypi-pico'...")
 
 # https://github.com/raspberrypi/pico-sdk-tools/releases
 # Download, unpack and rename the executable to avoid conflicts.
-set(pico_openocd "pico-openocd")
+set(pico_openocd "openocd")
+# set(pico_openocd "pico-openocd")
 
 # -----------------------------------------------------------------------------
 
@@ -83,17 +84,17 @@ if(ENABLE_RTOS_APIS_TEST)
   add_test(
     NAME "rtos-apis-test"
 
-    COMMAND $(pico_openocd)${extension}
+    COMMAND ${pico_openocd}${extension}
     -c "gdb port disabled"
     -c "tcl port disabled"
     -c "telnet port disabled"
     -f interface/cmsis-dap.cfg
-    -c "adapter speed 5000"
     -f target/rp2040.cfg
+    -c "adapter speed 5000"
     -c "program rtos-apis-test.elf verify"
     -c "arm semihosting enable"
     -c "arm semihosting_cmdline rtos-apis-test"
-    -c "reset"
+    -c "reset run"
   )
 endif()
 
@@ -120,17 +121,17 @@ if(ENABLE_MUTEX_STRESS_TEST)
   add_test(
     NAME "mutex-stress-test"
 
-    COMMAND $(pico_openocd)${extension}
+    COMMAND ${pico_openocd}${extension}
     -c "gdb port disabled"
     -c "tcl port disabled"
     -c "telnet port disabled"
     -f interface/cmsis-dap.cfg
-    -c "adapter speed 5000"
     -f target/rp2040.cfg
+    -c "adapter speed 5000"
     -c "program mutex-stress-test.elf verify"
     -c "arm semihosting enable"
     -c "arm semihosting_cmdline mutex-stress-test"
-    -c "reset"
+    -c "reset run"
   )
 endif()
 
@@ -160,17 +161,17 @@ if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
   add_test(
     NAME "cmsis-os-validator-test"
 
-    COMMAND $(pico_openocd)${extension}
+    COMMAND ${pico_openocd}${extension}
     -c "gdb port disabled"
     -c "tcl port disabled"
     -c "telnet port disabled"
     -f interface/cmsis-dap.cfg
-    -c "adapter speed 5000"
     -f target/rp2040.cfg
+    -c "adapter speed 5000"
     -c "program cmsis-os-validator-test.elf verify"
     -c "arm semihosting enable"
     -c "arm semihosting_cmdline cmsis-os-validator-test"
-    -c "reset"
+    -c "reset run"
   )
 endif()
 
