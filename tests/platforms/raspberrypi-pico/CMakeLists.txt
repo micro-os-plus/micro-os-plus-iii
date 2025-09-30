@@ -85,6 +85,7 @@ if(ENABLE_RTOS_APIS_TEST)
     NAME "rtos-apis-test"
 
     COMMAND ${pico_openocd}${extension}
+    # -d3
     -c "gdb port disabled"
     -c "tcl port disabled"
     -c "telnet port disabled"
