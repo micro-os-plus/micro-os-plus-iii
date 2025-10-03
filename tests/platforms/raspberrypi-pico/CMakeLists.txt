@@ -95,7 +95,8 @@ if(ENABLE_RTOS_APIS_TEST)
     -c "program rtos-apis-test.elf verify"
     -c "arm semihosting enable"
     -c "arm semihosting_cmdline rtos-apis-test"
-    -c "reset run"
+    -c "reset halt"
+    -c "rp2040.core0 arp_reset assert 0"
   )
 endif()
 
@@ -132,7 +133,8 @@ if(ENABLE_MUTEX_STRESS_TEST)
     -c "program mutex-stress-test.elf verify"
     -c "arm semihosting enable"
     -c "arm semihosting_cmdline mutex-stress-test"
-    -c "reset run"
+    -c "reset halt"
+    -c "rp2040.core0 arp_reset assert 0"
   )
 endif()
 
@@ -172,7 +174,8 @@ if(ENABLE_CMSIS_OS_VALIDATOR_TEST)
     -c "program cmsis-os-validator-test.elf verify"
     -c "arm semihosting enable"
     -c "arm semihosting_cmdline cmsis-os-validator-test"
-    -c "reset run"
+    -c "reset halt"
+    -c "rp2040.core0 arp_reset assert 0"
   )
 endif()
 
