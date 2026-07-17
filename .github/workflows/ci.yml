@@ -56,18 +56,18 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
-        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-13', 'macos-15', 'windows-2022' ]
+        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-15', 'windows-2025' ]
 
     steps:
     - name: Checkout
       # https://github.com/actions/checkout/
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7.0.0
       with:
         fetch-depth: 3
 
     - name: Setup Node.js on ${{ matrix.os }}
       # https://github.com/actions/setup-node/
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7.0.0
       with:
         # https://nodejs.org/en - use LTS
         node-version: 22
@@ -88,7 +88,7 @@ jobs:
 
     - name: Satisfy project dependencies on ${{ matrix.os }}
       run: |
-        npm ci -C tests
+        npm --prefix tests ci
         xpm run install-ci -C tests
 
     - name: Run tests on ${{ matrix.os }}
