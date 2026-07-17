@@ -2,10 +2,16 @@
   "name": "@micro-os-plus/micro-os-plus-iii",
   "version": "7.1.0",
   "description": "A source code library with the portable part of µOS++ IIIe",
-  "main": "",
-  "scripts": {
-    "postversion": "git push origin --all && git push origin --tags",
-    "git-log": "git log --pretty='%cd * %h %s' --date=short"
+  "keywords": [
+    "xpack",
+    "c++",
+    "micro-os-plus"
+  ],
+  "license": "MIT",
+  "author": {
+    "name": "Liviu Ionescu",
+    "email": "ilg@livius.net",
+    "url": "https://github.com/ilg-ul"
   },
   "repository": {
     "type": "git",
@@ -15,39 +21,34 @@
   "bugs": {
     "url": "https://github.com/micro-os-plus/micro-os-plus-iii/issues"
   },
-  "keywords": [
-    "xpack",
-    "c++",
-    "micro-os-plus"
-  ],
-  "author": {
-    "name": "Liviu Ionescu",
-    "email": "ilg@livius.net",
-    "url": "https://github.com/ilg-ul"
-  },
-  "license": "MIT",
-  "config": {},
-  "dependencies": {},
   "$devDependenciesUrls": [
     "https://www.npmjs.com/package/del-cli"
   ],
   "devDependencies": {
     "del-cli": "^5.1.0"
   },
+  "scripts": {
+    "npm-install": "npm install",
+    "npm-link-helpers": "npm link @xpack/npm-packages-helper",
+    "npm-outdated": "npm outdated",
+    "npm-ci": "npm ci",
+    "npm-pack": "npm pack",
+    "npm-link": "npm link",
+    "git-log": "git log --pretty='%cd * %h %s' --date=short",
+    "git-pull-helper": "git -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git pull",
+    "deep-clean": "del-cli node_modules package-lock.json *.tgz",
+    "postversion": "git push origin --all && git push origin --tags"
+  },
   "xpack": {
-    "minimumXpmRequired": "0.16.2",
-    "actions": {
-      "deep-clean": "del-cli node_modules package-lock.json",
-      "npm-install": "npm install",
-      "git-log": "git log --pretty='%cd * %h %s' --date=short",
-      "npm-pack": "npm pack",
-      "npm-version-patch": "npm version patch",
-      "npm-version-minor": "npm version minor",
-      "npm-version": "echo $(which node) $(node --version) && echo $(which npm) $(npm --version)"
+    "minimumXpmRequired": "0.20.8",
+    "devDependencies": {
+      "@xpack-dev-tools/clang": "21.1.8-1.1"
     },
-    "dependencies": {},
-    "devDependencies": {},
-    "properties": {},
-    "buildConfigurations": {}
+    "actions": {
+      "clang-format": "bash scripts/clang-format.sh"
+    }
+  },
+  "engines": {
+    "node": ">=20.0"
   }
 }

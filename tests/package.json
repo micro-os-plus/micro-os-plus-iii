@@ -2,24 +2,22 @@
   "name": "tests",
   "version": "0.0.0",
   "description": "Tests",
-  "main": "",
-  "scripts": {
-    "npm-install": "npm install",
-    "deep-clean": "del-cli build node_modules xpacks package-json.json"
-  },
+  "license": "MIT",
   "author": {
     "name": "Liviu Ionescu",
     "email": "ilg@livius.net",
     "url": "https://github.com/ilg-ul"
   },
-  "license": "MIT",
-  "config": {},
   "dependencies": {},
   "devDependencies": {
     "del-cli": "^5.0.0"
   },
+  "scripts": {
+    "npm-install": "npm install",
+    "deep-clean": "del-cli build node_modules xpacks package-json.json"
+  },
   "xpack": {
-    "minimumXpmRequired": "0.20.0",
+    "minimumXpmRequired": "0.20.8",
     "dependencies": {},
     "$devDependenciesUrls": [
       "https://github.com/micro-os-plus",
