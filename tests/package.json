@@ -19,7 +19,7 @@
     "del-cli": "^5.0.0"
   },
   "xpack": {
-    "minimumXpmRequired": "0.16.2",
+    "minimumXpmRequired": "0.20.0",
     "dependencies": {},
     "$devDependenciesUrls": [
       "https://github.com/micro-os-plus",

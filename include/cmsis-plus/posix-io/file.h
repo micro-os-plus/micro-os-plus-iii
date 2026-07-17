@@ -2,11 +2,11 @@
  * This file is part of the µOS++ project (https://micro-os-plus.github.io/).
  * Copyright (c) 2015-2025 Liviu Ionescu. All rights reserved.
  *
- * Permission to use, copy, modify, and/or distribute this software
- * for any purpose is hereby granted, under the terms of the MIT license.
+ * Permission to use, copy, modify, and/or distribute this software for any
+ * purpose is hereby granted, under the terms of the MIT license.
  *
- * If a copy of the license was not distributed with this file, it can
- * be obtained from https://opensource.org/licenses/mit.
+ * If a copy of the license was not distributed with this file, it can be
+ * obtained from https://opensource.org/licenses/mit.
  */
 
 #ifndef CMSIS_PLUS_POSIX_IO_FILE_H_
