@@ -20,11 +20,11 @@ message(VERBOSE "Including tests/platforms/${PLATFORM_NAME}/cmake/dependencies-f
 # -----------------------------------------------------------------------------
 set(xpack_dependencies_folders
 
-  "${CMAKE_SOURCE_DIR}/rtos-apis-test"
-  "${CMAKE_SOURCE_DIR}/mutex-stress-test"
-  "${CMAKE_SOURCE_DIR}/cmsis-os-validator-test"
-  "${CMAKE_SOURCE_DIR}/blinky-test"
-  "${CMAKE_SOURCE_DIR}/instrumentation-test"
+  "${CMAKE_SOURCE_DIR}/sources/rtos-apis"
+  "${CMAKE_SOURCE_DIR}/sources/mutex-stress"
+  "${CMAKE_SOURCE_DIR}/sources/cmsis-os-validator"
+  "${CMAKE_SOURCE_DIR}/sources/blinky"
+  "${CMAKE_SOURCE_DIR}/sources/instrumentation"
 
   # Project dependencies.
   # The BINARY_DIR is the `build/<config>` folder.
