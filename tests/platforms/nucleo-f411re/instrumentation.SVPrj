@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<SystemViewProject Version="2" Name="instrumentation">
+  <Recorder Type="J-LinkV2">
+    <J-LinkV2 CMB_HOST_IF="USB" TXT_USB_SN="" TXT_IP="" TXT_TUNNEL="" TXT_TARGET_DEVICE="STM32F411RE" CMB_TARGET_IF="SWD" SPN_TIF_SPEED="4000" SPN_TIF_IRPRE="-1" SPN_TIF_DRPRE="-1" SPN_NUM_CORES="0" RDG_RTT_MODE="Auto" TXT_RTT_CB_LOCATION="" TXT_RTT_CB_RANGE="" CHK_ADVANCED="0" FLE_SETTINGS="" FLE_SCRIPT="" FLE_LOG=""/>
+    <IP TXT_IP="127.0.0.1" TXT_PORT="19111"/>
+    <UART CMB_COM_PORT="cu.usbmodem14343302" TXT_BAUDRATE="700000"/>
+  </Recorder>
+  <RecordingFiles/>
+  <DescriptionsFiles/>
+  <ApplicationElfFiles/>
+  <ElfFiles/>
+  <RenamedResources/>
+  <ResourceNames/>
+</SystemViewProject>
