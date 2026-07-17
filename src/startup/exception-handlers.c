@@ -84,7 +84,7 @@ Reset_Handler (void)
   __asm__ (" MSR msp, %0 " : : "r"(&__stack) :);
 
   __disable_irq ();
-  
+
   // SCB
   // https://developer.arm.com/documentation/dui0552/a/cortex-m3-peripherals/system-control-block
 

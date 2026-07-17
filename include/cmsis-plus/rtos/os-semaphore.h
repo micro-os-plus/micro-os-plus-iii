@@ -112,11 +112,9 @@ namespace os
         attributes (const attributes&) = default;
         attributes (attributes&&) = default;
         attributes&
-        operator= (const attributes&)
-            = default;
+        operator= (const attributes&) = default;
         attributes&
-        operator= (attributes&&)
-            = default;
+        operator= (attributes&&) = default;
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -187,11 +185,9 @@ namespace os
         attributes_binary (const attributes_binary&) = default;
         attributes_binary (attributes_binary&&) = default;
         attributes_binary&
-        operator= (const attributes_binary&)
-            = default;
+        operator= (const attributes_binary&) = default;
         attributes_binary&
-        operator= (attributes_binary&&)
-            = default;
+        operator= (attributes_binary&&) = default;
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -237,11 +233,9 @@ namespace os
         attributes_counting (const attributes_counting&) = default;
         attributes_counting (attributes_counting&&) = default;
         attributes_counting&
-        operator= (const attributes_counting&)
-            = default;
+        operator= (const attributes_counting&) = default;
         attributes_counting&
-        operator= (attributes_counting&&)
-            = default;
+        operator= (attributes_counting&&) = default;
 
         /**
          * @brief Destruct the semaphore attributes object instance.
@@ -296,11 +290,9 @@ namespace os
       semaphore (const semaphore&) = delete;
       semaphore (semaphore&&) = delete;
       semaphore&
-      operator= (const semaphore&)
-          = delete;
+      operator= (const semaphore&) = delete;
       semaphore&
-      operator= (semaphore&&)
-          = delete;
+      operator= (semaphore&&) = delete;
 
       /**
        * @endcond
@@ -541,11 +533,9 @@ namespace os
       semaphore_binary (const semaphore_binary&) = delete;
       semaphore_binary (semaphore_binary&&) = delete;
       semaphore_binary&
-      operator= (const semaphore_binary&)
-          = delete;
+      operator= (const semaphore_binary&) = delete;
       semaphore_binary&
-      operator= (semaphore_binary&&)
-          = delete;
+      operator= (semaphore_binary&&) = delete;
 
       /**
        * @endcond
@@ -618,11 +608,9 @@ namespace os
       semaphore_counting (const semaphore_counting&) = delete;
       semaphore_counting (semaphore_counting&&) = delete;
       semaphore_counting&
-      operator= (const semaphore_counting&)
-          = delete;
+      operator= (const semaphore_counting&) = delete;
       semaphore_counting&
-      operator= (semaphore_counting&&)
-          = delete;
+      operator= (semaphore_counting&&) = delete;
 
       /**
        * @endcond
@@ -700,8 +688,7 @@ namespace os
 
     constexpr semaphore::attributes_counting::attributes_counting (
         count_t max_value, count_t initial_value)
-        : attributes{ max_value, initial_value }
-          // Use the protected constructor.
+        : attributes{ max_value, initial_value } // The protected constructor.
     {
     }
 

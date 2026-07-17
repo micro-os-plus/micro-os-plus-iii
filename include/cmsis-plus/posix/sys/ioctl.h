@@ -97,11 +97,14 @@
 
 /* 108-111 have been used for various private purposes. */
 
-#define BLKSSZGET _IO (0x12, 104) /* get block logical device sector size */
-#define BLKGETSIZE64 \
-  _IOR (0x12, 114, size_t) /* get device size in bytes (u64 *arg) */
-#define BLKPBSZGET _IO (0x12, 123) /* get block physical device sector size \
-                                    */
+/* get block logical device sector size */
+#define BLKSSZGET _IO (0x12, 104)
+
+/* get device size in bytes (u64 *arg) */
+#define BLKGETSIZE64 _IOR (0x12, 114, size_t)
+
+/* get block physical device sector size */
+#define BLKPBSZGET _IO (0x12, 123)
 
 // ----------------------------------------------------------------------------
 

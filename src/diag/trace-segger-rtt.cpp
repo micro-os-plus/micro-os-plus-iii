@@ -96,7 +96,7 @@ namespace os
     flush (void)
     {
       // Busy wait until all data is sent.
-      while (SEGGER_RTT_HasData(0) != 0)
+      while (SEGGER_RTT_HasData (0) != 0)
         {
           __NOP ();
         }

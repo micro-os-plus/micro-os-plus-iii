@@ -39,7 +39,7 @@ os_startup_initialize_hardware (void)
   // in the SystemCoreClock global RAM location.
   SystemCoreClockUpdate ();
 
-  MX_GPIO_Init();
+  MX_GPIO_Init ();
 }
 
 // ----------------------------------------------------------------------------
