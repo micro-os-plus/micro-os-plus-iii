@@ -7,7 +7,7 @@
 # purpose is hereby granted, under the terms of the MIT license.
 #
 # If a copy of the license was not distributed with this file, it can be
-#  obtained from https://opensource.org/licenses/mit.
+# obtained from https://opensource.org/licenses/mit.
 #
 # -----------------------------------------------------------------------------
 
@@ -15,10 +15,12 @@
 
 # -----------------------------------------------------------------------------
 
-message(VERBOSE "Including tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake...")
+message (VERBOSE
+         "Including tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake..."
+)
 
 # -----------------------------------------------------------------------------
 
-set(xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_NATIVE")
+set (xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_NATIVE")
 
 # -----------------------------------------------------------------------------

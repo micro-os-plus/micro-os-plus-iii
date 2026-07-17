@@ -7,14 +7,14 @@
 # purpose is hereby granted, under the terms of the MIT license.
 #
 # If a copy of the license was not distributed with this file, it can be
-#  obtained from https://opensource.org/licenses/mit.
+# obtained from https://opensource.org/licenses/mit.
 #
 # -----------------------------------------------------------------------------
 
 # Global definitions.
 
-set(ENABLE_RTOS_APIS_TEST true)
-set(ENABLE_MUTEX_STRESS_TEST true)
-set(ENABLE_CMSIS_OS_VALIDATOR_TEST true)
+set (ENABLE_RTOS_APIS_TEST true)
+set (ENABLE_MUTEX_STRESS_TEST true)
+set (ENABLE_CMSIS_OS_VALIDATOR_TEST true)
 
 # -----------------------------------------------------------------------------

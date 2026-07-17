@@ -7,7 +7,7 @@
 # purpose is hereby granted, under the terms of the MIT license.
 #
 # If a copy of the license was not distributed with this file, it can be
-#  obtained from https://opensource.org/licenses/mit.
+# obtained from https://opensource.org/licenses/mit.
 #
 # -----------------------------------------------------------------------------
 
@@ -15,64 +15,61 @@
 
 # -----------------------------------------------------------------------------
 
-message(VERBOSE "Including tests/platforms/${PLATFORM_NAME}/cmake/platform-library.cmake...")
+message (
+  VERBOSE
+  "Including tests/platforms/${PLATFORM_NAME}/cmake/platform-library.cmake..."
+)
 
 # -----------------------------------------------------------------------------
 
 # Validate.
-if(NOT DEFINED xpack_platform_compile_definition)
-  message(FATAL_ERROR "Define xpack_platform_compile_definition in platforms/${PLATFORM_NAME}/cmake/dependencies-folders.cmake")
-endif()
+if (NOT DEFINED xpack_platform_compile_definition)
+  message (
+    FATAL_ERROR
+      "Define xpack_platform_compile_definition in platforms/${PLATFORM_NAME}/cmake/dependencies-folders.cmake"
+  )
+endif ()
 
 # -----------------------------------------------------------------------------
 # Define the platform library.
-add_library(platform-raspberrypi-pico-interface INTERFACE EXCLUDE_FROM_ALL)
+add_library (platform-raspberrypi-pico-interface INTERFACE EXCLUDE_FROM_ALL)
 
 # -----------------------------------------------------------------------------
-target_include_directories(platform-raspberrypi-pico-interface INTERFACE
-
-  "include"
+target_include_directories (
+  platform-raspberrypi-pico-interface INTERFACE "include"
 )
 
-target_sources(platform-raspberrypi-pico-interface INTERFACE
-
-  "src/bs2_default_padded_checksummed.S"
+target_sources (
+  platform-raspberrypi-pico-interface
+  INTERFACE "src/bs2_default_padded_checksummed.S"
 )
 
-target_compile_definitions(platform-raspberrypi-pico-interface INTERFACE
-  "${xpack_platform_compile_definition}"
-
-  # _POSIX_C_SOURCE=200809L
-
-  # For S_IREAD
-  _GNU_SOURCE
+target_compile_definitions (
+  platform-raspberrypi-pico-interface
+  INTERFACE "${xpack_platform_compile_definition}"
+            # _POSIX_C_SOURCE=200809L
+            # For S_IREAD
+            _GNU_SOURCE
 )
 
-set(xpack_platform_common_options
-
+set (
+  xpack_platform_common_options
   -mcpu=cortex-m0plus
   -mthumb
-
   -mfloat-abi=soft
-
   # -fno-move-loop-invariants
-
-  # Embedded builds generally must be warning free, but PICO SDK does not allow this.
-  # -Werror
-
-  # -flto fails to run on QEMU.
-  # $<$<CONFIG:Release>:-flto>
+  # Embedded builds generally must be warning free, but PICO SDK does not allow
+  # this. -Werror
+  # -flto fails to run on QEMU. $<$<CONFIG:Release>:-flto>
   # $<$<CONFIG:MinSizeRel>:-flto>
   $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
-
   # ... libs-c/src/stdlib/exit.c:132:46
   # $<$<CXX_COMPILER_ID:GNU>:-Wno-missing-attributes>
-
-  # parameter passing for argument of type 'os::rtos::memory::allocator_stateless_default_resource<os::rtos::thread>' changed in GCC 7.1
+  # parameter passing for argument of type
+  # 'os::rtos::memory::allocator_stateless_default_resource<os::rtos::thread>'
+  # changed in GCC 7.1
   $<$<CXX_COMPILER_ID:GNU>:-Wno-psabi>
-
   # $<$<COMPILE_LANGUAGE:C>:-fxxx>
-
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html?highlight=compile_language#genex:COMPILE_LANGUAGE
   # $<$<COMPILE_LANGUAGE:CXX>:-fno-exceptions>
   # $<$<COMPILE_LANGUAGE:CXX>:-fno-rtti>
@@ -80,49 +77,48 @@ set(xpack_platform_common_options
   $<$<COMPILE_LANGUAGE:CXX>:-fno-threadsafe-statics>
 )
 
-target_compile_options(platform-raspberrypi-pico-interface INTERFACE
-  ${xpack_platform_common_options}
+target_compile_options (
+  platform-raspberrypi-pico-interface
+  INTERFACE ${xpack_platform_common_options}
 )
 
 # When `-flto` is used, the compile options must be passed to the linker too.
-target_link_options(platform-raspberrypi-pico-interface INTERFACE
-
+target_link_options (
+  platform-raspberrypi-pico-interface
+  INTERFACE
   -v
   ${xpack_platform_common_options}
-
   -nostartfiles
-
-  # --specs=rdimon.specs -Wl,--start-group -lgcc -lc -lc -lm -lrdimon -Wl,--end-group
-
-  # Force the linker to keep the interrupt vectors which otherwise
-  # are not referred from anywhere.
-  # -u_interrupt_vectors
-
-  # nano has no exceptions.
-  # -specs=nano.specs
+  # --specs=rdimon.specs -Wl,--start-group -lgcc -lc -lc -lm -lrdimon
+  # -Wl,--end-group
+  # Force the linker to keep the interrupt vectors which otherwise are not
+  # referred from anywhere. -u_interrupt_vectors
+  # nano has no exceptions. -specs=nano.specs
   -Wl,--gc-sections
 )
 
-if("${CMAKE_C_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.0.0")
-  target_link_options(platform-raspberrypi-pico-interface INTERFACE
-
+if ("${CMAKE_C_COMPILER_VERSION}" VERSION_GREATER_EQUAL "12.0.0")
+  target_link_options (
+    platform-raspberrypi-pico-interface INTERFACE
     # .elf has a LOAD segment with RWX permissions (GCC 12)
     -Wl,--no-warn-rwx-segment
   )
-endif()
+endif ()
 
-target_link_libraries(platform-raspberrypi-pico-interface INTERFACE
-  micro-os-plus::iii-cortexm
-  micro-os-plus::device
+target_link_libraries (
+  platform-raspberrypi-pico-interface INTERFACE micro-os-plus::iii-cortexm
+                                                micro-os-plus::device
 )
 
-if(COMMAND xpack_display_target_lists)
-  xpack_display_target_lists(platform-raspberrypi-pico-interface)
-endif()
+if (COMMAND xpack_display_target_lists)
+  xpack_display_target_lists (platform-raspberrypi-pico-interface)
+endif ()
 
 # -----------------------------------------------------------------------------
 # Aliases.
-add_library(micro-os-plus::platform ALIAS platform-raspberrypi-pico-interface)
-message(VERBOSE "> micro-os-plus::platform -> platform-raspberrypi-pico-interface")
+add_library (micro-os-plus::platform ALIAS platform-raspberrypi-pico-interface)
+message (VERBOSE
+         "> micro-os-plus::platform -> platform-raspberrypi-pico-interface"
+)
 
 # -----------------------------------------------------------------------------
