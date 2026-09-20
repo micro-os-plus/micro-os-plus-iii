@@ -56,28 +56,6 @@
     },
     "actions": {
       "deep-clean": "del-cli build node_modules xpacks package-lock.json",
-      "install": [
-        "xpm install",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
-      ],
-      "install-ci": [
-        "xpm install",
-        "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-debug{% endif %}",
-        "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-release{% endif %}",
-        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-debug{% endif %}",
-        "{% if os.platform == 'linux' or os.platform == 'darwin'%}xpm install --config native-cmake-clang-release{% endif %}",
-        "xpm install --config qemu-cortex-m0-cmake-debug",
-        "xpm install --config qemu-cortex-m0-cmake-release",
-        "xpm install --config qemu-cortex-m3-cmake-debug",
-        "xpm install --config qemu-cortex-m3-cmake-release",
-        "xpm install --config qemu-cortex-m7f-cmake-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-release"
-      ],
-      "install-all": [
-        "npm install",
-        "xpm install --all-configs"
-      ],
       "git-clone-deps": [
         "rm -rf ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "git clone --branch xpack-development https://github.com/micro-os-plus/build-helper-xpack.git ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
@@ -124,10 +102,60 @@
         "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git pull",
         "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git pull"
       ],
+      "install": [
+        "xpm install",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
       "link-deps": [
         "xpm link @micro-os-plus/build-helper",
         "xpm link @xpacks/arm-cmsis-rtos-validator",
         "xpm link @xpacks/chan-fatfs"
+      ],
+      "test": [
+        "xpm run test-qemu-cortex-m7f-cmake"
+      ],
+      "install-ci": [
+        "xpm install",
+        "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-debug{% endif %}",
+        "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-release{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-debug{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin'%}xpm install --config native-cmake-clang-release{% endif %}",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+      "test-ci": [
+        "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
+        "xpm run test-qemu-cortex-m0-cmake",
+        "xpm run test-qemu-cortex-m3-cmake",
+        "xpm run test-qemu-cortex-m7f-cmake"
+      ],
+      "install-qemu-cortex-latest": [
+        "xpm install",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+      "run-qemu-cortex-latest": [
+        "xpm run test-qemu-cortex-m0-cmake",
+        "xpm run test-qemu-cortex-m3-cmake",
+        "xpm run test-qemu-cortex-m4f-cmake",
+        "xpm run test-qemu-cortex-m7f-cmake"
+      ],
+
+      "install-all": [
+        "npm install",
+        "xpm install --all-configs"
       ],
       "link-deps-all": [
         "xpm run link-deps",
@@ -159,42 +187,33 @@
         "xpm run link-deps --config native-cmake-clang18-release",
         "xpm run link-deps --config native-cmake-clang19-debug",
         "xpm run link-deps --config native-cmake-clang19-release",
-        "xpm run link-deps --config qemu-cortex-m0-cmake-debug",
-        "xpm run link-deps --config qemu-cortex-m0-cmake-release",
-        "xpm run link-deps --config qemu-cortex-m3-cmake-debug",
-        "xpm run link-deps --config qemu-cortex-m3-cmake-release",
-        "xpm run link-deps --config qemu-cortex-m4f-cmake-debug",
-        "xpm run link-deps --config qemu-cortex-m4f-cmake-release",
-        "xpm run link-deps --config qemu-cortex-m7f-cmake-debug",
-        "xpm run link-deps --config qemu-cortex-m7f-cmake-release",
-        "xpm run link-deps --config raspberrypi-pico-cmake-debug",
-        "xpm run link-deps --config raspberrypi-pico-cmake-release",
-        "xpm run link-deps --config nucleo-f411re-cmake-debug",
-        "xpm run link-deps --config nucleo-f411re-cmake-release",
-        "xpm run link-deps --config nucleo-f767zi-cmake-debug",
-        "xpm run link-deps --config nucleo-f767zi-cmake-release",
-        "xpm run link-deps --config nucleo-h743zi-cmake-debug",
-        "xpm run link-deps --config nucleo-h743zi-cmake-release",
-        "xpm run link-deps --config raspberrypi-pico-cmake-debug",
-        "xpm run link-deps --config raspberrypi-pico-cmake-release"
-      ],
-      "clean-all": [
-        "xpm run clean --all-configs --ignore-errors"
-      ],
-      "test": [
-        "xpm run test-qemu-cortex-m7f-cmake"
-      ],
-      "test-ci": [
-        "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
-        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
-        "xpm run test-qemu-cortex-m0-cmake",
-        "xpm run test-qemu-cortex-m3-cmake",
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run link-deps --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run link-deps --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run link-deps --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run link-deps --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm run link-deps --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm run link-deps --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm run link-deps --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run link-deps --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run link-deps --config raspberrypi-pico-cmake-gcc-debug",
+        "xpm run link-deps --config raspberrypi-pico-cmake-gcc-release",
+        "xpm run link-deps --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run link-deps --config nucleo-f411re-cmake-gcc-release",
+        "xpm run link-deps --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run link-deps --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run link-deps --config nucleo-h743zi-cmake-gcc-debug",
+        "xpm run link-deps --config nucleo-h743zi-cmake-gcc-release",
+        "xpm run link-deps --config raspberrypi-pico-cmake-gcc-debug",
+        "xpm run link-deps --config raspberrypi-pico-cmake-gcc-release"
       ],
       "test-all": [
         "xpm run test-native-cmake",
         "xpm run test-cortex-cmake"
       ],
+      "clean-all": [
+        "xpm run clean --all-configs --ignore-errors"
+      ],
+
       "test-native-cmake": [
         "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc11{% endif %}",
@@ -208,6 +227,10 @@
         "xpm run test-native-cmake-clang17",
         "xpm run test-native-cmake-clang18",
         "xpm run test-native-cmake-clang19"
+      ],
+      "install-native-cmake-sys": [
+        "xpm install --config native-cmake-sys-debug",
+        "xpm install --config native-cmake-sys-release"
       ],
       "test-native-cmake-sys": [
         "xpm run prepare --config native-cmake-sys-debug",
@@ -328,68 +351,68 @@
         "xpm run test-qemu-cortex-m7f-cmake"
       ],
       "test-qemu-cortex-m0-cmake": [
-        "xpm run prepare --config qemu-cortex-m0-cmake-debug",
-        "xpm run build --config qemu-cortex-m0-cmake-debug",
-        "xpm run test --config qemu-cortex-m0-cmake-debug",
-        "xpm run prepare --config qemu-cortex-m0-cmake-release",
-        "xpm run build --config qemu-cortex-m0-cmake-release",
-        "xpm run test --config qemu-cortex-m0-cmake-release"
+        "xpm run prepare --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run build --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run test --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run prepare --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run build --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run test --config qemu-cortex-m0-cmake-gcc-release"
       ],
       "test-qemu-cortex-m3-cmake": [
-        "xpm run prepare --config qemu-cortex-m3-cmake-debug",
-        "xpm run build --config qemu-cortex-m3-cmake-debug",
-        "xpm run test --config qemu-cortex-m3-cmake-debug",
-        "xpm run prepare --config qemu-cortex-m3-cmake-release",
-        "xpm run build --config qemu-cortex-m3-cmake-release",
-        "xpm run test --config qemu-cortex-m3-cmake-release"
+        "xpm run prepare --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run build --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run test --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run prepare --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm run build --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm run test --config qemu-cortex-m3-cmake-gcc-release"
       ],
       "test-qemu-cortex-m4f-cmake": [
-        "xpm run prepare --config qemu-cortex-m4f-cmake-debug",
-        "xpm run build --config qemu-cortex-m4f-cmake-debug",
-        "xpm run test --config qemu-cortex-m4f-cmake-debug",
-        "xpm run prepare --config qemu-cortex-m4f-cmake-release",
-        "xpm run build --config qemu-cortex-m4f-cmake-release",
-        "xpm run test --config qemu-cortex-m4f-cmake-release"
+        "xpm run prepare --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm run build --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm run test --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm run prepare --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm run build --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm run test --config qemu-cortex-m4f-cmake-gcc-release"
       ],
       "test-qemu-cortex-m7f-cmake": [
-        "xpm run prepare --config qemu-cortex-m7f-cmake-debug",
-        "xpm run build --config qemu-cortex-m7f-cmake-debug",
-        "xpm run test --config qemu-cortex-m7f-cmake-debug",
-        "xpm run prepare --config qemu-cortex-m7f-cmake-release",
-        "xpm run build --config qemu-cortex-m7f-cmake-release",
-        "xpm run test --config qemu-cortex-m7f-cmake-release"
+        "xpm run prepare --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run build --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run test --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run prepare --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run build --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run test --config qemu-cortex-m7f-cmake-gcc-release"
       ],
       "test-raspberrypi-pico-cmake": [
-        "xpm run prepare --config raspberrypi-pico-cmake-debug",
-        "xpm run build --config raspberrypi-pico-cmake-debug",
-        "xpm run test --config raspberrypi-pico-cmake-debug",
-        "xpm run prepare --config raspberrypi-pico-cmake-release",
-        "xpm run build --config raspberrypi-pico-cmake-release",
-        "xpm run test --config raspberrypi-pico-cmake-release"
+        "xpm run prepare --config raspberrypi-pico-cmake-gcc-debug",
+        "xpm run build --config raspberrypi-pico-cmake-gcc-debug",
+        "xpm run test --config raspberrypi-pico-cmake-gcc-debug",
+        "xpm run prepare --config raspberrypi-pico-cmake-gcc-release",
+        "xpm run build --config raspberrypi-pico-cmake-gcc-release",
+        "xpm run test --config raspberrypi-pico-cmake-gcc-release"
       ],
       "test-nucleo-f411re-cmake": [
-        "xpm run prepare --config nucleo-f411re-cmake-debug",
-        "xpm run build --config nucleo-f411re-cmake-debug",
-        "xpm run test --config nucleo-f411re-cmake-debug",
-        "xpm run prepare --config nucleo-f411re-cmake-release",
-        "xpm run build --config nucleo-f411re-cmake-release",
-        "xpm run test --config nucleo-f411re-cmake-release"
+        "xpm run prepare --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run build --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run test --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run prepare --config nucleo-f411re-cmake-gcc-release",
+        "xpm run build --config nucleo-f411re-cmake-gcc-release",
+        "xpm run test --config nucleo-f411re-cmake-gcc-release"
       ],
       "test-nucleo-f767zi-cmake": [
-        "xpm run prepare --config nucleo-f767zi-cmake-debug",
-        "xpm run build --config nucleo-f767zi-cmake-debug",
-        "xpm run test --config nucleo-f767zi-cmake-debug",
-        "xpm run prepare --config nucleo-f767zi-cmake-release",
-        "xpm run build --config nucleo-f767zi-cmake-release",
-        "xpm run test --config nucleo-f767zi-cmake-release"
+        "xpm run prepare --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run build --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run test --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run prepare --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run build --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run test --config nucleo-f767zi-cmake-gcc-release"
       ],
       "test-nucleo-h743zi-cmake": [
-        "xpm run prepare --config nucleo-h743zi-cmake-debug",
-        "xpm run build --config nucleo-h743zi-cmake-debug",
-        "xpm run test --config nucleo-h743zi-cmake-debug",
-        "xpm run prepare --config nucleo-h743zi-cmake-release",
-        "xpm run build --config nucleo-h743zi-cmake-release",
-        "xpm run test --config nucleo-h743zi-cmake-release"
+        "xpm run prepare --config nucleo-h743zi-cmake-gcc-debug",
+        "xpm run build --config nucleo-h743zi-cmake-gcc-debug",
+        "xpm run test --config nucleo-h743zi-cmake-gcc-debug",
+        "xpm run prepare --config nucleo-h743zi-cmake-gcc-release",
+        "xpm run build --config nucleo-h743zi-cmake-gcc-release",
+        "xpm run test --config nucleo-h743zi-cmake-gcc-release"
       ],
       "clean-native-cmake": [
         "xpm run clean --config native-cmake-sys-debug --ignore-errors",
@@ -422,18 +445,18 @@
         "xpm run clean --config native-cmake-clang19-release --ignore-errors"
       ],
       "clean-cortex-cmake": [
-        "xpm run clean --config qemu-cortex-m0-cmake-debug --ignore-errors",
-        "xpm run clean --config qemu-cortex-m0-cmake-release --ignore-errors",
-        "xpm run clean --config qemu-cortex-m3-cmake-debug --ignore-errors",
-        "xpm run clean --config qemu-cortex-m3-cmake-release --ignore-errors",
-        "xpm run clean --config qemu-cortex-m4f-cmake-debug --ignore-errors",
-        "xpm run clean --config qemu-cortex-m4f-cmake-release --ignore-errors",
-        "xpm run clean --config qemu-cortex-m7f-cmake-debug --ignore-errors",
-        "xpm run clean --config qemu-cortex-m7f-cmake-release --ignore-errors",
-        "xpm run clean --config raspberrypi-pico-cmake-debug --ignore-errors",
-        "xpm run clean --config raspberrypi-pico-cmake-release --ignore-errors",
-        "xpm run clean --config nucleo-f767zi-cmake-debug --ignore-errors",
-        "xpm run clean --config nucleo-f767zi-cmake-release --ignore-errors"
+        "xpm run clean --config qemu-cortex-m0-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m0-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config qemu-cortex-m3-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m3-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config qemu-cortex-m4f-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m4f-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config qemu-cortex-m7f-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m7f-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config raspberrypi-pico-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config raspberrypi-pico-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config nucleo-f767zi-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config nucleo-f767zi-cmake-gcc-release --ignore-errors"
       ]
     },
     "buildConfigurations": {
@@ -932,7 +955,7 @@
           "buildType": "Release"
         }
       },
-      "qemu-cortex-m0-cmake-debug": {
+      "qemu-cortex-m0-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -949,16 +972,16 @@
           "shortConfigurationName": "m0d"
         }
       },
-      "qemu-cortex-m0-cmake-release": {
+      "qemu-cortex-m0-cmake-gcc-release": {
         "inherit": [
-          "qemu-cortex-m0-cmake-debug"
+          "qemu-cortex-m0-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "m0r"
         }
       },
-      "qemu-cortex-m3-cmake-debug": {
+      "qemu-cortex-m3-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -975,16 +998,16 @@
           "shortConfigurationName": "m3d"
         }
       },
-      "qemu-cortex-m3-cmake-release": {
+      "qemu-cortex-m3-cmake-gcc-release": {
         "inherit": [
-          "qemu-cortex-m3-cmake-debug"
+          "qemu-cortex-m3-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "m3r"
         }
       },
-      "qemu-cortex-m4f-cmake-debug": {
+      "qemu-cortex-m4f-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1001,16 +1024,16 @@
           "shortConfigurationName": "m4fd"
         }
       },
-      "qemu-cortex-m4f-cmake-release": {
+      "qemu-cortex-m4f-cmake-gcc-release": {
         "inherit": [
-          "qemu-cortex-m4f-cmake-debug"
+          "qemu-cortex-m4f-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "m4fr"
         }
       },
-      "qemu-cortex-m7f-cmake-debug": {
+      "qemu-cortex-m7f-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1027,16 +1050,16 @@
           "shortConfigurationName": "m7fd"
         }
       },
-      "qemu-cortex-m7f-cmake-release": {
+      "qemu-cortex-m7f-cmake-gcc-release": {
         "inherit": [
-          "qemu-cortex-m7f-cmake-debug"
+          "qemu-cortex-m7f-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "m7fr"
         }
       },
-      "raspberrypi-pico-cmake-debug": {
+      "raspberrypi-pico-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1065,16 +1088,16 @@
           ]
         }
       },
-      "raspberrypi-pico-cmake-release": {
+      "raspberrypi-pico-cmake-gcc-release": {
         "inherit": [
-          "raspberrypi-pico-cmake-debug"
+          "raspberrypi-pico-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "rpr"
         }
       },
-      "nucleo-f411re-cmake-debug": {
+      "nucleo-f411re-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1107,16 +1130,16 @@
           }
         }
       },
-      "nucleo-f411re-cmake-release": {
+      "nucleo-f411re-cmake-gcc-release": {
         "inherit": [
-          "nucleo-f411re-cmake-debug"
+          "nucleo-f411re-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "nf4r"
         }
       },
-      "nucleo-f767zi-cmake-debug": {
+      "nucleo-f767zi-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1137,16 +1160,16 @@
           ]
         }
       },
-      "nucleo-f767zi-cmake-release": {
+      "nucleo-f767zi-cmake-gcc-release": {
         "inherit": [
-          "nucleo-f767zi-cmake-debug"
+          "nucleo-f767zi-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
           "shortConfigurationName": "nf7r"
         }
       },
-      "nucleo-h743zi-cmake-debug": {
+      "nucleo-h743zi-cmake-gcc-debug": {
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1167,9 +1190,9 @@
           ]
         }
       },
-      "nucleo-h743zi-cmake-release": {
+      "nucleo-h743zi-cmake-gcc-release": {
         "inherit": [
-          "nucleo-h743zi-cmake-debug"
+          "nucleo-h743zi-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",

@@ -8,7 +8,7 @@
 A recent [xpm](https://xpack.github.io/xpm/), which is a portable
 [Node.js](https://nodejs.org/) command line application.
 
-## micro-os-plus-iii
+## Clone repository
 
 - <https://github.com/micro-os-plus/micro-os-plus-iii>
 
@@ -25,20 +25,72 @@ or, to update an existing folder:
 
 ```sh
 git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git pull
-
-xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
-Satisfy dependencies for all configurations and run all tests:
+## Top dependencies
+
+To install top dependencies:
 
 ```sh
-xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+npm --prefix ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests install
+```
+
+## Run a first test
+
+Satisfy dependencies and run a few tests:
+
+```sh
+xpm run install -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
 xpm run test -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
-or, to run the tests with all available toolchains:
+## Run a native test
 
 ```sh
+xpm run install-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+
+xpm run install-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+```
+
+## Run all tests
+
+To run the tests with all available toolchains:
+
+```sh
+xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+
 xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+```
+
+## Run QEMU Cortex-M tests
+
+To run the QEMU Cortex-M tests with the latest toolchains:
+
+```sh
+xpm run install-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+
+xpm run install-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+```
+
+## Remove all
+
+To remove all dependencies and build files:
+
+```sh
+xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+```
+
+After this restart from installing top dependencies.
+
+## Use development writable packages
+
+The previous tests install the dependencies as read only packages.
+
+During development it is necessary to have writable versions of the packages. 
+In the npm/xpm ecosystem, this can be achieved by _linking_ local git
+repositories.
+
+```sh
+xpm run git-clone-deps -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
