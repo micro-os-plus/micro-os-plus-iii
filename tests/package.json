@@ -60,19 +60,19 @@
         "rm -rf ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "git clone --branch xpack-development https://github.com/micro-os-plus/build-helper-xpack.git ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "xpm link -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
-        "rm -rf ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch-xpack.git",
+        "rm -rf ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
         "git clone --branch xpack-development https://github.com/micro-os-plus/micro-os-plus-iii-posix-arch.git ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
         "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
         "rm -rf ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
         "git clone --branch xpack-development https://github.com/micro-os-plus/micro-os-plus-iii-cortexm.git ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
         "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
-        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator-xpack.git",
+        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
         "git clone --branch xpack-development https://github.com/xpacks/arm-cmsis-rtos-validator.git ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
         "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
-        "rm -rf ${HOME}/Work/micro-os-plus-iii/chan-fatfs-xpack.git",
+        "rm -rf ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
         "git clone --branch xpack-development https://github.com/xpacks/chan-fatfs.git ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
         "xpm link -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
-        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis-xpack.git",
+        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
         "git clone --branch xpack-development https://github.com/xpacks/arm-cmsis.git ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
         "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
         "rm -rf ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
@@ -152,7 +152,6 @@
         "xpm run test-qemu-cortex-m4f-cmake",
         "xpm run test-qemu-cortex-m7f-cmake"
       ],
-
       "install-all": [
         "npm install",
         "xpm install --all-configs"
@@ -213,7 +212,6 @@
       "clean-all": [
         "xpm run clean --all-configs --ignore-errors"
       ],
-
       "test-native-cmake": [
         "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc11{% endif %}",
