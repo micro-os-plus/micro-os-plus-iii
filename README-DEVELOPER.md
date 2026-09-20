@@ -50,7 +50,7 @@ xpm run test -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```sh
 xpm run install-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
-xpm run install-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+xpm run test-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
 ## Run all tests
