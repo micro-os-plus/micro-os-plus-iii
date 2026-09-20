@@ -230,6 +230,10 @@
         "xpm install --config native-cmake-sys-debug",
         "xpm install --config native-cmake-sys-release"
       ],
+      "link-deps-native-cmake-sys": [
+        "xpm run link-deps --config native-cmake-sys-debug",
+        "xpm run link-deps --config native-cmake-sys-release"
+      ],
       "test-native-cmake-sys": [
         "xpm run prepare --config native-cmake-sys-debug",
         "xpm run build --config native-cmake-sys-debug",
