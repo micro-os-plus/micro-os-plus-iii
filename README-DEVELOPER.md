@@ -53,16 +53,6 @@ xpm run install-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.g
 xpm run test-native-cmake-sys -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
-## Run all tests
-
-To run the tests with all available toolchains:
-
-```sh
-xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
-
-xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
-```
-
 ## Run QEMU Cortex-M tests
 
 To run the QEMU Cortex-M tests with the latest toolchains:
@@ -71,6 +61,16 @@ To run the QEMU Cortex-M tests with the latest toolchains:
 xpm run install-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
 xpm run test-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+```
+
+## Run all tests
+
+To run the tests with all available toolchains:
+
+```sh
+xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+
+xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
 ## Remove all
