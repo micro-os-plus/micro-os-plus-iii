@@ -70,7 +70,7 @@ To run the QEMU Cortex-M tests with the latest toolchains:
 ```sh
 xpm run install-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
-xpm run install-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+xpm run test-qemu-cortex-latest -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
 ## Remove all
