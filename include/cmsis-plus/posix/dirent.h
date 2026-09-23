@@ -54,7 +54,8 @@ extern "C"
   // and casted to DIR.
   typedef struct
   {
-    ;
+    int reserved; /* C forbids an empty struct; a named member also avoids
+                     -Wextra-semi on the old `;` null declaration. */
   } DIR;
 
   // --------------------------------------------------------------------------
