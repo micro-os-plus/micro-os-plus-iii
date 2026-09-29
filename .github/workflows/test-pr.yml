@@ -24,6 +24,7 @@ name: Test on Pull Request
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 
 on:
+  # Runs on pull requests, if all conditions are met:
   pull_request:
     paths-ignore:
       - '.claude/**'

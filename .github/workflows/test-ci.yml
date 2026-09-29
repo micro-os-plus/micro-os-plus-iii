@@ -24,6 +24,7 @@ name: Test on Push
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 
 on:
+  # Runs on pushes, if all conditions are met:
   push:
     # ... on the active branches ...
     branches:
