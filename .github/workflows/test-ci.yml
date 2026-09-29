@@ -1,0 +1,102 @@
+# -----------------------------------------------------------------------------
+#
+# This file is part of the µOS++ project (http://micro-os-plus.github.io).
+# Copyright (c) 2021-2025 Liviu Ionescu. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software
+# for any purpose is hereby granted, under the terms of the MIT license.
+#
+# If a copy of the license was not distributed with this file, it can
+# be obtained from https://opensource.org/licenses/mit.
+#
+# -----------------------------------------------------------------------------
+
+# https://help.github.com/en/actions
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+# https://github.com/actions
+
+# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-ci.yml
+name: Test on Push
+
+on:
+  push:
+    paths-ignore:
+      - '.claude/**'
+      - '.github/skills/**'
+      - '.github/copilot-instructions.md'
+      - '.github/FUNDING.yml'
+      - '.settings/**'
+      - '.vscode/**'
+      - 'config/**'
+      - 'docs/**'
+      - 'doxygen/**'
+      - 'inspiration/**'
+      - 'scripts/**'
+      - 'templates/**'
+      - 'tests/scripts/**'
+      - 'LICENSE*'
+      - '**.md'
+      - '.gitignore'
+      - '.npmignore'
+      - '**/README**'
+    # This should disable running the workflow on tags, according to the
+    # on.<push|pull_request>.<branches|tags> GitHub Actions docs.
+    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushbranchestagsbranches-ignoretags-ignore
+    branches:
+      - '*'
+
+# Allow one concurrent deployment.
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: "tests"
+  cancel-in-progress: true
+
+jobs:
+  ci-test:
+    name: 'CI µOS++ IIIe tests'
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+        # macos-13 is x64, macos-15 is arm64.
+        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-13', 'macos-15', 'windows-2022' ]
+
+    steps:
+    - name: Checkout
+      # https://github.com/actions/checkout/
+      uses: actions/checkout@v5
+      with:
+        fetch-depth: 3
+
+    - name: Setup Node.js on ${{ matrix.os }}
+      # https://github.com/actions/setup-node/
+      uses: actions/setup-node@v4
+      with:
+        # https://nodejs.org/en - use LTS
+        node-version: 22
+
+    - name: Install xpm on ${{ matrix.os }}
+      run: |
+        # https://www.npmjs.com/package/xpm
+        npm install -g xpm@0.20.8
+
+    - name: Show environment
+      run: |
+        id
+        uname -a
+        node --version
+        npm --version
+        xpm --version
+        env | sort
+
+    - name: Satisfy project dependencies on ${{ matrix.os }}
+      run: |
+        npm ci -C tests
+        xpm run install-ci -C tests
+
+    - name: Run tests on ${{ matrix.os }}
+      run: xpm run test-ci -C tests
+      env:
+        CI: true

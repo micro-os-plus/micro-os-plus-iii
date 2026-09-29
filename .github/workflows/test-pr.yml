@@ -3,11 +3,11 @@
 # This file is part of the µOS++ project (http://micro-os-plus.github.io).
 # Copyright (c) 2021-2025 Liviu Ionescu. All rights reserved.
 #
-# Permission to use, copy, modify, and/or distribute this software
-# for any purpose is hereby granted, under the terms of the MIT license.
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose is hereby granted, under the terms of the MIT license.
 #
-# If a copy of the license was not distributed with this file, it can
-# be obtained from https://opensource.org/licenses/mit.
+# If a copy of the license was not distributed with this file, it can be
+# obtained from https://opensource.org/licenses/mit.
 #
 # -----------------------------------------------------------------------------
 
@@ -15,40 +15,45 @@
 # https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
 # https://github.com/actions
 
-# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/ci.yml
-name: CI on Push
+# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-pr.yml
+name: Test on Pull Request
 
 on:
-  push:
+  pull_request:
     paths-ignore:
+      - '.claude/**'
+      - '.github/skills/**'
+      - '.github/copilot-instructions.md'
+      - '.github/FUNDING.yml'
+      - '.settings/**'
       - '.vscode/**'
-      - 'LICENSE'
-      - '**.md'
-      - '.clang-format'
-      - '.gitignore'
-      - '.npmignore'
-      - 'tests/scripts/**'
-      - '**/README**'
+      - 'config/**'
       - 'docs/**'
       - 'doxygen/**'
       - 'inspiration/**'
       - 'scripts/**'
       - 'templates/**'
-    # This should disable running the workflow on tags, according to the
-    # on.<push|pull_request>.<branches|tags> GitHub Actions docs.
-    # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushbranchestagsbranches-ignoretags-ignore
-    branches:
-      - '*'
+      - 'tests/scripts/**'
+      - 'LICENSE*'
+      - '**.md'
+      - '.gitignore'
+      - '.npmignore'
+      - '**/README**'
 
-# Allow one concurrent deployment.
+
+# Allow one concurrent run per pull request; new pushes cancel older runs.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
-  group: "tests"
+  group: "tests-pr-${{ github.event.pull_request.number }}"
   cancel-in-progress: true
+
+# Pull requests from forks must not get write access.
+permissions:
+  contents: read
 
 jobs:
   ci-test:
-    name: 'CI µOS++ IIIe tests'
+    name: 'PR µOS++ IIIe tests'
 
     runs-on: ${{ matrix.os }}
 
@@ -56,18 +61,18 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
-        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-13', 'macos-15', 'windows-2022' ]
+        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-15', 'windows-2025' ]
 
     steps:
     - name: Checkout
       # https://github.com/actions/checkout/
-      uses: actions/checkout@v5
+      uses: actions/checkout@v7.0.0
       with:
         fetch-depth: 3
 
     - name: Setup Node.js on ${{ matrix.os }}
       # https://github.com/actions/setup-node/
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v7.0.0
       with:
         # https://nodejs.org/en - use LTS
         node-version: 22
@@ -88,7 +93,7 @@ jobs:
 
     - name: Satisfy project dependencies on ${{ matrix.os }}
       run: |
-        npm ci -C tests
+        npm --prefix tests ci
         xpm run install-ci -C tests
 
     - name: Run tests on ${{ matrix.os }}
