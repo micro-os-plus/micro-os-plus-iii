@@ -7,7 +7,7 @@ toolchains as possible, and run them on as many platforms as possible.
 
 There is a GitHub Actions CI workflow that runs a selection of the
 tests on every push; for details see
-[ci.yml](../.github/workflows/ci.yml) (to be activated soon for automated
+[test-ci.yml](../.github/workflows/test-ci.yml) (to be activated soon for automated
 tests).
 
 A second workflow is triggered manually, and runs all available tests

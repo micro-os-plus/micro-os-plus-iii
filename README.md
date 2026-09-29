@@ -1,7 +1,7 @@
 [![GitHub package.json version](https://img.shields.io/github/package-json/v/micro-os-plus/micro-os-plus-iii)](https://github.com/micro-os-plus/micro-os-plus-iii/blob/xpack/package.json)
 [![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/micro-os-plus/micro-os-plus-iii)](https://github.com/micro-os-plus/micro-os-plus-iii/tags/)
 [![license](https://img.shields.io/github/license/micro-os-plus/micro-os-plus-iii)](https://github.com/micro-os-plus/micro-os-plus-iii/blob/xpack/LICENSE)
-[![CI on Push](https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/ci.yml/badge.svg)](https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/ci.yml)
+[![CI on Push](https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-ci.yml/badge.svg)](https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-ci.yml)
 [![Website](https://img.shields.io/website?url=https%3A%2F%2Fmicro-os-plus.github.io%2F)](https://micro-os-plus.github.io/micro-os-plus-iii/)
 
 # A source code library with the portable part of µOS++ IIIe (an xpm/npm package)
