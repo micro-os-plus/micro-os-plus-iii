@@ -46,7 +46,6 @@ on:
       - '.npmignore'
       - '**/README**'
 
-
 # Allow one concurrent run per pull request; new pushes cancel older runs.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
