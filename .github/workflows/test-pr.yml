@@ -16,7 +16,12 @@
 # https://github.com/actions
 
 # https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-pr.yml
+
+# Workflow for running some tests on each Pull Request.
 name: Test on Pull Request
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 
 on:
   pull_request:
@@ -53,7 +58,7 @@ permissions:
 
 jobs:
   ci-test:
-    name: 'PR µOS++ IIIe tests'
+    name: 'µOS++ IIIe PR tests'
 
     runs-on: ${{ matrix.os }}
 

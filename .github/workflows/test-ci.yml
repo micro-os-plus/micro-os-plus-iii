@@ -16,10 +16,23 @@
 # https://github.com/actions
 
 # https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-ci.yml
+
+# Workflow for running some tests on each Push.
 name: Test on Push
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 
 on:
   push:
+    # ... on the active branches ...
+    branches:
+      - 'xpack-development'
+      - 'xpack'
+    # ... skip tags only ...
+    tags-ignore:
+      - '**'
+    # ... include everything except ...
     paths-ignore:
       - '.claude/**'
       - '.github/skills/**'
@@ -45,7 +58,7 @@ on:
     branches:
       - '*'
 
-# Allow one concurrent deployment.
+# Allow one concurrent run per push; new pushes cancel older runs.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
   group: "tests-ci-${{ github.ref_name }}"
@@ -53,7 +66,7 @@ concurrency:
 
 jobs:
   ci-test:
-    name: 'CI µOS++ IIIe tests'
+    name: 'µOS++ IIIe CI tests'
 
     runs-on: ${{ matrix.os }}
 
