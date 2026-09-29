@@ -48,7 +48,7 @@ on:
 # Allow one concurrent deployment.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
-  group: "tests"
+  group: "tests-ci-${{ github.ref_name }}"
   cancel-in-progress: true
 
 jobs:
