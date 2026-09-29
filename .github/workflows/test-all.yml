@@ -1,0 +1,80 @@
+# -----------------------------------------------------------------------------
+#
+# This file is part of the µOS++ project (http://micro-os-plus.github.io).
+# Copyright (c) 2021-2025 Liviu Ionescu. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose is hereby granted, under the terms of the MIT license.
+#
+# If a copy of the license was not distributed with this file, it can be
+# obtained from https://opensource.org/licenses/mit.
+#
+# -----------------------------------------------------------------------------
+
+# https://help.github.com/en/actions
+# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
+# https://github.com/actions
+
+# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-all.yml
+name: Test All (manual)
+
+on:
+  # Run only when manually triggered from the Actions tab.
+  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+  workflow_dispatch:
+
+# Allow one concurrent deployment.
+# https://docs.github.com/en/actions/using-jobs/using-concurrency
+concurrency:
+  group: "tests-all"
+  cancel-in-progress: true
+
+jobs:
+  ci-test:
+    name: 'All µOS++ IIIe tests'
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
+        # macos-13 is x64, macos-15 is arm64.
+        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-15', 'windows-2025' ]
+
+    steps:
+    - name: Checkout
+      # https://github.com/actions/checkout/
+      uses: actions/checkout@v7.0.0
+      with:
+        fetch-depth: 3
+
+    - name: Setup Node.js on ${{ matrix.os }}
+      # https://github.com/actions/setup-node/
+      uses: actions/setup-node@v7.0.0
+      with:
+        # https://nodejs.org/en - use LTS
+        node-version: 22
+
+    - name: Install xpm on ${{ matrix.os }}
+      run: |
+        # https://www.npmjs.com/package/xpm
+        npm install -g xpm@0.20.8
+
+    - name: Show environment
+      run: |
+        id
+        uname -a
+        node --version
+        npm --version
+        xpm --version
+        env | sort
+
+    - name: Satisfy project dependencies on ${{ matrix.os }}
+      run: |
+        npm --prefix tests ci
+        xpm run install-all -C tests
+
+    - name: Run tests on ${{ matrix.os }}
+      run: xpm run test-all -C tests
+      env:
+        CI: true
