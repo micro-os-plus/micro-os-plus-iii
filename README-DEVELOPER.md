@@ -25,14 +25,19 @@ or, to update an existing folder:
 
 ```sh
 git -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git pull
+```
 
+To remove all build files:
+
+```sh
+npm --prefix ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests install
 xpm run deep-clean -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
 
-Satisfy dependencies for all configurations and run all tests:
+Satisfy dependencies and run a few tests:
 
 ```sh
-xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+xpm run install -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 
 xpm run test -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
@@ -40,5 +45,7 @@ xpm run test -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 or, to run the tests with all available toolchains:
 
 ```sh
+xpm run install-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
+
 xpm run test-all -C ~/Work/micro-os-plus-iii/micro-os-plus-iii.git/tests
 ```
