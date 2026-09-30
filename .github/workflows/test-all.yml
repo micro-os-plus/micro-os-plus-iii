@@ -27,6 +27,7 @@ on:
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
   group: "tests-all-${{ github.ref_name }}"
+    # A new manual trigger cancels the older run.
   cancel-in-progress: true
 
 jobs:
@@ -36,6 +37,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      # Run all platforms to completion, even if one fails.
+      fail-fast: false
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
