@@ -45,6 +45,7 @@ on:
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
   group: "tests-pr-${{ github.event.pull_request.number }}"
+  # A new pull request update to the same pull request cancels the older run.
   cancel-in-progress: true
 
 # Pull requests from forks must not get write access.
@@ -58,6 +59,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
+      # Run all platforms to completion, even if one fails.
+      fail-fast: false
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
