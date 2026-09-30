@@ -28,31 +28,31 @@ on:
   push:
     # ... on the active branches ...
     branches:
-      - 'xpack-development'
-      - 'xpack'
+      - "xpack-development"
+      - "xpack"
     # ... skip tags only ...
     tags-ignore:
-      - '**'
+      - "**"
     # ... include everything except ...
     paths-ignore:
-      - '.claude/**'
-      - '.github/skills/**'
-      - '.github/copilot-instructions.md'
-      - '.github/FUNDING.yml'
-      - '.settings/**'
-      - '.vscode/**'
-      - 'config/**'
-      - 'docs/**'
-      - 'doxygen/**'
-      - 'inspiration/**'
-      - 'scripts/**'
-      - 'templates/**'
-      - 'tests/scripts/**'
-      - 'LICENSE*'
-      - '**.md'
-      - '.gitignore'
-      - '.npmignore'
-      - '**/README**'
+      - ".claude/**"
+      - ".github/skills/**"
+      - ".github/copilot-instructions.md"
+      - ".github/FUNDING.yml"
+      - ".settings/**"
+      - ".vscode/**"
+      - "config/**"
+      - "docs/**"
+      - "doxygen/**"
+      - "inspiration/**"
+      - "scripts/**"
+      - "templates/**"
+      - "tests/scripts/**"
+      - "LICENSE*"
+      - "**.md"
+      - ".gitignore"
+      - ".npmignore"
+      - "**/README**"
 
 # Allow one concurrent run per push; new pushes cancel older runs.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
@@ -63,7 +63,7 @@ concurrency:
 
 jobs:
   ci-test:
-    name: 'µOS++ IIIe CI tests'
+    name: "µOS++ IIIe CI tests"
 
     runs-on: ${{ matrix.os }}
 
@@ -73,42 +73,49 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
-        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-15', 'windows-2025' ]
+        os:
+          [
+            "ubuntu-24.04",
+            "ubuntu-24.04-arm",
+            "macos-15-intel",
+            "macos-15",
+            "windows-2025",
+          ]
 
     steps:
-    - name: Checkout
-      # https://github.com/actions/checkout/
-      uses: actions/checkout@v7.0.0
-      with:
-        fetch-depth: 3
+      - name: Checkout
+        # https://github.com/actions/checkout/
+        uses: actions/checkout@v7.0.0
+        with:
+          fetch-depth: 3
 
-    - name: Setup Node.js on ${{ matrix.os }}
-      # https://github.com/actions/setup-node/
-      uses: actions/setup-node@v7.0.0
-      with:
-        # https://nodejs.org/en - use LTS
-        node-version: 22
+      - name: Setup Node.js on ${{ matrix.os }}
+        # https://github.com/actions/setup-node/
+        uses: actions/setup-node@v7.0.0
+        with:
+          # https://nodejs.org/en - use LTS
+          node-version: 22
 
-    - name: Install xpm on ${{ matrix.os }}
-      run: |
-        # https://www.npmjs.com/package/xpm
-        npm install -g xpm@0.20.8
+      - name: Install xpm on ${{ matrix.os }}
+        run: |
+          # https://www.npmjs.com/package/xpm
+          npm install -g xpm@0.20.8
 
-    - name: Show environment
-      run: |
-        id
-        uname -a
-        node --version
-        npm --version
-        xpm --version
-        env | sort
+      - name: Show environment
+        run: |
+          id
+          uname -a
+          node --version
+          npm --version
+          xpm --version
+          env | sort
 
-    - name: Satisfy project dependencies on ${{ matrix.os }}
-      run: |
-        npm --prefix tests ci
-        xpm run install-ci -C tests
+      - name: Satisfy project dependencies on ${{ matrix.os }}
+        run: |
+          npm --prefix tests ci
+          xpm run install-ci -C tests
 
-    - name: Run tests on ${{ matrix.os }}
-      run: xpm run test-ci -C tests
-      env:
-        CI: true
+      - name: Run tests on ${{ matrix.os }}
+        run: xpm run test-ci -C tests
+        env:
+          CI: true

@@ -27,12 +27,12 @@ on:
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
   group: "tests-all-${{ github.ref_name }}"
-    # A new manual trigger cancels the older run.
+  # A new manual trigger cancels the older run.
   cancel-in-progress: true
 
 jobs:
   ci-test:
-    name: 'All µOS++ IIIe tests'
+    name: "All µOS++ IIIe tests"
 
     runs-on: ${{ matrix.os }}
 
@@ -42,42 +42,52 @@ jobs:
       matrix:
         # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
         # macos-13 is x64, macos-15 is arm64.
-        os: [ 'ubuntu-24.04', 'ubuntu-24.04-arm', 'macos-15-intel', 'macos-15', 'windows-2025' ]
+        os:
+          [
+            "ubuntu-24.04",
+            "ubuntu-22.04",
+            "ubuntu-24.04-arm",
+            "ubuntu-22.04-arm",
+            "macos-15-intel",
+            "macos-15",
+            "windows-2025",
+            "windows-2022",
+          ]
 
     steps:
-    - name: Checkout
-      # https://github.com/actions/checkout/
-      uses: actions/checkout@v7.0.0
-      with:
-        fetch-depth: 3
+      - name: Checkout
+        # https://github.com/actions/checkout/
+        uses: actions/checkout@v7.0.0
+        with:
+          fetch-depth: 3
 
-    - name: Setup Node.js on ${{ matrix.os }}
-      # https://github.com/actions/setup-node/
-      uses: actions/setup-node@v7.0.0
-      with:
-        # https://nodejs.org/en - use LTS
-        node-version: 22
+      - name: Setup Node.js on ${{ matrix.os }}
+        # https://github.com/actions/setup-node/
+        uses: actions/setup-node@v7.0.0
+        with:
+          # https://nodejs.org/en - use LTS
+          node-version: 22
 
-    - name: Install xpm on ${{ matrix.os }}
-      run: |
-        # https://www.npmjs.com/package/xpm
-        npm install -g xpm@0.20.8
+      - name: Install xpm on ${{ matrix.os }}
+        run: |
+          # https://www.npmjs.com/package/xpm
+          npm install -g xpm@0.20.8
 
-    - name: Show environment
-      run: |
-        id
-        uname -a
-        node --version
-        npm --version
-        xpm --version
-        env | sort
+      - name: Show environment
+        run: |
+          id
+          uname -a
+          node --version
+          npm --version
+          xpm --version
+          env | sort
 
-    - name: Satisfy project dependencies on ${{ matrix.os }}
-      run: |
-        npm --prefix tests ci
-        xpm run install-all -C tests
+      - name: Satisfy project dependencies on ${{ matrix.os }}
+        run: |
+          npm --prefix tests ci
+          xpm run install-all -C tests
 
-    - name: Run tests on ${{ matrix.os }}
-      run: xpm run test-all -C tests
-      env:
-        CI: true
+      - name: Run tests on ${{ matrix.os }}
+        run: xpm run test-all -C tests
+        env:
+          CI: true
