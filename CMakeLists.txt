@@ -38,10 +38,12 @@ endif ()
 
 # -----------------------------------------------------------------------------
 # The project library definitions.
+
 add_library (micro-os-plus-iii-interface INTERFACE EXCLUDE_FROM_ALL)
 
 # -----------------------------------------------------------------------------
 # Target settings.
+
 target_include_directories (
   micro-os-plus-iii-interface INTERFACE "include" "include/cmsis-plus/legacy"
 )
