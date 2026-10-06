@@ -243,7 +243,10 @@ namespace os
       polymorphic_allocator<T>::select_on_container_copy_construction (
           void) const noexcept
       {
-        return polymorphic_allocator ();
+        // C++17 requires a copy of the allocator, not a default-constructed
+        // one; returning a default allocator would silently rebind a copied
+        // container to the global resource instead of its own.
+        return *this;
       }
 
       template <typename T>
