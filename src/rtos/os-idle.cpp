@@ -79,6 +79,14 @@ os_rtos_idle_actions (void)
         interrupts::critical_section ics;
         node = const_cast<internal::waiting_thread_node*> (
             scheduler::terminated_threads_list_.head ());
+        thread* th = node->thread_;
+        if (th->state_ == thread::state::destroying
+            || th->state_ == thread::state::destroyed)
+          {
+            node->unlink ();
+            continue;
+          }
+        th->state_ = thread::state::destroying;
         node->unlink ();
         // ----- Exit critical section ----------------------------------------
       }

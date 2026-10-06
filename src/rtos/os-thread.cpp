@@ -1318,28 +1318,48 @@ namespace os
             return result::ok; // Already exited itself
           }
 
+        bool we_claimed = false;
         {
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;
 
-          // Remove thread from the funeral list and kill it here.
-          ready_node_.unlink ();
-
-          // If the thread is waiting on an event, remove it from the list.
-          if (waiting_node_ != nullptr)
+          if (state_ != state::destroying && state_ != state::destroyed)
             {
-              waiting_node_->unlink ();
-            }
+              we_claimed = true;
+              state_ = state::destroying;
 
-          // If the thread is waiting on a timeout, remove it from the list.
-          if (clock_node_ != nullptr)
-            {
-              clock_node_->unlink ();
-            }
+              // Remove thread from the funeral list and kill it here.
+              ready_node_.unlink ();
 
-          child_links_.unlink ();
+              // If the thread is waiting on an event, remove it from the list.
+              if (waiting_node_ != nullptr)
+                {
+                  waiting_node_->unlink ();
+                }
+
+              // If the thread is waiting on a timeout, remove it from the list.
+              if (clock_node_ != nullptr)
+                {
+                  clock_node_->unlink ();
+                }
+
+              child_links_.unlink ();
+            }
           // ----- Exit critical section --------------------------------------
         }
+
+        if (!we_claimed)
+          {
+            // The idle reaper already claimed this thread for destruction.
+            // Wait with lock released until it is completely destroyed.
+            while (state_ != state::destroyed)
+              {
+                scheduler::uncritical_section sucs;
+                this_thread::yield ();
+              }
+            instrumentation::thread::kill_retval (this, result::ok);
+            return result::ok;
+          }
 
         // The must be no more children threads alive.
         assert (children_.empty ());

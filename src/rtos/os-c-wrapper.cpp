@@ -239,6 +239,8 @@ static_assert (os_thread_state_terminated == thread::state::terminated,
                "adjust os_thread_state_terminated");
 static_assert (os_thread_state_destroyed == thread::state::destroyed,
                "adjust os_thread_state_destroyed");
+static_assert (os_thread_state_destroying == thread::state::destroying,
+               "adjust os_thread_state_destroying");
 
 static_assert (os_timer_once == timer::run::once, "adjust os_timer_once");
 static_assert (os_timer_periodic == timer::run::periodic,

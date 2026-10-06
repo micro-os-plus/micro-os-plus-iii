@@ -315,7 +315,11 @@ extern "C"
     /**
      * @brief Used to check reused threads.
      */
-    os_thread_state_initialising = 6
+    os_thread_state_initialising = 6,
+    /**
+     * @brief In process of being destroyed.
+     */
+    os_thread_state_destroying = 7
   };
 
   /**

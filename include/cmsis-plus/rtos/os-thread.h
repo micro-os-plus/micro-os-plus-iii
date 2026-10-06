@@ -400,7 +400,11 @@ namespace os
           /**
            * @brief Used to check reused threads.
            */
-          initializing = 6 //
+          initializing = 6, //
+          /**
+           * @brief In process of being destroyed.
+           */
+          destroying = 7 //
         };
         /* enum  */
       }; /* struct state */
