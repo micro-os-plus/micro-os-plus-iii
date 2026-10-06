@@ -917,7 +917,7 @@ namespace os
     double_list_iterator<T, N, MP, U>::operator++ (int)
     {
       const auto tmp = *this;
-      node_ = static_cast<iterator_pointer> (node_->next);
+      node_ = static_cast<iterator_pointer> (node_->next ());
       return tmp;
     }
 
@@ -925,7 +925,7 @@ namespace os
     inline double_list_iterator<T, N, MP, U>&
     double_list_iterator<T, N, MP, U>::operator-- ()
     {
-      node_ = static_cast<iterator_pointer> (node_->prev);
+      node_ = static_cast<iterator_pointer> (node_->prev ());
       return *this;
     }
 
@@ -934,7 +934,7 @@ namespace os
     double_list_iterator<T, N, MP, U>::operator-- (int)
     {
       const auto tmp = *this;
-      node_ = static_cast<iterator_pointer> (node_->prev);
+      node_ = static_cast<iterator_pointer> (node_->prev ());
       return tmp;
     }
 
