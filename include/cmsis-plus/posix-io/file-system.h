@@ -28,6 +28,7 @@
 #include <cmsis-plus/utils/lists.h>
 
 #include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/rtos/os.h>
 
 #include <mutex>
 #include <cstdarg>
@@ -821,12 +822,14 @@ namespace os
     inline void
     file_system::add_deferred_file (file* fil)
     {
+      rtos::interrupts::critical_section ics;
       deferred_files_list_.link (*fil);
     }
 
     inline void
     file_system::add_deferred_directory (directory* dir)
     {
+      rtos::interrupts::critical_section ics;
       deferred_directories_list_.link (*dir);
     }
 
@@ -848,16 +851,21 @@ namespace os
     {
       using file_type = T;
 
-      file_type* fil;
+      file_type* fil = nullptr;
+      {
+        rtos::interrupts::critical_section ics;
+        if (!deferred_files_list_.empty ())
+          {
+            fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+          }
+      }
 
-      if (deferred_files_list_.empty ())
+      if (fil == nullptr)
         {
           fil = new file_type (*this);
         }
       else
         {
-          fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
-
           // Call the constructor before reusing the object,
           fil->~file_type ();
 
@@ -875,16 +883,21 @@ namespace os
     {
       using file_type = T;
 
-      file_type* fil;
+      file_type* fil = nullptr;
+      {
+        rtos::interrupts::critical_section ics;
+        if (!deferred_files_list_.empty ())
+          {
+            fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+          }
+      }
 
-      if (deferred_files_list_.empty ())
+      if (fil == nullptr)
         {
           fil = new file_type (*this, locker);
         }
       else
         {
-          fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
-
           // Call the constructor before reusing the object,
           fil->~file_type ();
 
@@ -902,13 +915,20 @@ namespace os
     {
       using file_type = T;
 
-      // Deallocate all remaining elements in the list.
-      while (!deferred_files_list_.empty ())
+      for (;;)
         {
-          file_type* f
-              = static_cast<file_type*> (deferred_files_list_.unlink_head ());
-
-          // Call the destructor and the deallocator.
+          file_type* f = nullptr;
+          {
+            rtos::interrupts::critical_section ics;
+            if (!deferred_files_list_.empty ())
+              {
+                f = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+              }
+          }
+          if (f == nullptr)
+            {
+              break;
+            }
           delete f;
         }
     }
@@ -919,17 +939,22 @@ namespace os
     {
       using directory_type = T;
 
-      directory_type* dir;
+      directory_type* dir = nullptr;
+      {
+        rtos::interrupts::critical_section ics;
+        if (!deferred_directories_list_.empty ())
+          {
+            dir = static_cast<directory_type*> (
+                deferred_directories_list_.unlink_head ());
+          }
+      }
 
-      if (deferred_directories_list_.empty ())
+      if (dir == nullptr)
         {
           dir = new directory_type (*this);
         }
       else
         {
-          dir = static_cast<directory_type*> (
-              deferred_directories_list_.unlink_head ());
-
           // Call the constructor before reusing the object,
           dir->~directory_type ();
 
@@ -947,17 +972,22 @@ namespace os
     {
       using directory_type = T;
 
-      directory_type* dir;
+      directory_type* dir = nullptr;
+      {
+        rtos::interrupts::critical_section ics;
+        if (!deferred_directories_list_.empty ())
+          {
+            dir = static_cast<directory_type*> (
+                deferred_directories_list_.unlink_head ());
+          }
+      }
 
-      if (deferred_directories_list_.empty ())
+      if (dir == nullptr)
         {
           dir = new directory_type (*this, locker);
         }
       else
         {
-          dir = static_cast<directory_type*> (
-              deferred_directories_list_.unlink_head ());
-
           // Call the constructor before reusing the object,
           dir->~directory_type ();
 
@@ -975,13 +1005,21 @@ namespace os
     {
       using directory_type = T;
 
-      // Deallocate all remaining elements in the list.
-      while (!deferred_directories_list_.empty ())
+      for (;;)
         {
-          directory_type* d = static_cast<directory_type*> (
-              deferred_directories_list_.unlink_head ());
-
-          // Call the destructor and the deallocator.
+          directory_type* d = nullptr;
+          {
+            rtos::interrupts::critical_section ics;
+            if (!deferred_directories_list_.empty ())
+              {
+                d = static_cast<directory_type*> (
+                    deferred_directories_list_.unlink_head ());
+              }
+          }
+          if (d == nullptr)
+            {
+              break;
+            }
           delete d;
         }
     }

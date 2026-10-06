@@ -26,6 +26,7 @@
 #include <cmsis-plus/utils/lists.h>
 
 #include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/rtos/os.h>
 
 #include <cstddef>
 #include <cassert>
@@ -468,6 +469,7 @@ namespace os
     inline void
     net_stack::add_deferred_socket (class socket* sock)
     {
+      rtos::interrupts::critical_section ics;
       deferred_sockets_list_.link (*sock);
     }
 
@@ -483,17 +485,22 @@ namespace os
     {
       using socket_type = T;
 
-      socket_type* sock;
+      socket_type* sock = nullptr;
+      {
+        rtos::interrupts::critical_section ics;
+        if (!deferred_sockets_list_.empty ())
+          {
+            sock = static_cast<socket_type*> (
+                deferred_sockets_list_.unlink_head ());
+          }
+      }
 
-      if (deferred_sockets_list_.empty ())
+      if (sock == nullptr)
         {
           sock = new socket_type (*this);
         }
       else
         {
-          sock = static_cast<socket_type*> (
-              deferred_sockets_list_.unlink_head ());
-
           // Call the constructor before reusing the object,
           sock->~socket_type ();
 
@@ -501,12 +508,21 @@ namespace os
           new (sock) socket_type (*this);
 
           // Deallocate all remaining elements in the list.
-          while (!deferred_sockets_list_.empty ())
+          for (;;)
             {
-              socket_type* s = static_cast<socket_type*> (
-                  deferred_sockets_list_.unlink_head ());
-
-              // Call the destructor and the deallocator.
+              socket_type* s = nullptr;
+              {
+                rtos::interrupts::critical_section ics;
+                if (!deferred_sockets_list_.empty ())
+                  {
+                    s = static_cast<socket_type*> (
+                        deferred_sockets_list_.unlink_head ());
+                  }
+              }
+              if (s == nullptr)
+                {
+                  break;
+                }
               delete s;
             }
         }
@@ -519,17 +535,22 @@ namespace os
     {
       using socket_type = T;
 
-      socket_type* sock;
+      socket_type* sock = nullptr;
+      {
+        rtos::interrupts::critical_section ics;
+        if (!deferred_sockets_list_.empty ())
+          {
+            sock = static_cast<socket_type*> (
+                deferred_sockets_list_.unlink_head ());
+          }
+      }
 
-      if (deferred_sockets_list_.empty ())
+      if (sock == nullptr)
         {
           sock = new socket_type (*this, locker);
         }
       else
         {
-          sock = static_cast<socket_type*> (
-              deferred_sockets_list_.unlink_head ());
-
           // Call the constructor before reusing the object,
           sock->~socket_type ();
 
@@ -537,12 +558,21 @@ namespace os
           new (sock) socket_type (*this, locker);
 
           // Deallocate all remaining elements in the list.
-          while (!deferred_sockets_list_.empty ())
+          for (;;)
             {
-              socket_type* s = static_cast<socket_type*> (
-                  deferred_sockets_list_.unlink_head ());
-
-              // Call the destructor and the deallocator.
+              socket_type* s = nullptr;
+              {
+                rtos::interrupts::critical_section ics;
+                if (!deferred_sockets_list_.empty ())
+                  {
+                    s = static_cast<socket_type*> (
+                        deferred_sockets_list_.unlink_head ());
+                  }
+              }
+              if (s == nullptr)
+                {
+                  break;
+                }
               delete s;
             }
         }
