@@ -777,7 +777,11 @@ namespace os
           if (protocol_ == protocol::inherit)
             {
               thread::priority_t prio = th->priority ();
-              boosted_prio_ = prio;
+              if ((boosted_prio_ == thread::priority::none)
+                  || (prio > boosted_prio_))
+                {
+                  boosted_prio_ = prio;
+                }
 
               if (owner_links_.unlinked ())
                 {
@@ -861,14 +865,8 @@ namespace os
                 mutexes_list* thread_mutexes
                     = reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
 
-                if (thread_mutexes->empty ())
-                  {
-                    // If the owner thread has no more mutexes,
-                    // clear the inherited priority,
-                    // and the assigned priority will take precedence.
-                    boosted_prio_ = thread::priority::none;
-                  }
-                else
+                thread::priority_t inherited_prio = thread::priority::none;
+                if (!thread_mutexes->empty ())
                   {
                     // If the owner thread acquired other mutexes too,
                     // compute the maximum boosted priority.
@@ -886,10 +884,14 @@ namespace os
                           }
                       }
 #pragma GCC diagnostic pop
-                    boosted_prio_ = max_prio;
+                    if (max_prio > 0)
+                      {
+                        inherited_prio = max_prio;
+                      }
                   }
                 // Delayed until end of critical section.
-                owner_->priority_inherited (boosted_prio_);
+                owner_->priority_inherited (inherited_prio);
+                boosted_prio_ = thread::priority::none;
               }
 
             // Delayed until end of critical section.
