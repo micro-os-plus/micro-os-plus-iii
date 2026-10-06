@@ -168,7 +168,7 @@ namespace os
                         pool_addr_, align_sz);
 
       // std::align() will fail if it cannot fit the adjusted block size.
-      if (res != nullptr)
+      if (res == nullptr)
         {
           assert (res != nullptr);
         }
