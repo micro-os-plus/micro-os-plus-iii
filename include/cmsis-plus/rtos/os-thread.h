@@ -2081,6 +2081,14 @@ namespace os
       inline int* __attribute__ ((always_inline))
       __errno (void)
       {
+        // A timer callback runs inside the tick ISR and a libc call there
+        // (e.g. printf) still touches errno; thread() asserts in handler mode,
+        // so hand back a scratch int instead of the current thread's.
+        if (interrupts::in_handler_mode ())
+          {
+            static int isr_errno;
+            return &isr_errno;
+          }
         return &this_thread::thread ().errno_;
       }
 
