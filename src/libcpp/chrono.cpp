@@ -113,13 +113,15 @@ namespace os
 #endif
         // The duration is the number of sum of SysTick ticks plus the current
         // count of CPU cycles (computed from the SysTick counter).
-        // Notice: a more exact solution would be to compute
-        // ticks * divisor + cycles, but this severely reduces the
-        // range of ticks.
+        // Decompose into seconds and remainder to avoid 64-bit overflow
+        // on cycles * 1e9 after ~13 minutes.
+        uint64_t freq = rtos::hrclock.input_clock_frequency_hz ();
+        uint64_t sec = cycles / freq;
+        uint64_t rem = cycles % freq;
+        uint64_t ns = sec * 1000000000ULL + (rem * 1000000000ULL) / freq;
         return time_point{
           duration{
-              duration{ cycles * 1000000000ULL
-                        / rtos::hrclock.input_clock_frequency_hz () }
+              duration{ ns }
               + realtime_clock::startup_time_point.time_since_epoch () } //
         };
 #pragma GCC diagnostic pop
