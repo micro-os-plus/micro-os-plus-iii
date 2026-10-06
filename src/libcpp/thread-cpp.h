@@ -85,7 +85,28 @@ thread::join ()
 {
   os::trace::printf ("%s() @%p\n", __func__, this);
 
-  delete_system_thread ();
+  if (id_ != id ())
+    {
+      // Wait for the thread to end, as ISO join() does, before freeing what
+      // it runs on. Deleting it straight away -- which is what this did --
+      // frees its bound arguments and kills the system thread; on one core
+      // the thread had usually finished by then, on SMP it is still running
+      // on another core.
+      id_.native_thread_->join ();
+
+      if (function_object_ != nullptr && function_object_deleter_ != nullptr)
+        {
+          // Manually delete the function object used to store arguments.
+          // Use our own pointer, because the kernel clears `func_args_` when
+          // the thread exits -- which happens before `join()` returns for any
+          // short-lived thread.
+          function_object_deleter_ (function_object_);
+          function_object_ = nullptr;
+        }
+
+      // Manually delete the system thread, destroyed by now.
+      delete id_.native_thread_;
+    }
 
   id_ = id ();
   os::trace::printf ("%s() @%p joined\n", __func__, this);
