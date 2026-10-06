@@ -1837,7 +1837,12 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
-      inline void
+      // NOTE: NOT 'inline'. It is declared non-inline in os-thread.h, and its
+      // body lives only here (not in a header), so other TUs (e.g. the C API
+      // wrapper os_this_thread_suspend) that odr-use it need an out-of-line
+      // definition. Marking it 'inline' meant no TU emitted one -> undefined
+      // reference unless the caller happened to be pruned by --gc-sections.
+      void
       suspend (void)
       {
         os::instrumentation::thread::suspend (_thread ());
