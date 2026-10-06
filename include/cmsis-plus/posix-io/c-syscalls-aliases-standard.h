@@ -19,6 +19,16 @@ extern "C"
 {
 #endif
 
+  // newlib declares read()/write() with its own return type
+  // (_READ_WRITE_RETURN_TYPE, which is `int` on aarch64-none-elf and
+  // `_ssize_t` on arm-none-eabi). Match it, or the alias below conflicts
+  // with the system declaration.
+#if defined(_READ_WRITE_RETURN_TYPE)
+#define CMSIS_PLUS_POSIX_IO_RW_RETURN_TYPE _READ_WRITE_RETURN_TYPE
+#else
+#define CMSIS_PLUS_POSIX_IO_RW_RETURN_TYPE ssize_t
+#endif
+
   // --------------------------------------------------------------------------
 
   /**
@@ -130,7 +140,7 @@ extern "C"
   int __attribute__ ((weak, alias ("__posix_raise")))
   raise (int sig);
 
-  ssize_t __attribute__ ((weak, alias ("__posix_read")))
+  CMSIS_PLUS_POSIX_IO_RW_RETURN_TYPE __attribute__ ((weak, alias ("__posix_read")))
   read (int fildes, void* buf, size_t nbyte);
 
   struct dirent* __attribute__ ((weak, alias ("__posix_readdir")))
@@ -247,7 +257,7 @@ extern "C"
   pid_t __attribute__ ((weak, alias ("__posix_wait")))
   wait (int* stat_loc);
 
-  ssize_t __attribute__ ((weak, alias ("__posix_write")))
+  CMSIS_PLUS_POSIX_IO_RW_RETURN_TYPE __attribute__ ((weak, alias ("__posix_write")))
   write (int fildes, const void* buf, size_t nbyte);
 
   ssize_t __attribute__ ((weak, alias ("__posix_writev")))
