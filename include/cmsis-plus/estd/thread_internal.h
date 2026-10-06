@@ -146,6 +146,12 @@ private:
   using function_object_deleter_t = void (*) (void*);
   function_object_deleter_t function_object_deleter_ = nullptr;
 
+  // The bound function object, remembered here so it can be deleted even
+  // after the kernel has cleared the thread's `func_args_` on exit. Relying
+  // on `native_thread_->function_args()` leaks it whenever the thread has
+  // already finished by the time `join()` runs (the common case).
+  void* function_object_ = nullptr;
+
 public:
 };
 
@@ -357,6 +363,10 @@ thread::thread (Callable_T&& f, Args_T&&... args)
   // template functions.
   Function_object* funct_obj = new Function_object (std::bind (
       std::forward<Callable_T> (f), std::forward<Args_T> (args)...));
+
+  // Remember the object ourselves; the kernel may clear its own copy when
+  // the thread exits, before `join()` gets a chance to read it.
+  function_object_ = funct_obj;
 
   // The function to start the thread is a custom proxy that
   // knows how to get the variadic arguments.
