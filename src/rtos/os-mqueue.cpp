@@ -961,17 +961,26 @@ namespace os
 
 #else
 
+      bool sent;
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
-        if (internal_try_send_ (msg, nbytes, mprio))
-          {
-            instrumentation::message_queue::send_retval (this, result::ok);
-            return result::ok;
-          }
+        sent = internal_try_send_ (msg, nbytes, mprio);
         // ----- Exit critical section ----------------------------------------
       }
+
+      if (sent)
+        {
+          // internal_try_send_() resumed a waiting receiver. Rescheduling here,
+          // with the kernel lock released, lets it run at once -- as the ARM
+          // ports do when PendSV is taken on the way out of the section --
+          // instead of waiting for the next tick.
+          port::scheduler::reschedule ();
+
+          instrumentation::message_queue::send_retval (this, result::ok);
+          return result::ok;
+        }
 
       thread& crt_thread = this_thread::thread ();
 
@@ -1083,23 +1092,29 @@ namespace os
       // Don't call this from high priority interrupts.
       assert (port::interrupts::is_priority_valid ());
 
+      bool sent;
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
-        if (internal_try_send_ (msg, nbytes, mprio))
-          {
-            instrumentation::message_queue::try_send_retval (this, result::ok);
-            return result::ok;
-          }
-        else
-          {
-            instrumentation::message_queue::try_send_retval (this,
-                                                             EWOULDBLOCK);
-            return EWOULDBLOCK;
-          }
+        sent = internal_try_send_ (msg, nbytes, mprio);
         // ----- Exit critical section ----------------------------------------
       }
+
+      if (sent)
+        {
+          // internal_try_send_() resumed a waiting receiver. Rescheduling here,
+          // with the kernel lock released, lets it run at once -- as the ARM
+          // ports do when PendSV is taken on the way out of the section --
+          // instead of waiting for the next tick.
+          port::scheduler::reschedule ();
+
+          instrumentation::message_queue::try_send_retval (this, result::ok);
+          return result::ok;
+        }
+
+      instrumentation::message_queue::try_send_retval (this, EWOULDBLOCK);
+      return EWOULDBLOCK;
 
 #endif
     }
@@ -1185,18 +1200,26 @@ namespace os
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
+      bool sent;
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
-        if (internal_try_send_ (msg, nbytes, mprio))
-          {
-            instrumentation::message_queue::timed_send_retval (this,
-                                                               result::ok);
-            return result::ok;
-          }
+        sent = internal_try_send_ (msg, nbytes, mprio);
         // ----- Exit critical section ----------------------------------------
       }
+
+      if (sent)
+        {
+          // internal_try_send_() resumed a waiting receiver. Rescheduling here,
+          // with the kernel lock released, lets it run at once -- as the ARM
+          // ports do when PendSV is taken on the way out of the section --
+          // instead of waiting for the next tick.
+          port::scheduler::reschedule ();
+
+          instrumentation::message_queue::timed_send_retval (this, result::ok);
+          return result::ok;
+        }
 
       thread& crt_thread = this_thread::thread ();
 
@@ -1338,17 +1361,25 @@ namespace os
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
+      bool received;
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
-        if (internal_try_receive_ (msg, nbytes, mprio))
-          {
-            instrumentation::message_queue::receive_retval (this, result::ok);
-            return result::ok;
-          }
+        received = internal_try_receive_ (msg, nbytes, mprio);
         // ----- Exit critical section ----------------------------------------
       }
+
+      if (received)
+        {
+          // internal_try_receive_() resumed a waiting sender. Rescheduling
+          // here, with the kernel lock released, lets it run at once instead
+          // of waiting for the next tick.
+          port::scheduler::reschedule ();
+
+          instrumentation::message_queue::receive_retval (this, result::ok);
+          return result::ok;
+        }
 
       thread& crt_thread = this_thread::thread ();
 
@@ -1463,24 +1494,28 @@ namespace os
       // Don't call this from high priority interrupts.
       assert (port::interrupts::is_priority_valid ());
 
+      bool received;
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
-        if (internal_try_receive_ (msg, nbytes, mprio))
-          {
-            instrumentation::message_queue::try_receive_retval (this,
-                                                                result::ok);
-            return result::ok;
-          }
-        else
-          {
-            instrumentation::message_queue::try_receive_retval (this,
-                                                                EWOULDBLOCK);
-            return EWOULDBLOCK;
-          }
+        received = internal_try_receive_ (msg, nbytes, mprio);
         // ----- Exit critical section ----------------------------------------
       }
+
+      if (received)
+        {
+          // internal_try_receive_() resumed a waiting sender. Rescheduling
+          // here, with the kernel lock released, lets it run at once instead
+          // of waiting for the next tick.
+          port::scheduler::reschedule ();
+
+          instrumentation::message_queue::try_receive_retval (this, result::ok);
+          return result::ok;
+        }
+
+      instrumentation::message_queue::try_receive_retval (this, EWOULDBLOCK);
+      return EWOULDBLOCK;
 
 #endif
     }
@@ -1578,18 +1613,26 @@ namespace os
 
       // Extra test before entering the loop, with its inherent weight.
       // Trade size for speed.
+      bool received;
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
-        if (internal_try_receive_ (msg, nbytes, mprio))
-          {
-            instrumentation::message_queue::timed_receive_retval (this,
-                                                                  result::ok);
-            return result::ok;
-          }
+        received = internal_try_receive_ (msg, nbytes, mprio);
         // ----- Exit critical section ----------------------------------------
       }
+
+      if (received)
+        {
+          // internal_try_receive_() resumed a waiting sender. Rescheduling
+          // here, with the kernel lock released, lets it run at once instead
+          // of waiting for the next tick.
+          port::scheduler::reschedule ();
+
+          instrumentation::message_queue::timed_receive_retval (this,
+                                                                result::ok);
+          return result::ok;
+        }
 
       thread& crt_thread = this_thread::thread ();
 
