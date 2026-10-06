@@ -960,7 +960,22 @@ namespace os
 
 #else
 
-      // TODO: implement
+      {
+        interrupts::critical_section ics;
+
+        if (state_ == state::destroyed)
+          {
+            instrumentation::thread::detach_retval (this, EINVAL);
+            return EINVAL;
+          }
+
+        if (parent_ != nullptr)
+          {
+            child_links_.unlink ();
+            scheduler::top_threads_list_.link (*this);
+            parent_ = nullptr;
+          }
+      }
 
 #endif
 
