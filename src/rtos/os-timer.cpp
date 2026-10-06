@@ -374,9 +374,17 @@ namespace os
         {
           // Re-arm the timer for the next period.
           timer_node_.timestamp += period_;
+          clock::timestamp_t now = clock_->steady_now ();
+          if (timer_node_.timestamp <= now)
+            {
+              // Prevent burst loop if callback or ISR was delayed
+              timer_node_.timestamp = now + period_;
+            }
 
-          // No need for critical section in ISR.
-          clock_->steady_list ().link (timer_node_);
+          {
+            interrupts::critical_section ics;
+            clock_->steady_list ().link (timer_node_);
+          }
         }
       else
         {

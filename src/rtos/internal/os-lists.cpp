@@ -499,33 +499,42 @@ namespace os
         // iterate until a node with future time stamp is identified.
         for (;;)
           {
-            // ----- Enter critical section -----------------------------------
-            interrupts::critical_section ics;
+            timestamp_node* node = nullptr;
+            {
+              // ----- Enter critical section -----------------------------------
+              interrupts::critical_section ics;
 
-            if (empty ())
-              {
-                break;
-              }
+              if (empty ())
+                {
+                  break;
+                }
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wnull-dereference"
 #endif
-            clock::timestamp_t head_ts = head ()->timestamp;
+              clock::timestamp_t head_ts = head ()->timestamp;
 #pragma GCC diagnostic pop
-            if (now >= head_ts)
+              if (now >= head_ts)
+                {
+                  node = const_cast<timestamp_node*> (head ());
+                  node->unlink ();
+                }
+              else
+                {
+                  break;
+                }
+              // ----- Exit critical section ------------------------------------
+            }
+
+            if (node != nullptr)
               {
 #if defined(OS_TRACE_RTOS_LISTS_CLOCKS)
                 trace::printf ("%s() %u \n", __func__,
                                static_cast<uint32_t> (sysclock.now ()));
 #endif
-                const_cast<timestamp_node*> (head ())->action ();
+                node->action ();
               }
-            else
-              {
-                break;
-              }
-            // ----- Exit critical section ------------------------------------
           }
       }
 
