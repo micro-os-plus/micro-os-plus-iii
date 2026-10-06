@@ -679,10 +679,15 @@ namespace os
         interrupts::critical_section ics;
 
         // If the thread is not already in the ready list, enqueue it.
-        if (ready_node_.next () == nullptr)
+        // In SMP, a running thread has ready_node_.next() == nullptr;
+        // it must not be re-enqueued while actively executing.
+        if (state_ == state::suspended || state_ == state::initializing)
           {
-            scheduler::ready_threads_list_.link (ready_node_);
-            // state::ready set in above link().
+            if (ready_node_.next () == nullptr)
+              {
+                scheduler::ready_threads_list_.link (ready_node_);
+                // state::ready set in above link().
+              }
           }
         // ----- Exit critical section ----------------------------------------
       }
