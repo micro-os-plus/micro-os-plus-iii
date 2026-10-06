@@ -271,8 +271,7 @@ namespace os
      * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      */
     condition_variable::condition_variable (const char* name,
-                                            const attributes& attr
-                                            __attribute__ ((unused)))
+                                            const attributes& attr)
         : object_named_system{ name }
     {
       instrumentation::condition_variable::create (this);
@@ -283,6 +282,10 @@ namespace os
 
       // Don't call this from interrupt handlers.
       os_assert_throw (!interrupts::in_handler_mode (), EPERM);
+
+#if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
+      clock_ = attr.clock != nullptr ? attr.clock : &sysclock;
+#endif
 
       instrumentation::condition_variable::create_return (this);
     }
@@ -371,10 +374,20 @@ namespace os
       // Don't call this from interrupt handlers.
       os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
+#if defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
+
+      result_t res = port::condition_variable::signal (this);
+      instrumentation::condition_variable::signal_retval (this, res);
+      return res;
+
+#else
+
       list_.resume_one ();
 
       instrumentation::condition_variable::signal_retval (this, result::ok);
       return result::ok;
+
+#endif
     }
 
     /**
@@ -447,6 +460,14 @@ namespace os
       // Don't call this from interrupt handlers.
       os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
+#if defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
+
+      result_t res = port::condition_variable::broadcast (this);
+      instrumentation::condition_variable::broadcast_retval (this, res);
+      return res;
+
+#else
+
       // Wake-up all threads, if any.
       // Need not be inside the critical section,
       // the list is protected by inner `resume_one()`.
@@ -454,6 +475,8 @@ namespace os
 
       instrumentation::condition_variable::broadcast_retval (this, result::ok);
       return result::ok;
+
+#endif
     }
 
     /**
@@ -555,6 +578,14 @@ namespace os
       // Don't call this from critical regions.
       os_assert_err (!scheduler::locked (), EPERM);
 
+#if defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
+
+      result_t res = port::condition_variable::wait (this, &mutex);
+      instrumentation::condition_variable::wait_retval (this, res);
+      return res;
+
+#else
+
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -562,32 +593,52 @@ namespace os
       // list and guaranteed to be removed before this function returns.
       internal::waiting_thread_node node{ crt_thread };
 
-      // TODO: validate
-
       result_t res;
-      res = mutex.unlock ();
+      {
+        // ----- Enter critical section ---------------------------------------
+        // The link and the unlock must be one step for this CPU's scheduler.
+        // Once linked, the thread is `suspended`; a tick or an IPI taken
+        // before `mutex.unlock()` would switch it out still OWNING the mutex,
+        // and the thread that could signal it would block on that mutex
+        // forever (smp-pro-cons-test stalled this way on 4 cores, 1 run in
+        // about 20). Other CPUs are not held back: they can still take the
+        // mutex, and signal(), as soon as it is released.
+        scheduler::critical_section scs;
 
-      if (res != result::ok)
         {
-          instrumentation::condition_variable::wait_retval (this, res);
-          return res;
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+
+          // Add this thread to the condition variable waiting list.
+          scheduler::internal_link_node (
+              list_, node, OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_CONDVAR);
+          // state::suspended set in above link().
+          // ----- Exit critical section --------------------------------------
         }
 
-      {
-        // Add this thread to the condition variable waiting list.
-        list_.link (node);
-        node.thread_->waiting_node_ = &node;
+        res = mutex.unlock ();
 
-        res = mutex.lock ();
-
-        // Remove the thread from the node waiting list,
-        // if not already removed.
-        node.thread_->waiting_node_ = nullptr;
-        node.unlink ();
+        if (res != result::ok)
+          {
+            scheduler::internal_unlink_node (node);
+            instrumentation::condition_variable::wait_retval (this, res);
+            return res;
+          }
+        // ----- Exit critical section ----------------------------------------
       }
+
+      port::scheduler::reschedule ();
+
+      // Remove the thread from the condition variable waiting list,
+      // if not already removed by signal() / broadcast().
+      scheduler::internal_unlink_node (node);
+
+      res = mutex.lock ();
 
       instrumentation::condition_variable::wait_retval (this, res);
       return res;
+
+#endif
     }
 
     /**
@@ -715,6 +766,14 @@ namespace os
       // Don't call this from critical regions.
       os_assert_err (!scheduler::locked (), EPERM);
 
+#if defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
+
+      result_t res = port::condition_variable::timed_wait (this, &mutex, timeout);
+      instrumentation::condition_variable::timed_wait_retval (this, res);
+      return res;
+
+#else
+
       thread& crt_thread = this_thread::thread ();
 
       // Prepare a list node pointing to the current thread.
@@ -722,32 +781,62 @@ namespace os
       // list and guaranteed to be removed before this function returns.
       internal::waiting_thread_node node{ crt_thread };
 
-      // TODO: validate
+      clock* clk = (clock_ != nullptr) ? clock_ : &sysclock;
+      internal::clock_timestamps_list& clock_list = clk->steady_list ();
+      clock::timestamp_t timeout_timestamp = clk->steady_now () + timeout;
+
+      // Prepare a timeout node pointing to the current thread.
+      internal::timeout_thread_node timeout_node{ timeout_timestamp,
+                                                  crt_thread };
 
       result_t res;
-      res = mutex.unlock ();
+      {
+        // ----- Enter critical section ---------------------------------------
+        // Link and unlock as one step for this CPU's scheduler; see wait().
+        scheduler::critical_section scs;
 
-      if (res != result::ok)
         {
-          instrumentation::condition_variable::timed_wait_retval (this, res);
-          return res;
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+
+          // Add this thread to the condition variable waiting list,
+          // and the clock timeout list.
+          scheduler::internal_link_node (
+              list_, node, clock_list, timeout_node,
+              OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_CONDVAR);
+          // state::suspended set in above link().
+          // ----- Exit critical section --------------------------------------
         }
 
-      {
-        // Add this thread to the condition variable waiting list.
-        list_.link (node);
-        node.thread_->waiting_node_ = &node;
+        res = mutex.unlock ();
 
-        res = mutex.timed_lock (timeout);
-
-        // Remove the thread from the node waiting list,
-        // if not already removed.
-        node.thread_->waiting_node_ = nullptr;
-        node.unlink ();
+        if (res != result::ok)
+          {
+            scheduler::internal_unlink_node (node, timeout_node);
+            instrumentation::condition_variable::timed_wait_retval (this, res);
+            return res;
+          }
+        // ----- Exit critical section ----------------------------------------
       }
+
+      port::scheduler::reschedule ();
+
+      // Remove the thread from the condition variable waiting list,
+      // if not already removed by signal() / broadcast() and from the clock
+      // timeout list, if not already removed by the timer.
+      scheduler::internal_unlink_node (node, timeout_node);
+
+      res = mutex.lock ();
+
+      if (res == result::ok && clk->steady_now () >= timeout_timestamp)
+        {
+          res = ETIMEDOUT;
+        }
 
       instrumentation::condition_variable::timed_wait_retval (this, res);
       return res;
+
+#endif
     }
 
     // ------------------------------------------------------------------------

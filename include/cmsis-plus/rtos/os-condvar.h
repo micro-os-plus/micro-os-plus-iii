@@ -278,7 +278,7 @@ namespace os
 
 #if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
       internal::waiting_threads_list list_;
-      // clock& clock_;
+      clock* clock_ = nullptr;
 #endif
 
       /**

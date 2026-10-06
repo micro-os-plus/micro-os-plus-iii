@@ -1064,7 +1064,7 @@ extern "C"
     const char* name;
 #if !defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
     os_internal_threads_waiting_list_t list;
-    // void* clock;
+    void* clock;
 #endif
 
     /**
