@@ -1504,7 +1504,9 @@ os_timer_construct (os_timer_t* timer, const char* name,
   assert (timer != nullptr);
   if (attr == nullptr)
     {
-      attr = (const os_timer_attr_t*)&timer::periodic_initializer;
+      // The C++ and CMSIS defaults are one-shot timers; only an explicit
+      // periodic attribute (os_timer_attr_get_periodic()) should repeat.
+      attr = (const os_timer_attr_t*)&timer::once_initializer;
     }
   new (timer)
       rtos::timer (name, (timer::func_t)function, (timer::func_args_t)args,
@@ -1545,7 +1547,9 @@ os_timer_new (const char* name, os_timer_func_t function,
 {
   if (attr == nullptr)
     {
-      attr = (const os_timer_attr_t*)&timer::periodic_initializer;
+      // The C++ and CMSIS defaults are one-shot timers; only an explicit
+      // periodic attribute (os_timer_attr_get_periodic()) should repeat.
+      attr = (const os_timer_attr_t*)&timer::once_initializer;
     }
   return reinterpret_cast<os_timer_t*> (
       new rtos::timer (name, (timer::func_t)function, (timer::func_args_t)args,
