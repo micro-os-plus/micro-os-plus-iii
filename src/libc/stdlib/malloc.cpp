@@ -160,6 +160,17 @@ calloc (size_t nelem, size_t elbytes)
       return nullptr;
     }
 
+  // Reject requests whose total size would overflow `size_t`. Without this
+  // guard the product wraps to a small value (e.g. on a 32-bit target
+  // `calloc(0x10001, 0x10000)` becomes 0) and a tiny block is returned while
+  // the caller believes the full, huge array was allocated. `elbytes` is
+  // known non-zero here, so the division is safe.
+  if (nelem > static_cast<std::size_t> (-1) / elbytes)
+    {
+      errno = ENOMEM;
+      return nullptr;
+    }
+
   void* mem;
   {
     // ----- Begin of critical section ----------------------------------------
@@ -294,7 +305,16 @@ realloc (void* ptr, size_t bytes)
     mem = estd::pmr::get_default_resource ()->allocate (bytes);
     if (mem != nullptr)
       {
-        memcpy (mem, ptr, bytes);
+        // POSIX requires the contents to be preserved "up to the lesser of
+        // the new and old sizes". The old size is queried from the allocator
+        // (the bare-metal default resource is a `first_fit_top`, which keeps
+        // it in the chunk header). Copying `bytes` unconditionally would read
+        // past the end of the old block whenever the new size is larger,
+        // i.e. on every growing `realloc()`.
+        std::size_t old_bytes
+            = estd::pmr::get_default_resource ()->usable_size (ptr);
+        std::size_t copy_bytes = (bytes < old_bytes) ? bytes : old_bytes;
+        memcpy (mem, ptr, copy_bytes);
         estd::pmr::get_default_resource ()->deallocate (ptr, 0);
       }
     else

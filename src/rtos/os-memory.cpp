@@ -440,6 +440,23 @@ namespace os
 
       /**
        * @details
+       * The default implementation of this virtual function returns
+       * zero, meaning the usable size is not known.
+       *
+       * Override this function to return the actual size.
+       *
+       * @par Standard compliance
+       *   Extension to standard.
+       */
+      std::size_t
+      memory_resource::do_usable_size (void* addr) const noexcept
+      {
+        static_cast<void> (addr);
+        return 0;
+      }
+
+      /**
+       * @details
        * The default implementation of this virtual function
        * does nothing.
        *

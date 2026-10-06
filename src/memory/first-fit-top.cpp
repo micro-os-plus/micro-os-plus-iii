@@ -122,13 +122,32 @@ namespace os
     {
       using namespace os;
 
+
+      if (bytes > total_bytes_)
+        {
+          return nullptr;
+        }
+
       std::size_t block_padding = calc_block_padding (alignment);
       std::size_t alloc_size = rtos::memory::align_size (bytes, chunk_align);
+      if (alloc_size == static_cast<std::size_t> (-1)
+          || alloc_size > total_bytes_)
+        {
+          return nullptr;
+        }
       alloc_size += block_padding;
       alloc_size += chunk_offset;
+      if (alloc_size > total_bytes_)
+        {
+          return nullptr;
+        }
 
       std::size_t block_minchunk = calc_block_minchunk (block_padding);
       alloc_size = os::rtos::memory::max (alloc_size, block_minchunk);
+      if (alloc_size > total_bytes_)
+        {
+          return nullptr;
+        }
 
       chunk_t* chunk;
 
@@ -427,6 +446,37 @@ namespace os
     {
       return total_bytes_;
     }
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wcast-align"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
+#endif
+    std::size_t
+    first_fit_top::do_usable_size (void* addr) const noexcept
+    {
+      // Recover the chunk header placed immediately before the payload.
+      chunk_t* chunk = reinterpret_cast<chunk_t*> (static_cast<char*> (addr)
+                                                    - chunk_offset);
+
+      // For an aligned block, the adjusted header stores the (negative)
+      // alignment offset as its size; step back to the real chunk header
+      // exactly as do_deallocate() does.
+      if (static_cast<std::ptrdiff_t> (chunk->size) < 0)
+        {
+          chunk = reinterpret_cast<chunk_t*> (
+              reinterpret_cast<char*> (chunk)
+              + static_cast<std::ptrdiff_t> (chunk->size));
+        }
+
+      // Usable bytes are those from the given address to the end of the
+      // chunk; this naturally accounts for any alignment slack between the
+      // chunk payload and the returned pointer.
+      return static_cast<std::size_t> (
+          reinterpret_cast<char*> (chunk) + chunk->size
+          - static_cast<char*> (addr));
+    }
+#pragma GCC diagnostic pop
 
     void*
     first_fit_top::internal_align_ (chunk_t* chunk, std::size_t bytes,

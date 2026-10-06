@@ -84,6 +84,10 @@ namespace os
       constexpr std::size_t
       align_size (std::size_t size, std::size_t align) noexcept
       {
+        if (size > static_cast<std::size_t> (-1) - (align - 1L))
+          {
+            return static_cast<std::size_t> (-1);
+          }
         return ((size) + (align)-1L) & ~((align)-1L);
       }
 
@@ -275,6 +279,21 @@ namespace os
         max_size (void) const noexcept;
 
         /**
+         * @brief Get the usable size of a previously allocated block.
+         * @param addr Address of a block returned by `allocate()`.
+         * @return Number of usable bytes, or 0 if the size is unknown.
+         *
+         * @details
+         * This is an extension used by `realloc()` to copy at most the
+         * old contents; the allocator is the only one who knows the real
+         * size of a block when the caller passed 0 to `deallocate()`.
+         *
+         * @see do_usable_size();
+         */
+        std::size_t
+        usable_size (void* addr) const noexcept;
+
+        /**
          * @brief Set the out of memory handler.
          * @param handler Pointer to new handler.
          * @return Pointer to old handler.
@@ -421,6 +440,18 @@ namespace os
          */
         virtual std::size_t
         do_max_size (void) const noexcept;
+
+        /**
+         * @brief Implementation of the function to get the usable block size.
+         * @param addr Address of a previously allocated block.
+         * @return Number of usable bytes, or 0 if the size is unknown.
+         *
+         * @details
+         * The default implementation returns 0 (unknown); allocators that
+         * keep the block size, like `first_fit_top`, override it.
+         */
+        virtual std::size_t
+        do_usable_size (void* addr) const noexcept;
 
         /**
          * @brief Implementation of the function to reset the memory manager.
@@ -1340,6 +1371,15 @@ namespace os
       memory_resource::max_size (void) const noexcept
       {
         return do_max_size ();
+      }
+
+      /**
+       * @see do_usable_size();
+       */
+      inline std::size_t
+      memory_resource::usable_size (void* addr) const noexcept
+      {
+        return do_usable_size (addr);
       }
 
       /**
