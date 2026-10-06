@@ -284,20 +284,22 @@ namespace os
           return cv_status::timeout;
         }
 
-      Native_clock::time_point start_tp = Native_clock::now ();
-
       os::rtos::clock::duration_t ticks
           = os::estd::chrono::ceil<std::chrono::duration<
               os::rtos::clock::duration_t, typename Native_clock::period>> (
                 rel_time)
                 .count ();
 
-      ncv_.timed_wait (
+      // Trust the kernel's verdict rather than re-deriving it from the wall
+      // clock: a signalled wake that happened to be preempted beyond
+      // `rel_time`, or a timeout that rounded down to fewer ticks, would be
+      // misreported by a pure elapsed-time comparison. `timed_wait()` returns
+      // `result::ok` on a signal and `ETIMEDOUT` when the timeout expired.
+      os::rtos::result_t res = ncv_.timed_wait (
           /*(rtos::mutex &)*/ (*(lock.mutex ()->native_handle ())), ticks);
 
-      return (Native_clock::now () - start_tp) < rel_time
-                 ? cv_status::no_timeout
-                 : cv_status::timeout;
+      return (res == os::rtos::result::ok) ? cv_status::no_timeout
+                                           : cv_status::timeout;
     }
 
     template <class Rep_T, class Period_T, class Predicate_T>
