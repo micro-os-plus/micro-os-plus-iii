@@ -796,17 +796,24 @@ namespace os
 
 #else
 
-      if (state_ == state::ready)
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          // Remove from initial location and reinsert according
-          // to new priority.
-          ready_node_.unlink ();
-          scheduler::ready_threads_list_.link (ready_node_);
-          // ----- Exit critical section --------------------------------------
-        }
+        // Test and relink under one lock, and only a thread that is still
+        // linked in the ready list. On SMP another CPU may pick this thread
+        // between a test made outside the lock and the relink: link() would
+        // then put a thread being dispatched back in the ready list, marked
+        // ready, and a third CPU could run the same context at once.
+        if (state_ == state::ready && ready_node_.next () != nullptr)
+          {
+            // Remove from initial location and reinsert according
+            // to new priority.
+            ready_node_.unlink ();
+            scheduler::ready_threads_list_.link (ready_node_);
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       // Mandatory, the priority might have been raised, the
       // task must be scheduled to run.
@@ -880,17 +887,24 @@ namespace os
 
 #else
 
-      if (state_ == state::ready)
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          // Remove from initial location and reinsert according
-          // to new priority.
-          ready_node_.unlink ();
-          scheduler::ready_threads_list_.link (ready_node_);
-          // ----- Exit critical section --------------------------------------
-        }
+        // Test and relink under one lock, and only a thread that is still
+        // linked in the ready list. On SMP another CPU may pick this thread
+        // between a test made outside the lock and the relink: link() would
+        // then put a thread being dispatched back in the ready list, marked
+        // ready, and a third CPU could run the same context at once.
+        if (state_ == state::ready && ready_node_.next () != nullptr)
+          {
+            // Remove from initial location and reinsert according
+            // to new priority.
+            ready_node_.unlink ();
+            scheduler::ready_threads_list_.link (ready_node_);
+          }
+        // ----- Exit critical section ----------------------------------------
+      }
 
       // Mandatory, the priority might have been raised, the
       // task must be scheduled to run.
