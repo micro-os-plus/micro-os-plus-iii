@@ -638,6 +638,15 @@ namespace os
       // First lock.
       if (owner_ == nullptr)
         {
+          // Prio ceiling must be at least the priority of the highest
+          // priority thread. Checked before anything is taken: a refused
+          // lock must not leave the mutex on the thread's list of owned
+          // mutexes, nor counted in acquired_mutexes_.
+          if (protocol_ == protocol::protect && th->priority () > prio_ceiling_)
+            {
+              return EINVAL;
+            }
+
           // If the mutex has no owner, own it.
           owner_ = th;
 
@@ -661,16 +670,6 @@ namespace os
 
           if (protocol_ == protocol::protect)
             {
-              if (th->priority () > prio_ceiling_)
-                {
-                  // No need to keep the lock.
-                  owner_ = nullptr;
-
-                  // Prio ceiling must be at least the priority of the
-                  // highest priority thread.
-                  return EINVAL;
-                }
-
               // POSIX: When a thread owns one or more mutexes
               // initialised with the mutex::protocol::protect protocol,
               // it shall execute at the higher of its priority or the
