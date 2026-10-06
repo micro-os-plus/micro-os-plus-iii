@@ -153,7 +153,7 @@ namespace os
           // Get logical device sector size (to be used for read/writes).
           {
             std::size_t* sz = va_arg (args, std::size_t*);
-            if (sz == nullptr || impl ().block_logical_size_bytes_ != 0)
+            if (sz == nullptr || impl ().block_logical_size_bytes_ == 0)
               {
                 errno = EINVAL;
 
@@ -171,7 +171,7 @@ namespace os
           // Get physical device sector size (internally used for erase).
           {
             std::size_t* sz = va_arg (args, std::size_t*);
-            if (sz == nullptr || impl ().block_physical_size_bytes_ != 0)
+            if (sz == nullptr || impl ().block_physical_size_bytes_ == 0)
               {
                 errno = EINVAL;
 
@@ -189,7 +189,7 @@ namespace os
           // Get device size in bytes.
           {
             uint64_t* sz = va_arg (args, uint64_t*);
-            if (sz == nullptr || impl ().num_blocks_ != 0)
+            if (sz == nullptr || impl ().num_blocks_ == 0)
               {
                 errno = EINVAL;
 
