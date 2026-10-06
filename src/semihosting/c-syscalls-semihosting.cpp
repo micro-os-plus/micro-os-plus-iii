@@ -263,9 +263,12 @@ __semihosting_stat (int fd, struct stat* st)
       return -1;
     }
 
-  /* Always assume a character device,
-   with 1024 byte blocks. */
-  st->st_mode |= S_IFCHR;
+  /* If the caller did not already specify a file type,
+     default to character device, with 1024 byte blocks. */
+  if ((st->st_mode & S_IFMT) == 0)
+    {
+      st->st_mode |= S_IFCHR;
+    }
   st->st_blksize = 1024;
 
   int res;
