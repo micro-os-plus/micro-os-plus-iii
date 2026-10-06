@@ -290,6 +290,135 @@ void* __attribute__ ((weak)) operator new[] (std::size_t bytes,
 
 /**
  * @ingroup cmsis-plus-rtos-memres
+ * @brief Allocate over-aligned space for a new object instance.
+ * @param bytes Number of bytes to allocate.
+ * @param alignment Required alignment (C++17 `std::align_val_t`).
+ * @return Pointer to aligned allocated object.
+ *
+ * @details
+ * C++17 calls this overload for types whose alignment exceeds
+ * `alignof(std::max_align_t)`. The requested alignment is passed through to
+ * the RTOS default memory resource; the bare-metal `first_fit_top` honours
+ * it, whereas the plain `size_t` overload only promises `max_align`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void* __attribute__ ((weak))
+operator new (std::size_t bytes, std::align_val_t alignment)
+{
+  assert (!rtos::interrupts::in_handler_mode ());
+  if (bytes == 0)
+    {
+      bytes = 1;
+    }
+
+  // ----- Begin of critical section ------------------------------------------
+  rtos::scheduler::critical_section scs;
+
+  while (true)
+    {
+      void* mem = estd::pmr::get_default_resource ()->allocate (
+          bytes, static_cast<std::size_t> (alignment));
+
+      if (mem != nullptr)
+        {
+          return mem;
+        }
+
+      if (new_handler_)
+        {
+          new_handler_ ();
+        }
+      else
+        {
+          estd::__throw_bad_alloc ();
+        }
+    }
+
+  // ----- End of critical section --------------------------------------------
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Allocate over-aligned space for a new object instance (nothrow).
+ * @param bytes Number of bytes to allocate.
+ * @param alignment Required alignment (C++17 `std::align_val_t`).
+ * @param nothrow (unused)
+ * @return Pointer to aligned allocated object or nullptr.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void* __attribute__ ((weak))
+operator new (std::size_t bytes, std::align_val_t alignment,
+              const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+{
+  assert (!rtos::interrupts::in_handler_mode ());
+  if (bytes == 0)
+    {
+      bytes = 1;
+    }
+
+  // ----- Begin of critical section ------------------------------------------
+  rtos::scheduler::critical_section scs;
+
+  while (true)
+    {
+      void* mem = estd::pmr::get_default_resource ()->allocate (
+          bytes, static_cast<std::size_t> (alignment));
+
+      if (mem != nullptr)
+        {
+          return mem;
+        }
+
+      if (new_handler_)
+        {
+          new_handler_ ();
+        }
+      else
+        {
+          break; // return nullptr
+        }
+    }
+
+  // ----- End of critical section --------------------------------------------
+
+  return nullptr;
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Allocate over-aligned space for an array of new object instances.
+ * @param bytes Number of bytes to allocate.
+ * @param alignment Required alignment (C++17 `std::align_val_t`).
+ * @return Pointer to aligned allocated object.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void* __attribute__ ((weak))
+operator new[] (std::size_t bytes, std::align_val_t alignment)
+{
+  return ::operator new (bytes, alignment);
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Allocate over-aligned space for an array of new object
+ *  instances (nothrow).
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void* __attribute__ ((weak))
+operator new[] (std::size_t bytes, std::align_val_t alignment,
+                const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+{
+  return ::operator new (bytes, alignment, std::nothrow);
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
  * @brief Deallocate the dynamically allocated object instance.
  * @param ptr Pointer to object.
  * @par Returns
@@ -514,6 +643,116 @@ void __attribute__ ((weak)) operator delete[] (void* ptr, const std::nothrow_t
                                                & nothrow) noexcept
 {
   ::operator delete (ptr, nothrow);
+}
+
+// ----------------------------------------------------------------------------
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Deallocate an over-aligned dynamically allocated object.
+ * @param ptr Pointer to object.
+ * @param alignment Required alignment (C++17 `std::align_val_t`).
+ * @par Returns
+ *  Nothing.
+ *
+ * @details
+ * Counterpart of `operator new(std::size_t, std::align_val_t)`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void __attribute__ ((weak))
+operator delete (void* ptr, std::align_val_t alignment) noexcept
+{
+  assert (!rtos::interrupts::in_handler_mode ());
+
+  if (ptr)
+    {
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section scs;
+
+      estd::pmr::get_default_resource ()->deallocate (
+          ptr, 0, static_cast<std::size_t> (alignment));
+      // ----- End of critical section ----------------------------------------
+    }
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Deallocate an over-aligned dynamically allocated object (sized).
+ * @param ptr Pointer to object.
+ * @param bytes Number of bytes to deallocate.
+ * @param alignment Required alignment (C++17 `std::align_val_t`).
+ * @par Returns
+ *  Nothing.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void __attribute__ ((weak))
+operator delete (void* ptr, std::size_t bytes,
+                 std::align_val_t alignment) noexcept
+{
+  assert (!rtos::interrupts::in_handler_mode ());
+
+  if (ptr)
+    {
+      // ----- Begin of critical section --------------------------------------
+      rtos::scheduler::critical_section scs;
+
+      estd::pmr::get_default_resource ()->deallocate (
+          ptr, bytes, static_cast<std::size_t> (alignment));
+      // ----- End of critical section ----------------------------------------
+    }
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Deallocate an over-aligned dynamically allocated array.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void __attribute__ ((weak))
+operator delete[] (void* ptr, std::align_val_t alignment) noexcept
+{
+  ::operator delete (ptr, alignment);
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Deallocate an over-aligned dynamically allocated array (sized).
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void __attribute__ ((weak))
+operator delete[] (void* ptr, std::size_t bytes,
+                   std::align_val_t alignment) noexcept
+{
+  ::operator delete (ptr, bytes, alignment);
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Deallocate an over-aligned dynamically allocated object (nothrow).
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void __attribute__ ((weak))
+operator delete (void* ptr, std::align_val_t alignment,
+                 const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+{
+  ::operator delete (ptr, alignment);
+}
+
+/**
+ * @ingroup cmsis-plus-rtos-memres
+ * @brief Deallocate an over-aligned dynamically allocated array (nothrow).
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+void __attribute__ ((weak))
+operator delete[] (void* ptr, std::align_val_t alignment,
+                   const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+{
+  ::operator delete[] (ptr, alignment);
 }
 
 // error: end of file with unbalanced grouping commands
