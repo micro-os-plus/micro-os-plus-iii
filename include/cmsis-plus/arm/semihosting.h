@@ -73,7 +73,8 @@ extern "C"
 #endif
 // For thumb only architectures use the BKPT instruction instead of SWI.
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_6M__)
+    || defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_MAIN__) \
+    || defined(__ARM_ARCH_8M_BASE__)
 #define AngelSWIInsn "bkpt"
 #define AngelSWIAsm bkpt
 #else
@@ -103,6 +104,9 @@ extern "C"
         " mov r1, %[arg]  \n"
 #if defined(OS_DEBUG_SEMIHOSTING_FAULTS)
         " " AngelSWITestFault " \n"
+#elif defined(SEMIHOST_TRAP_HLT)
+        " .arm \n"
+        " .inst 0xE10F0070 \n"
 #else
       " " AngelSWIInsn " %[swi] \n"
 #endif
