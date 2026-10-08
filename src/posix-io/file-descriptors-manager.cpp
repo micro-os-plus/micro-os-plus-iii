@@ -91,7 +91,7 @@ namespace os
     io*
     file_descriptors_manager::io (int fildes)
     {
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
       // Check if valid descriptor or buffer not yet initialised
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__)
@@ -110,7 +110,7 @@ namespace os
     bool
     file_descriptors_manager::valid (int fildes)
     {
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__)
           || (descriptors_array__ == nullptr)
@@ -135,7 +135,7 @@ namespace os
           return -1;
         }
 
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
       for (std::size_t i = reserved__; i < size__; ++i)
         {
@@ -177,7 +177,7 @@ namespace os
           return -1;
         }
 
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -196,7 +196,7 @@ namespace os
       trace::printf ("file_descriptors_manager::%s(%d)\n", __func__, fildes);
 #endif
 
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__)
           || (descriptors_array__ == nullptr)
@@ -221,7 +221,7 @@ namespace os
     {
       assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
 
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -242,7 +242,7 @@ namespace os
     size_t
     file_descriptors_manager::used (void)
     {
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
 
       std::size_t count = reserved__;
       for (std::size_t i = reserved__; i < file_descriptors_manager::size ();
