@@ -136,6 +136,7 @@ namespace std
 void* __attribute__ ((weak)) operator new (std::size_t bytes)
 {
   assert (!rtos::interrupts::in_handler_mode ());
+
   if (bytes == 0)
     {
       bytes = 1;
@@ -307,6 +308,7 @@ void* __attribute__ ((weak))
 operator new (std::size_t bytes, std::align_val_t alignment)
 {
   assert (!rtos::interrupts::in_handler_mode ());
+
   if (bytes == 0)
     {
       bytes = 1;
@@ -353,6 +355,7 @@ operator new (std::size_t bytes, std::align_val_t alignment,
               const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
 {
   assert (!rtos::interrupts::in_handler_mode ());
+
   if (bytes == 0)
     {
       bytes = 1;

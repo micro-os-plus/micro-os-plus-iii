@@ -230,7 +230,6 @@ namespace os
     file_descriptors_manager::socket (int fildes)
     {
       assert (!rtos::interrupts::in_handler_mode ());
-
       assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
 
       rtos::scheduler::critical_section scs;
