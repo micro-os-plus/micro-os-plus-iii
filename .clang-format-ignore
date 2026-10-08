@@ -1,0 +1,4 @@
+# Files excluded from clang-format (see scripts/clang-format.sh).
+
+# STM32CubeMX generated projects; vendor code, do not reformat.
+tests/platforms/*/*cubemx/**
