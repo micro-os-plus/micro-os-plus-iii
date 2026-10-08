@@ -469,7 +469,7 @@ namespace os
     inline void
     net_stack::add_deferred_socket (class socket* sock)
     {
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
       deferred_sockets_list_.link (*sock);
     }
 
@@ -487,7 +487,7 @@ namespace os
 
       socket_type* sock = nullptr;
       {
-        rtos::interrupts::critical_section ics;
+        rtos::scheduler::critical_section scs;
         if (!deferred_sockets_list_.empty ())
           {
             sock = static_cast<socket_type*> (
@@ -512,7 +512,7 @@ namespace os
             {
               socket_type* s = nullptr;
               {
-                rtos::interrupts::critical_section ics;
+                rtos::scheduler::critical_section scs;
                 if (!deferred_sockets_list_.empty ())
                   {
                     s = static_cast<socket_type*> (
@@ -537,7 +537,7 @@ namespace os
 
       socket_type* sock = nullptr;
       {
-        rtos::interrupts::critical_section ics;
+        rtos::scheduler::critical_section scs;
         if (!deferred_sockets_list_.empty ())
           {
             sock = static_cast<socket_type*> (
@@ -562,7 +562,7 @@ namespace os
             {
               socket_type* s = nullptr;
               {
-                rtos::interrupts::critical_section ics;
+                rtos::scheduler::critical_section scs;
                 if (!deferred_sockets_list_.empty ())
                   {
                     s = static_cast<socket_type*> (

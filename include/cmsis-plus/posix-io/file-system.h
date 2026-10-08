@@ -822,14 +822,14 @@ namespace os
     inline void
     file_system::add_deferred_file (file* fil)
     {
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
       deferred_files_list_.link (*fil);
     }
 
     inline void
     file_system::add_deferred_directory (directory* dir)
     {
-      rtos::interrupts::critical_section ics;
+      rtos::scheduler::critical_section scs;
       deferred_directories_list_.link (*dir);
     }
 
@@ -853,7 +853,7 @@ namespace os
 
       file_type* fil = nullptr;
       {
-        rtos::interrupts::critical_section ics;
+        rtos::scheduler::critical_section scs;
         if (!deferred_files_list_.empty ())
           {
             fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
@@ -885,7 +885,7 @@ namespace os
 
       file_type* fil = nullptr;
       {
-        rtos::interrupts::critical_section ics;
+        rtos::scheduler::critical_section scs;
         if (!deferred_files_list_.empty ())
           {
             fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
@@ -919,7 +919,7 @@ namespace os
         {
           file_type* f = nullptr;
           {
-            rtos::interrupts::critical_section ics;
+            rtos::scheduler::critical_section scs;
             if (!deferred_files_list_.empty ())
               {
                 f = static_cast<file_type*> (deferred_files_list_.unlink_head ());
@@ -941,7 +941,7 @@ namespace os
 
       directory_type* dir = nullptr;
       {
-        rtos::interrupts::critical_section ics;
+        rtos::scheduler::critical_section scs;
         if (!deferred_directories_list_.empty ())
           {
             dir = static_cast<directory_type*> (
@@ -974,7 +974,7 @@ namespace os
 
       directory_type* dir = nullptr;
       {
-        rtos::interrupts::critical_section ics;
+        rtos::scheduler::critical_section scs;
         if (!deferred_directories_list_.empty ())
           {
             dir = static_cast<directory_type*> (
@@ -1009,7 +1009,7 @@ namespace os
         {
           directory_type* d = nullptr;
           {
-            rtos::interrupts::critical_section ics;
+            rtos::scheduler::critical_section scs;
             if (!deferred_directories_list_.empty ())
               {
                 d = static_cast<directory_type*> (
