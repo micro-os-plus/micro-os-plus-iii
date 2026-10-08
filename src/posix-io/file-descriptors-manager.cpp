@@ -91,6 +91,8 @@ namespace os
     io*
     file_descriptors_manager::io (int fildes)
     {
+      assert (!rtos::interrupts::in_handler_mode ());
+
       rtos::scheduler::critical_section scs;
 
       // Check if valid descriptor or buffer not yet initialised
@@ -110,6 +112,8 @@ namespace os
     bool
     file_descriptors_manager::valid (int fildes)
     {
+      assert (!rtos::interrupts::in_handler_mode ());
+
       rtos::scheduler::critical_section scs;
 
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__)
@@ -124,6 +128,8 @@ namespace os
     int
     file_descriptors_manager::allocate (class io* io)
     {
+      assert (!rtos::interrupts::in_handler_mode ());
+
 #if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
       trace::printf ("file_descriptors_manager::%s(%p)\n", __func__, io);
 #endif
@@ -164,6 +170,8 @@ namespace os
     int
     file_descriptors_manager::assign (file_descriptor_t fildes, class io* io)
     {
+      assert (!rtos::interrupts::in_handler_mode ());
+
       if ((fildes < 0) || (static_cast<std::size_t> (fildes) >= size__))
         {
           errno = EBADF;
@@ -191,7 +199,9 @@ namespace os
 
     int
     file_descriptors_manager::deallocate (int fildes)
-    {
+    {  
+      assert (!rtos::interrupts::in_handler_mode ());
+
 #if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
       trace::printf ("file_descriptors_manager::%s(%d)\n", __func__, fildes);
 #endif
@@ -219,6 +229,8 @@ namespace os
     /* class */ socket*
     file_descriptors_manager::socket (int fildes)
     {
+      assert (!rtos::interrupts::in_handler_mode ());
+
       assert ((fildes >= 0) && (static_cast<std::size_t> (fildes) < size__));
 
       rtos::scheduler::critical_section scs;
@@ -242,6 +254,8 @@ namespace os
     size_t
     file_descriptors_manager::used (void)
     {
+      assert (!rtos::interrupts::in_handler_mode ());
+
       rtos::scheduler::critical_section scs;
 
       std::size_t count = reserved__;
