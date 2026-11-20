@@ -398,12 +398,18 @@ extern "C"
 
   /**
    * @brief Clear thread event flags.
-   * @param [in] mask The OR-ed flags to clear.
+   * @param [in] mask The OR-ed flags to clear; must not be zero.
    * @param [out] oflags Optional pointer where to store the
    *  previous flags; may be `NULL`.
    * @retval os_ok The flags were cleared.
-   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-   * @retval EINVAL The mask is zero.
+   * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+   *  is defined, otherwise an assertion fails.
+   *
+   * @warning Cannot be invoked from Interrupt Service Routines;
+   *  when `NDEBUG` is not defined an assertion fails, and when
+   *  `NDEBUG` is defined the C++ implementation throws a
+   *  `std::system_error` (or calls `abort()` if exceptions are
+   *  disabled).
    */
   os_result_t
   os_this_thread_flags_clear (os_flags_mask_t mask, os_flags_mask_t* oflags);
@@ -571,12 +577,14 @@ extern "C"
   /**
    * @brief Raise thread event flags.
    * @param [in] thread Pointer to thread object instance.
-   * @param [in] mask The OR-ed flags to raise.
+   * @param [in] mask The OR-ed flags to raise; must not be zero.
    * @param [out] oflags Optional pointer where to store the
    *  previous flags; may be `NULL`.
    * @retval os_ok The flags were raised.
-   * @retval EINVAL The mask is zero.
-   * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+   * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+   *  is defined, otherwise an assertion fails.
+   *
+   * @note Can be invoked from Interrupt Service Routines.
    */
   os_result_t
   os_thread_flags_raise (os_thread_t* thread, os_flags_mask_t mask,
@@ -2589,12 +2597,15 @@ extern "C"
   /**
    * @brief Raise event flags.
    * @param [in] evflags Pointer to event flags object instance.
-   * @param [in] mask The OR-ed flags to raise.
+   * @param [in] mask The OR-ed flags to raise; must not be zero.
    * @param [out] oflags Optional pointer where to store the
-   *  new value of the flags; may be `NULL`.
+   *  previous value of the flags; may be `NULL`.
    * @retval os_ok The flags were raised.
-   * @retval EINVAL The mask is zero.
+   * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+   *  is defined, otherwise an assertion fails.
    * @retval ENOTRECOVERABLE Raise failed.
+   *
+   * @note Can be invoked from Interrupt Service Routines.
    */
   os_result_t
   os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
@@ -2603,11 +2614,14 @@ extern "C"
   /**
    * @brief Clear event flags.
    * @param [in] evflags Pointer to event flags object instance.
-   * @param [in] mask The OR-ed flags to clear. Zero means 'all'.
+   * @param [in] mask The OR-ed flags to clear; must not be zero.
    * @param [out] oflags Optional pointer where to store the
    *  previous value of the flags; may be `NULL`.
    * @retval os_ok The flags were cleared.
-   * @retval EINVAL The mask is zero.
+   * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+   *  is defined, otherwise an assertion fails.
+   *
+   * @note Can be invoked from Interrupt Service Routines.
    */
   os_result_t
   os_evflags_clear (os_evflags_t* evflags, os_flags_mask_t mask,

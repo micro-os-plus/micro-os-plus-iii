@@ -573,9 +573,17 @@ namespace os
 
     /**
      * @details
-     * Set more bits in the thread current signal mask.
+     * Set more bits in the event flags mask.
      * Use OR at bit-mask level.
      * Wake-up all waiting threads, if any.
+     *
+     * The mask must not be zero. A zero mask is a programming error:
+     * when `NDEBUG` is not defined it triggers an assertion; when
+     * `NDEBUG` is defined, the flags are not changed and the function
+     * returns `EINVAL`.
+     *
+     * If `oflags` is not `nullptr`, the value of the flags before
+     * raising is stored there.
      *
      * @note Can be invoked from Interrupt Service Routines.
      */
@@ -625,6 +633,17 @@ namespace os
     }
 
     /**
+     * @details
+     * Clear bits in the event flags mask.
+     *
+     * The mask must not be zero. A zero mask is a programming error:
+     * when `NDEBUG` is not defined it triggers an assertion; when
+     * `NDEBUG` is defined, the flags are not changed and the function
+     * returns `EINVAL`.
+     *
+     * If `oflags` is not `nullptr`, the value of the flags before
+     * clearing is stored there.
+     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t

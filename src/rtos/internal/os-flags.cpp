@@ -150,6 +150,8 @@ namespace os
       {
         os_assert_err (mask != 0, EINVAL);
 
+        assert (port::interrupts::is_priority_valid ());
+
         {
           // ----- Enter critical section -------------------------------------
           interrupts::critical_section ics;

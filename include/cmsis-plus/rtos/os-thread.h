@@ -183,12 +183,17 @@ namespace os
 
       /**
        * @brief Clear thread event flags.
-       * @param [in] mask The OR-ed flags to clear.
+       * @param [in] mask The OR-ed flags to clear; must not be zero.
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is zero.
+       * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+       *  is defined, otherwise an assertion fails.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines;
+       *  when `NDEBUG` is not defined an assertion fails, and when
+       *  `NDEBUG` is defined a `std::system_error` with `EPERM` is
+       *  thrown (or `abort()` is called if exceptions are disabled).
        */
       result_t
       flags_clear (flags::mask_t mask, flags::mask_t* oflags = nullptr);
@@ -1273,12 +1278,14 @@ namespace os
 
       /**
        * @brief Raise thread event flags.
-       * @param [in] mask The OR-ed flags to raise.
+       * @param [in] mask The OR-ed flags to raise; must not be zero.
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
        * @retval result::ok The flags were raised.
-       * @retval EINVAL The mask is zero.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
+       * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+       *  is defined, otherwise an assertion fails.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       result_t
       flags_raise (flags::mask_t mask, flags::mask_t* oflags = nullptr);
@@ -1291,6 +1298,17 @@ namespace os
 
       // This is a kludge required to support CMSIS RTOS V1
       // public osSignalClear().
+      /**
+       * @brief Clear thread event flags.
+       * @param [in] mask The OR-ed flags to clear; must not be zero.
+       * @param [out] oflags Optional pointer where to store the
+       *  previous flags; may be `nullptr`.
+       * @retval result::ok The flags were cleared.
+       * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+       *  is defined, otherwise an assertion fails.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
+       */
       result_t
       flags_clear (flags::mask_t mask, flags::mask_t* oflags);
 
@@ -1546,12 +1564,15 @@ namespace os
 
       /**
        * @brief Clear thread event flags.
-       * @param [in] mask The OR-ed flags to clear. Zero means 'all'
+       * @param [in] mask The OR-ed flags to clear; must not be zero.
        * @param [out] oflags Optional pointer where to store the
        *  previous flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.
-       * @retval EPERM Cannot be invoked from an Interrupt Service Routines.
-       * @retval EINVAL The mask is zero.
+       * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+       *  is defined, otherwise an assertion fails.
+       *
+       * @note Can be invoked from Interrupt Service Routines; the callers
+       *  that cannot (`this_thread::flags_clear()`) check it themselves.
        */
       result_t
       internal_flags_clear_ (flags::mask_t mask, flags::mask_t* oflags);

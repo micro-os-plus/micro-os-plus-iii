@@ -1469,6 +1469,14 @@ namespace os
      * Use OR at bit-mask level.
      * Wake-up the thread to evaluate the event flags.
      *
+     * The mask must not be zero. A zero mask is a programming error:
+     * when `NDEBUG` is not defined it triggers an assertion; when
+     * `NDEBUG` is defined, the flags are not changed and the function
+     * returns `EINVAL`.
+     *
+     * If `oflags` is not `nullptr`, the value of the flags before
+     * raising is stored there.
+     *
      * @note Can be invoked from Interrupt Service Routines.
      */
     result_t
@@ -1497,6 +1505,20 @@ namespace os
 
 #if defined(OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR)
 
+    /**
+     * @details
+     * Clear bits in the thread event flags mask.
+     *
+     * The mask must not be zero. A zero mask is a programming error:
+     * when `NDEBUG` is not defined it triggers an assertion; when
+     * `NDEBUG` is defined, the flags are not changed and the function
+     * returns `EINVAL`.
+     *
+     * If `oflags` is not `nullptr`, the value of the flags before
+     * clearing is stored there.
+     *
+     * @note Can be invoked from Interrupt Service Routines.
+     */
     result_t
     thread::flags_clear (flags::mask_t mask, flags::mask_t* oflags)
     {
@@ -1791,7 +1813,8 @@ namespace os
     }
 
     /**
-     * @warning Cannot be invoked from Interrupt Service Routines.
+     * @note Can be invoked from Interrupt Service Routines; the callers
+     * that cannot (`this_thread::flags_clear()`) check it themselves.
      */
     result_t
     thread::internal_flags_clear_ (flags::mask_t mask, flags::mask_t* oflags)
@@ -1800,9 +1823,6 @@ namespace os
       trace::printf ("%s(0x%X) @%p %s <0x%X\n", __func__, mask, this, name (),
                      event_flags_.mask ());
 #endif
-
-      // Don't call this from interrupt handlers.
-      os_assert_err (!interrupts::in_handler_mode (), EPERM);
 
       result_t res = event_flags_.clear (mask, oflags);
 
@@ -1945,7 +1965,22 @@ namespace os
       }
 
       /**
-       * @warning Cannot be invoked from Interrupt Service Routines.
+       * @details
+       * Clear bits in the current thread event flags mask.
+       *
+       * The mask must not be zero. A zero mask is a programming error:
+       * when `NDEBUG` is not defined it triggers an assertion; when
+       * `NDEBUG` is defined, the flags are not changed and the function
+       * returns `EINVAL`.
+       *
+       * If `oflags` is not `nullptr`, the value of the flags before
+       * clearing is stored there.
+       *
+       * @warning Cannot be invoked from Interrupt Service Routines;
+       * the check is done by `this_thread::thread()`: when `NDEBUG` is
+       * not defined an assertion fails, and when `NDEBUG` is defined a
+       * `std::system_error` with `EPERM` is thrown (or `abort()` is
+       * called if exceptions are disabled).
        */
       result_t
       flags_clear (flags::mask_t mask, flags::mask_t* oflags)

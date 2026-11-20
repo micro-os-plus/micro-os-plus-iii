@@ -246,23 +246,29 @@ namespace os
 
       /**
        * @brief Raise event flags.
-       * @param [in] mask The OR-ed flags to raise.
+       * @param [in] mask The OR-ed flags to raise; must not be zero.
        * @param [out] oflags Optional pointer where to store the
-       *  new value of the flags; may be `nullptr`.
+       *  previous value of the flags; may be `nullptr`.
        * @retval result::ok The flags were raised.
-       * @retval EINVAL The mask is zero.
+       * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+       *  is defined, otherwise an assertion fails.
        * @retval ENOTRECOVERABLE Raise failed.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       result_t
       raise (flags::mask_t mask, flags::mask_t* oflags = nullptr);
 
       /**
        * @brief Clear event flags.
-       * @param [in] mask The OR-ed flags to clear.
+       * @param [in] mask The OR-ed flags to clear; must not be zero.
        * @param [out] oflags Optional pointer where to store the
        *  previous value of the flags; may be `nullptr`.
        * @retval result::ok The flags were cleared.
-       * @retval EINVAL The mask is zero.
+       * @retval EINVAL The mask is zero; returned only when `NDEBUG`
+       *  is defined, otherwise an assertion fails.
+       *
+       * @note Can be invoked from Interrupt Service Routines.
        */
       result_t
       clear (flags::mask_t mask, flags::mask_t* oflags = nullptr);

@@ -710,7 +710,15 @@ os_this_thread_flags_timed_wait (os_flags_mask_t mask,
 }
 
 /**
- * @warning Cannot be invoked from Interrupt Service Routines.
+ * @details
+ * The mask must not be zero; when `NDEBUG` is not defined a zero mask
+ * triggers an assertion, and when `NDEBUG` is defined the function
+ * returns `EINVAL`.
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines;
+ * when `NDEBUG` is not defined an assertion fails, and when
+ * `NDEBUG` is defined the C++ implementation throws a
+ * `std::system_error` (or calls `abort()` if exceptions are disabled).
  *
  * @par For the complete definition, see
  *  @ref os::rtos::this_thread::flags_clear()
@@ -928,6 +936,11 @@ os_thread_resume (os_thread_t* thread)
 }
 
 /**
+ * @details
+ * The mask must not be zero; when `NDEBUG` is not defined a zero mask
+ * triggers an assertion, and when `NDEBUG` is defined the function
+ * returns `EINVAL`.
+ *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3175,6 +3188,11 @@ os_evflags_timed_wait (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
+ * @details
+ * The mask must not be zero; when `NDEBUG` is not defined a zero mask
+ * triggers an assertion, and when `NDEBUG` is defined the function
+ * returns `EINVAL`.
+ *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
@@ -3190,6 +3208,11 @@ os_evflags_raise (os_evflags_t* evflags, os_flags_mask_t mask,
 }
 
 /**
+ * @details
+ * The mask must not be zero; when `NDEBUG` is not defined a zero mask
+ * triggers an assertion, and when `NDEBUG` is defined the function
+ * returns `EINVAL`.
+ *
  * @note Can be invoked from Interrupt Service Routines.
  *
  * @par For the complete definition, see
