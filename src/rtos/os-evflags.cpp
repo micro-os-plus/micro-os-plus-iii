@@ -591,11 +591,17 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
-      os_assert_err (mask != 0, EINVAL);
+      // Validate here rather than with os_assert_err(), which would
+      // return early and skip the instrumentation exit call.
+      assert (mask != 0);
 
-      result_t res = port::event_flags::raise (this, mask, oflags);
+      result_t res = EINVAL;
+      if (mask != 0)
+        {
+          res = port::event_flags::raise (this, mask, oflags);
+        }
 
-      instrumentation::event_flags::raised (this, mask, res);
+      instrumentation::event_flags::raise_retval (this, res);
       return res;
 
 #else
@@ -633,9 +639,15 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_EVENT_FLAGS)
 
-      os_assert_err (mask != 0, EINVAL);
+      // Validate here rather than with os_assert_err(), which would
+      // return early and skip the instrumentation exit call.
+      assert (mask != 0);
 
-      result_t res = port::event_flags::clear (this, mask, oflags);
+      result_t res = EINVAL;
+      if (mask != 0)
+        {
+          res = port::event_flags::clear (this, mask, oflags);
+        }
 
       instrumentation::event_flags::clear_retval (this, res);
       return res;
