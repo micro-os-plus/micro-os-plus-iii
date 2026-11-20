@@ -29,8 +29,7 @@ target_include_directories (
             "Drivers/STM32H7xx_HAL_Driver/Inc"
 )
 
-# find * -type f -name "*.c" -o -name "*.S" -o -name "*.s" | sed -e 's|\(.*\)|
-# "\1"|'
+# find * -type f -name "*.c" -o -name "*.S" -o -name "*.s" | sed -e 's|\(.*\)|  "\1"|'
 target_sources (
   stm32cubemx-interface
   INTERFACE "Core/Src/stm32h7xx_hal_msp.c"
@@ -69,10 +68,15 @@ target_compile_options (
   stm32cubemx-interface
   INTERFACE $<$<COMPILE_LANGUAGE:C>:-Wno-bad-function-cast>
             $<$<COMPILE_LANGUAGE:C>:-Wno-nested-externs>
-            # -Wno-undef -Wno-attributes
+            # -Wno-undef
+            # -Wno-attributes
             -Wno-padded
-            # -Wno-format -Wno-format-y2k -Wno-format-nonliteral
-            # -Wno-format-security -Wno-aggregate-return -Wno-packed
+            # -Wno-format
+            # -Wno-format-y2k
+            # -Wno-format-nonliteral
+            # -Wno-format-security
+            # -Wno-aggregate-return
+            # -Wno-packed
             # -Wno-missing-declarations
             -Wno-redundant-decls
             -Wno-conversion

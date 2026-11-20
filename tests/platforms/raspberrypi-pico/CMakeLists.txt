@@ -15,17 +15,18 @@ message (VERBOSE "Processing 'tests/platforms/raspberrypi-pico'...")
 
 # -----------------------------------------------------------------------------
 
-# set(xpack_create_listing true) set(xpack_create_hex true)
+# set(xpack_create_listing true)
+# set(xpack_create_hex true)
 
-# https://github.com/raspberrypi/pico-sdk-tools/releases Download, unpack and
-# rename the executable to avoid conflicts.
+# https://github.com/raspberrypi/pico-sdk-tools/releases
+# Download, unpack and rename the executable to avoid conflicts.
 set (pico_openocd "openocd")
 # set(pico_openocd "pico-openocd")
 
 # -----------------------------------------------------------------------------
 
-# Currently there is no separate device package, the definitions are here is a
-# separate folder.
+# Currently there is no separate device package, the definitions are
+# here is a separate folder.
 add_subdirectory ("device")
 
 include ("cmake/platform-library.cmake")
@@ -40,8 +41,8 @@ function (add_test_executable name)
 
   target_compile_definitions (${name} PRIVATE OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-  # No other common compile or link options, all were defined in the libraries
-  # and will be inherited.
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
   target_link_options (
     ${name} PRIVATE -Wl,-Map,platform-bin/${name}-map.txt # -v
   )

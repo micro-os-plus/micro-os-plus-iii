@@ -1,5 +1,6 @@
 # -----------------------------------------------------------------------------
-# DO NOT EDIT! Automatically generated from build-helper/templates.
+# DO NOT EDIT!
+# Automatically generated from build-helper/templates.
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
 # Copyright (c) 2022-2025 Liviu Ionescu. All rights reserved.
@@ -12,12 +13,12 @@
 #
 # -----------------------------------------------------------------------------
 
-# Generate the compile_commands.json file to feed the indexer. Highly
-# recommended, to help IDEs construct the index.
+# Generate the compile_commands.json file to feed the indexer.
+# Highly recommended, to help IDEs construct the index.
 set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Enable this to see the dependency graph. set_property(GLOBAL PROPERTY
-# GLOBAL_DEPENDS_DEBUG_MODE 1)
+# Enable this to see the dependency graph.
+# set_property(GLOBAL PROPERTY GLOBAL_DEPENDS_DEBUG_MODE 1)
 
 # -----------------------------------------------------------------------------
 
@@ -29,15 +30,15 @@ endif ()
 # -----------------------------------------------------------------------------
 # Non-target specific definitions.
 
-# The globals must be included in this scope, before creating any targets. The
-# compile options, symbols and include folders apply to all compiled sources,
-# from all libraries.
+# The globals must be included in this scope, before creating any targets.
+# The compile options, symbols and include folders apply to all
+# compiled sources, from all libraries.
 if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
   set (extension ".cmd")
 endif ()
 
-# Define `micro-os-plus::common-options` with the compile & link options common
-# to all platforms.
+# Define `micro-os-plus::common-options` with the compile & link options
+# common to all platforms.
 include ("cmake/common-options.cmake")
 
 # Platform specific definitions.
@@ -60,8 +61,8 @@ add_subdirectory (".." "top-bin")
 # -----------------------------------------------------------------------------
 # Platform specifics.
 
-# Add the platform specific targets and tests. For consistency, the binaries are
-# created in the `platform-bin` folder.
+# Add the platform specific targets and tests.
+# For consistency, the binaries are created in the `platform-bin` folder.
 add_subdirectory ("platforms/${PLATFORM_NAME}" "platform-bin")
 
 # -----------------------------------------------------------------------------

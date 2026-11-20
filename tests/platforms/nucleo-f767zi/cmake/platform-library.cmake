@@ -59,7 +59,8 @@ set (
   # -fno-move-loop-invariants
   # Embedded builds must be warning free.
   -Werror
-  # -flto fails to run on QEMU. $<$<CONFIG:Release>:-flto>
+  # -flto fails to run on QEMU.
+  # $<$<CONFIG:Release>:-flto>
   # $<$<CONFIG:MinSizeRel>:-flto>
   $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
   # ... libs-c/src/stdlib/exit.c:132:46

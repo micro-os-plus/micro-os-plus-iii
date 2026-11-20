@@ -36,8 +36,8 @@ function (add_test_executable name)
 
   target_compile_definitions (${name} PRIVATE OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-  # No other common compile or link options, all were defined in the libraries
-  # and will be inherited.
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
   target_link_options (
     ${name} PRIVATE -Wl,-Map,platform-bin/${name}-map.txt # -v
   )
@@ -90,13 +90,14 @@ if (ENABLE_RTOS_APIS_TEST)
       PRIVATE OS_HAS_SYSTEMCLOCK_CONFIG
               # OS_USE_TRACE_SEGGER_RTT
               OS_USE_TRACE_SEMIHOSTING_STDOUT
-              # OS_USE_TRACE_SEMIHOSTING_STDERR OS_USE_TRACE_SEMIHOSTING_ITM
+              # OS_USE_TRACE_SEMIHOSTING_STDERR
+              # OS_USE_TRACE_SEMIHOSTING_ITM
               OS_INCLUDE_INSTRUMENTATION
               # OS_DISABLE_INSTRUMENTATION_AUTOSTART
     )
 
-    # No other common compile or link options, all were defined in the libraries
-    # and will be inherited.
+    # No other common compile or link options, all were defined in the
+    # libraries and will be inherited.
     target_link_options (
       rtos-apis-instrumentation-test PRIVATE
       -Wl,-Map,platform-bin/rtos-apis-instrumentation-test-map.txt # -v
@@ -126,8 +127,7 @@ if (ENABLE_RTOS_APIS_TEST)
 
     message (VERBOSE "A> rtos-apis-instrumentation-test")
 
-    # There is no automated test, it requires manual invocation using SEGGER
-    # tools.
+    # There is no automated test, it requires manual invocation using SEGGER tools.
   endif ()
 
 endif ()
@@ -232,13 +232,14 @@ if (ENABLE_INSTRUMENTATION_TEST)
     PRIVATE OS_HAS_SYSTEMCLOCK_CONFIG
             # OS_USE_TRACE_SEGGER_RTT
             OS_USE_TRACE_SEMIHOSTING_STDOUT
-            # OS_USE_TRACE_SEMIHOSTING_STDERR OS_USE_TRACE_SEMIHOSTING_ITM
+            # OS_USE_TRACE_SEMIHOSTING_STDERR
+            # OS_USE_TRACE_SEMIHOSTING_ITM
             OS_INCLUDE_INSTRUMENTATION
             # OS_DISABLE_INSTRUMENTATION_AUTOSTART
   )
 
-  # No other common compile or link options, all were defined in the libraries
-  # and will be inherited.
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
   target_link_options (
     instrumentation-test PRIVATE
     -Wl,-Map,platform-bin/instrumentation-test-map.txt # -v
@@ -266,8 +267,7 @@ if (ENABLE_INSTRUMENTATION_TEST)
 
   message (VERBOSE "A> instrumentation-test")
 
-  # There is no automated test, it requires manual invocation using SEGGER
-  # tools.
+  # There is no automated test, it requires manual invocation using SEGGER tools.
 endif ()
 
 # -----------------------------------------------------------------------------

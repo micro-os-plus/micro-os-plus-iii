@@ -56,8 +56,10 @@ target_sources (
             src/diag/trace.cpp
             src/driver/common.cpp
             src/driver/serial.cpp
-            # src/driver/usart-wrapper.cpp src/driver/usb-device.cpp
-            # src/driver/usb-host.cpp src/driver/usbd-wrapper.cpp
+            # src/driver/usart-wrapper.cpp
+            # src/driver/usb-device.cpp
+            # src/driver/usb-host.cpp
+            # src/driver/usbd-wrapper.cpp
             # src/driver/usbh-wrapper.cpp
             src/libc/_sbrk.c
             src/libc/newlib/c-newlib-reent.cpp

@@ -1,5 +1,6 @@
 # -----------------------------------------------------------------------------
-# DO NOT EDIT! Automatically generated from build-helper/templates.
+# DO NOT EDIT!
+# Automatically generated from build-helper/templates.
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
 # Copyright (c) 2022-2025 Liviu Ionescu. All rights reserved.
@@ -12,8 +13,9 @@
 #
 # -----------------------------------------------------------------------------
 
-# This file defines an interface library with the common compile & link options
-# that apply to all platforms. The library must be linked to the platform.
+# This file defines an interface library with the common compile & link
+# options that apply to all platforms.
+# The library must be linked to the platform.
 
 # -----------------------------------------------------------------------------
 
@@ -42,11 +44,12 @@ set (
   -ffunction-sections
   -fdata-sections
   -fdiagnostics-color=always
-  # No need, the toolchain does it. $<$<CONFIG:Debug>:${DEBUG_OPTION}>
+  # No need, the toolchain does it.
+  # $<$<CONFIG:Debug>:${DEBUG_OPTION}>
 )
 
-# A list of all imaginable warnings. Targets may add options to disable some of
-# them.
+# A list of all imaginable warnings.
+# Targets may add options to disable some of them.
 xpack_set_all_compiler_warnings (all_warnings)
 
 target_include_directories (

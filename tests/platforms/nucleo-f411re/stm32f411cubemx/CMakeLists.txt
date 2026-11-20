@@ -27,8 +27,7 @@ target_include_directories (
             "Drivers/CMSIS/Device/ST/STM32F4xx/Include"
 )
 
-# find * -type f -name "*.c" -o -name "*.S" -o -name "*.s" | sed -e 's|\(.*\)|
-# "\1"|'
+# find * -type f -name "*.c" -o -name "*.S" -o -name "*.s" | sed -e 's|\(.*\)|  "\1"|'
 target_sources (
   stm32cubemx-interface
   INTERFACE "Core/Src/gpio.c"

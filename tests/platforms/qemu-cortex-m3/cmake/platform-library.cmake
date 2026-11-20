@@ -1,5 +1,6 @@
 # -----------------------------------------------------------------------------
-# DO NOT EDIT! Automatically generated from build-helper/templates.
+# DO NOT EDIT!
+# Automatically generated from build-helper/templates.
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
 # Copyright (c) 2022-2025 Liviu Ionescu. All rights reserved.
@@ -62,7 +63,8 @@ set (
   # -fno-move-loop-invariants
   # Embedded builds must be warning free.
   -Werror
-  # -flto fails to run on QEMU. $<$<CONFIG:Release>:-flto>
+  # -flto fails to run on QEMU.
+  # $<$<CONFIG:Release>:-flto>
   # $<$<CONFIG:MinSizeRel>:-flto>
   $<$<CONFIG:Debug>:-fno-omit-frame-pointer>
   # ... libs-c/src/stdlib/exit.c:132:46

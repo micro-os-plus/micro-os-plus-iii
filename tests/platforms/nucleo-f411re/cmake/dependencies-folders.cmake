@@ -28,7 +28,8 @@ set (
   "${CMAKE_SOURCE_DIR}/sources/cmsis-os-validator"
   "${CMAKE_SOURCE_DIR}/sources/blinky"
   "${CMAKE_SOURCE_DIR}/sources/instrumentation"
-  # Project dependencies. The BINARY_DIR is the `build/<config>` folder.
+  # Project dependencies.
+  # The BINARY_DIR is the `build/<config>` folder.
   "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-cortexm"
   # Extra, specific to this platform.
   "${CMAKE_BINARY_DIR}/xpacks/@xpack-segger/rtt"
@@ -36,7 +37,8 @@ set (
   # The SOURCE_DIR is the `tests` folder.
   "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/arm-cmsis-rtos-validator"
   "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/chan-fatfs"
-  # Build configuration dependencies. None.
+  # Build configuration dependencies.
+  # None.
 )
 
 # -----------------------------------------------------------------------------

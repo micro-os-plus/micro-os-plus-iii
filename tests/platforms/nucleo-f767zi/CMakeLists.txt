@@ -15,7 +15,8 @@ message (VERBOSE "Processing 'tests/platforms/nucleo-f767zi'...")
 
 # -----------------------------------------------------------------------------
 
-# set(xpack_create_listing true) set(xpack_create_hex true)
+# set(xpack_create_listing true)
+# set(xpack_create_hex true)
 
 # -----------------------------------------------------------------------------
 add_subdirectory ("stm32f767cubemx")
@@ -35,8 +36,8 @@ function (add_test_executable name)
 
   target_compile_definitions (${name} PRIVATE OS_USE_TRACE_SEMIHOSTING_STDOUT)
 
-  # No other common compile or link options, all were defined in the libraries
-  # and will be inherited.
+  # No other common compile or link options, all were defined in the
+  # libraries and will be inherited.
   target_link_options (
     ${name} PRIVATE -Wl,-Map,platform-bin/${name}-map.txt # -v
   )
