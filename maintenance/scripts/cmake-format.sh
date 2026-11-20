@@ -57,7 +57,7 @@ argv="$@"
 # set -x
 PYPATH="$(python3 -m site --user-base)"
 echo cmake-format "$(${PYPATH}/bin/cmake-format --version)"
-# "${PYPATH}/bin/cmake-format" --no-default --dump-config yaml --config-file "config/.cmake-format.yaml"
+# "${PYPATH}/bin/cmake-format" --no-default --dump-config yaml --config-file "maintenance/config/.cmake-format.yaml"
 
 function run_verbose()
 {
@@ -70,7 +70,7 @@ function run_verbose()
   "${_app_path}" "$@" 2>&1
 }
 
-run_verbose "${PYPATH}/bin/cmake-format" --config-file "config/.cmake-format.py" --in-place \
+run_verbose "${PYPATH}/bin/cmake-format" --config-file "maintenance/config/.cmake-format.py" --in-place \
   $(find . \( \( -type d -name "build" \) -o \( -type d -name "xpacks" \) -o \( -type d -name "node_modules" \) \) -prune -o \
   -type f \( -name "CMakeLists.txt" -o -name "*.cmake" \) -print)
 

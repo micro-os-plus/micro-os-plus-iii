@@ -63,7 +63,7 @@ function run_verbose()
   "${_app_path}" "$@" 2>&1
 }
 
-run_verbose clang-format --style=file:config/.clang-format -i --verbose \
+run_verbose clang-format --style=file:maintenance/config/.clang-format -i --verbose \
   $(find src \( -name '*.cpp' -o -name '*.c' -o -name '*.h' \)) \
   $(find include -name '*.h') \
   $(find tests/sources \( -name '*.cpp' -o -name '*.c' -o -name '*.h' \)) \
