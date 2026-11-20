@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-This file provides guidance to AI coding assistants when working
+This file provides guidance to Claude Code (claude.ai/code) when working
 with code in this repository.
 
 @.github/copilot-instructions.md
@@ -125,12 +125,19 @@ application (or the test platform) must provide them on the include path:
   library (alias `micro-os-plus::iii`); **every new source file must be
   added to `target_sources()` here**, otherwise it is not built
 - `tests/` - a separate xpm project with the test suite (see below)
-- `config/` - `.clang-format`, `.cmake-format.py`, prettier configs
-- `scripts/` - formatting scripts (generated from templates, do not edit)
-- `doxygen/`, `docs/` - reference documentation sources
-- `inspiration/` - third-party reference code (libstdc++, libc++,
-  newlib); not compiled, do not modify
-- `templates/` - project templates; not compiled
+- `doxygen/` - reference documentation (Doxygen) sources
+- `maintenance/` - **maintainer-only material; not part of the library.**
+  Applications using this library must not use, include or depend on
+  anything in this folder, and code reviews must ignore it (do not
+  review, flag or suggest changes to its contents). It holds:
+  - `config/` - `.clang-format`, `.cmake-format.py`, prettier configs
+  - `scripts/` - formatting scripts (generated from templates, do not edit)
+  - `docs/` - maintainer notes (`README-DEVELOPER.md`,
+    `README-MAINTAINER.md`, `TODO.md`, `HISTORY.md`, POSIX I/O notes)
+  - `inspiration/` - third-party reference code (libstdc++, libc++,
+    newlib); not compiled, do not modify
+  - `templates/` - project templates and work-in-progress headers;
+    not compiled
 
 ## Build and test
 
@@ -225,7 +232,7 @@ xpm run clang-format    # src, include, tests/sources|includes|platforms
 xpm run cmake-format    # all CMakeLists.txt and *.cmake files
 ```
 
-The clang-format style is in `config/.clang-format` (GNU-like style:
+The clang-format style is in `maintenance/config/.clang-format` (GNU-like style:
 return type on its own line, a space before parentheses, two-space
 indentation). Format only the files you touch; avoid reformatting
 unrelated code.
@@ -266,8 +273,8 @@ unrelated code.
 - `xpack` - latest stable release; `xpack-development` is merged into it
   on release
 - Releases: bump `package.json`, update `include/cmsis-plus/os-versions.h`,
-  `README.md`, `README-MAINTAINER.md` and `CHANGELOG.md`, run all tests,
+  `README.md`, `maintenance/docs/README-MAINTAINER.md` and `CHANGELOG.md`, run all tests,
   then `npm version X.Y.Z` (the `postversion` script pushes branches and
-  tags). Details in [README-MAINTAINER.md](README-MAINTAINER.md).
+  tags). Details in [README-MAINTAINER.md](maintenance/docs/README-MAINTAINER.md).
 - The npm package only ships the files allowed by `.npmignore`; check
   with `npm pack` before publishing.

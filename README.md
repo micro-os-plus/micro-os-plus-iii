@@ -20,7 +20,7 @@ This page is addressed to developers who plan to include this source code
 library into their own projects.
 
 For maintainer info, please see the
-[README-MAINTAINER](README-MAINTAINER.md) file.
+[README-MAINTAINER](maintenance/docs/README-MAINTAINER.md) file.
 
 ## Purpose
 
