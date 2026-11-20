@@ -15,7 +15,9 @@ with section("format"):
     separate_fn_name_with_space = True
     
 with section("markup"):
-    enable_markup = True
+    # Keep comments as written; reflow merges commented-out options and
+    # pasted tool output into the surrounding prose.
+    enable_markup = False
 
 with section("parse"):
     additional_commands = {
