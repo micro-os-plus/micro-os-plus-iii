@@ -149,7 +149,8 @@ namespace os
                   // The head chunk is smaller than the request, so this arena
                   // cannot satisfy it. Clear `chunk` so the loop below falls
                   // through to the out-of-memory handler (or returns nullptr)
-                  // instead of handing the too-small chunk to internal_align_().
+                  // instead of handing the too-small chunk to
+                  // internal_align_().
                   chunk = nullptr;
                 }
             }

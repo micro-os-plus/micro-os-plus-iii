@@ -972,9 +972,9 @@ namespace os
 
       if (sent)
         {
-          // internal_try_send_() resumed a waiting receiver. Rescheduling here,
-          // with the kernel lock released, lets it run at once -- as the ARM
-          // ports do when PendSV is taken on the way out of the section --
+          // internal_try_send_() resumed a waiting receiver. Rescheduling
+          // here, with the kernel lock released, lets it run at once -- as the
+          // ARM ports do when PendSV is taken on the way out of the section --
           // instead of waiting for the next tick.
           port::scheduler::reschedule ();
 
@@ -1103,9 +1103,9 @@ namespace os
 
       if (sent)
         {
-          // internal_try_send_() resumed a waiting receiver. Rescheduling here,
-          // with the kernel lock released, lets it run at once -- as the ARM
-          // ports do when PendSV is taken on the way out of the section --
+          // internal_try_send_() resumed a waiting receiver. Rescheduling
+          // here, with the kernel lock released, lets it run at once -- as the
+          // ARM ports do when PendSV is taken on the way out of the section --
           // instead of waiting for the next tick.
           port::scheduler::reschedule ();
 
@@ -1211,9 +1211,9 @@ namespace os
 
       if (sent)
         {
-          // internal_try_send_() resumed a waiting receiver. Rescheduling here,
-          // with the kernel lock released, lets it run at once -- as the ARM
-          // ports do when PendSV is taken on the way out of the section --
+          // internal_try_send_() resumed a waiting receiver. Rescheduling
+          // here, with the kernel lock released, lets it run at once -- as the
+          // ARM ports do when PendSV is taken on the way out of the section --
           // instead of waiting for the next tick.
           port::scheduler::reschedule ();
 
@@ -1510,7 +1510,8 @@ namespace os
           // of waiting for the next tick.
           port::scheduler::reschedule ();
 
-          instrumentation::message_queue::try_receive_retval (this, result::ok);
+          instrumentation::message_queue::try_receive_retval (this,
+                                                              result::ok);
           return result::ok;
         }
 

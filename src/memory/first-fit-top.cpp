@@ -122,7 +122,6 @@ namespace os
     {
       using namespace os;
 
-
       if (bytes > total_bytes_)
         {
           return nullptr;
@@ -457,7 +456,7 @@ namespace os
     {
       // Recover the chunk header placed immediately before the payload.
       chunk_t* chunk = reinterpret_cast<chunk_t*> (static_cast<char*> (addr)
-                                                    - chunk_offset);
+                                                   - chunk_offset);
 
       // For an aligned block, the adjusted header stores the (negative)
       // alignment offset as its size; step back to the real chunk header
@@ -472,9 +471,9 @@ namespace os
       // Usable bytes are those from the given address to the end of the
       // chunk; this naturally accounts for any alignment slack between the
       // chunk payload and the returned pointer.
-      return static_cast<std::size_t> (
-          reinterpret_cast<char*> (chunk) + chunk->size
-          - static_cast<char*> (addr));
+      return static_cast<std::size_t> (reinterpret_cast<char*> (chunk)
+                                       + chunk->size
+                                       - static_cast<char*> (addr));
     }
 #pragma GCC diagnostic pop
 

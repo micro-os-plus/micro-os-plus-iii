@@ -87,11 +87,8 @@ protected:
 #pragma GCC diagnostic pop
 
 mutex_test::mutex_test (const char* name)
-    : th_{ name,
-           [] (void* attr) -> void* {
-             return static_cast<mutex_test*> (attr)->object_main ();
-           },
-           this }
+    : th_{ name, [] (void* attr) -> void*
+  { return static_cast<mutex_test*> (attr)->object_main (); }, this }
 {
   trace::printf ("%s @%p %s\n", __func__, this, name);
 }
@@ -181,11 +178,8 @@ protected:
 
 periodic::periodic (unsigned int seconds)
     : seconds_ (seconds), //
-      th_{ "P",
-           [] (void* attr) -> void* {
-             return static_cast<periodic*> (attr)->object_main ();
-           },
-           this }
+      th_{ "P", [] (void* attr) -> void*
+  { return static_cast<periodic*> (attr)->object_main (); }, this }
 {
   trace::printf ("%s @%p\n", __func__, this);
 }

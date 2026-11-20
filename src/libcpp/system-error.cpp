@@ -141,8 +141,8 @@ namespace os
     __throw_cmsis_error (int ev, const char* what_arg)
     {
 #if defined(__EXCEPTIONS)
-      throw std::system_error (std::error_code (ev, get_cmsis_error_category ()),
-                               what_arg);
+      throw std::system_error (
+          std::error_code (ev, get_cmsis_error_category ()), what_arg);
 #else
       trace_printf ("system_error(%d, %s)\n", ev, what_arg);
       std::abort ();

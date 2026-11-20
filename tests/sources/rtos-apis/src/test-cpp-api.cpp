@@ -451,7 +451,7 @@ test_cpp_api (void)
 
     cq2.send (&msg_out, sizeof (my_msg_t));
 
-    cq2.reset();
+    cq2.reset ();
   }
 
   // --------------------------------------------------------------------------
@@ -617,7 +617,7 @@ test_cpp_api (void)
     blk = static_cast<my_blk_t*> (cp1.timed_alloc (1));
     cp1.free (blk);
 
-    cp1.reset();
+    cp1.reset ();
 
     memory_pool cp2{ "cp2", 3, sizeof (my_blk_t) };
 
@@ -1050,7 +1050,7 @@ test_cpp_api (void)
     sp.post ();
     sp.timed_wait (0xFFFFFFFF);
 
-    sp.reset();
+    sp.reset ();
   }
 
   {

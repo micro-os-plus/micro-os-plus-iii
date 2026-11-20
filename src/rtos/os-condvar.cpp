@@ -768,7 +768,8 @@ namespace os
 
 #if defined(OS_USE_RTOS_PORT_CONDITION_VARIABLE)
 
-      result_t res = port::condition_variable::timed_wait (this, &mutex, timeout);
+      result_t res
+          = port::condition_variable::timed_wait (this, &mutex, timeout);
       instrumentation::condition_variable::timed_wait_retval (this, res);
       return res;
 

@@ -1061,7 +1061,6 @@ namespace os
           port::scheduler::reschedule ();
         }
 
-
 #if defined(OS_TRACE_RTOS_THREAD)
       trace::printf ("%s() @%p %s joined\n", __func__, this, name ());
 #endif
@@ -1410,7 +1409,8 @@ namespace os
                   waiting_node_->unlink ();
                 }
 
-              // If the thread is waiting on a timeout, remove it from the list.
+              // If the thread is waiting on a timeout, remove it from the
+              // list.
               if (clock_node_ != nullptr)
                 {
                   clock_node_->unlink ();

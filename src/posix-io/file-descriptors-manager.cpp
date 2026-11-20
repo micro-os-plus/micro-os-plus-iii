@@ -199,7 +199,7 @@ namespace os
 
     int
     file_descriptors_manager::deallocate (int fildes)
-    {  
+    {
       assert (!rtos::interrupts::in_handler_mode ());
 
 #if defined(OS_TRACE_POSIX_IO_FILE_DESCRIPTORS_MANAGER)
@@ -243,7 +243,8 @@ namespace os
                            : nullptr;
 #pragma GCC diagnostic pop
       if (io == nullptr
-          || io->get_type () != static_cast<posix::io::type_t> (io::type::socket))
+          || io->get_type ()
+                 != static_cast<posix::io::type_t> (io::type::socket))
         {
           return nullptr;
         }
@@ -265,7 +266,8 @@ namespace os
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wunsafe-buffer-usage"
 #endif
-          if (descriptors_array__ != nullptr && descriptors_array__[i] != nullptr)
+          if (descriptors_array__ != nullptr
+              && descriptors_array__[i] != nullptr)
             {
               ++count;
             }

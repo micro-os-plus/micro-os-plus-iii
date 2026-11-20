@@ -856,7 +856,8 @@ namespace os
         rtos::scheduler::critical_section scs;
         if (!deferred_files_list_.empty ())
           {
-            fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+            fil = static_cast<file_type*> (
+                deferred_files_list_.unlink_head ());
           }
       }
 
@@ -888,7 +889,8 @@ namespace os
         rtos::scheduler::critical_section scs;
         if (!deferred_files_list_.empty ())
           {
-            fil = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+            fil = static_cast<file_type*> (
+                deferred_files_list_.unlink_head ());
           }
       }
 
@@ -922,7 +924,8 @@ namespace os
             rtos::scheduler::critical_section scs;
             if (!deferred_files_list_.empty ())
               {
-                f = static_cast<file_type*> (deferred_files_list_.unlink_head ());
+                f = static_cast<file_type*> (
+                    deferred_files_list_.unlink_head ());
               }
           }
           if (f == nullptr)

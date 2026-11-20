@@ -117,11 +117,11 @@ os_main (int argc, char* argv[])
     delete evf;
   }
 
-    sysclock.sleep_for (1);
+  sysclock.sleep_for (1);
 
   {
-    this_thread::thread().flags_raise (0x1248);
-    
+    this_thread::thread ().flags_raise (0x1248);
+
     this_thread::flags_wait (0x1000);
     this_thread::flags_try_wait (0x0200);
     this_thread::flags_timed_wait (0x0040, 42);

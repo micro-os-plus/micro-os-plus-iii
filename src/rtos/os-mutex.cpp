@@ -642,7 +642,8 @@ namespace os
           // priority thread. Checked before anything is taken: a refused
           // lock must not leave the mutex on the thread's list of owned
           // mutexes, nor counted in acquired_mutexes_.
-          if (protocol_ == protocol::protect && th->priority () > prio_ceiling_)
+          if (protocol_ == protocol::protect
+              && th->priority () > prio_ceiling_)
             {
               return EINVAL;
             }

@@ -304,8 +304,8 @@ void* __attribute__ ((weak)) operator new[] (std::size_t bytes,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void* __attribute__ ((weak))
-operator new (std::size_t bytes, std::align_val_t alignment)
+void* __attribute__ ((weak)) operator new (std::size_t bytes,
+                                           std::align_val_t alignment)
 {
   assert (!rtos::interrupts::in_handler_mode ());
 
@@ -352,7 +352,7 @@ operator new (std::size_t bytes, std::align_val_t alignment)
  */
 void* __attribute__ ((weak))
 operator new (std::size_t bytes, std::align_val_t alignment,
-              const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+              const std::nothrow_t & nothrow __attribute__ ((unused))) noexcept
 {
   assert (!rtos::interrupts::in_handler_mode ());
 
@@ -398,8 +398,8 @@ operator new (std::size_t bytes, std::align_val_t alignment,
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void* __attribute__ ((weak))
-operator new[] (std::size_t bytes, std::align_val_t alignment)
+void* __attribute__ ((weak)) operator new[] (std::size_t bytes,
+                                             std::align_val_t alignment)
 {
   return ::operator new (bytes, alignment);
 }
@@ -411,9 +411,11 @@ operator new[] (std::size_t bytes, std::align_val_t alignment)
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
-void* __attribute__ ((weak))
-operator new[] (std::size_t bytes, std::align_val_t alignment,
-                const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+void* __attribute__ ((weak)) operator new[] (std::size_t bytes,
+                                             std::align_val_t alignment,
+                                             const std::nothrow_t
+                                             & nothrow
+                                             __attribute__ ((unused))) noexcept
 {
   return ::operator new (bytes, alignment, std::nothrow);
 }
@@ -739,8 +741,8 @@ operator delete[] (void* ptr, std::size_t bytes,
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void __attribute__ ((weak))
-operator delete (void* ptr, std::align_val_t alignment,
-                 const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+operator delete (void* ptr, std::align_val_t alignment, const std::nothrow_t
+                 & nothrow __attribute__ ((unused))) noexcept
 {
   ::operator delete (ptr, alignment);
 }
@@ -752,8 +754,8 @@ operator delete (void* ptr, std::align_val_t alignment,
  * @warning Cannot be invoked from Interrupt Service Routines.
  */
 void __attribute__ ((weak))
-operator delete[] (void* ptr, std::align_val_t alignment,
-                   const std::nothrow_t& nothrow __attribute__ ((unused))) noexcept
+operator delete[] (void* ptr, std::align_val_t alignment, const std::nothrow_t
+                   & nothrow __attribute__ ((unused))) noexcept
 {
   ::operator delete[] (ptr, alignment);
 }

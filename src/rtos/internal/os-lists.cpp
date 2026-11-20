@@ -501,7 +501,7 @@ namespace os
           {
             timestamp_node* node = nullptr;
             {
-              // ----- Enter critical section -----------------------------------
+              // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
 
               if (empty ())
@@ -524,7 +524,7 @@ namespace os
                 {
                   break;
                 }
-              // ----- Exit critical section ------------------------------------
+              // ----- Exit critical section ----------------------------------
             }
 
             if (node != nullptr)
