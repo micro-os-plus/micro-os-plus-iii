@@ -29,7 +29,7 @@
   },
   "scripts": {
     "npm-install": "npm install",
-    "npm-link-helpers": "npm link @xpack/npm-packages-helper",
+    "npm-link-helper": "npm link @xpack/npm-packages-helper",
     "npm-outdated": "npm outdated",
     "npm-ci": "npm ci",
     "npm-pack": "npm pack",
