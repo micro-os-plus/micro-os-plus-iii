@@ -102,6 +102,24 @@
         "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git pull",
         "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git pull"
       ],
+      "xpm-link-deps": [
+        "xpm link -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
+        "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
+        "xpm link -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
+        "xpm link -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git"
+      ],
+      "xpm-link-deps-ilg": [
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/xPacks/build-helper-xpack.git",
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git",
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii-cortexm.git",
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/chan-fatfs.git",
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/arm-cmsis.git"
+      ],
       "install": [
         "xpm install",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
