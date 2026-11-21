@@ -16,6 +16,7 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/diag/trace.h>
+#include <cmsis-plus/diag/instrumentation.h>
 
 // ----------------------------------------------------------------------------
 
@@ -341,9 +342,14 @@ namespace os
 #endif
       }
 
-      // Must be called in a critical section.
+      // Called in the interrupts critical section that unlinked the
+      // node (see check_timestamp()). The thread is resumed here, since
+      // on SMP, once the critical section is left, the thread may be
+      // woken on another CPU, return and reuse the stack that holds
+      // this node.
       void
-      timeout_thread_node::action (void)
+      timeout_thread_node::expire (deferred_action& deferred
+                                   __attribute__ ((unused)))
       {
         rtos::thread* th = &this->thread;
         this->unlink ();
@@ -379,11 +385,14 @@ namespace os
        * @details
        * Remove the node from the list and perform the timer actions.
        */
+      // Called in the interrupts critical section that unlinked the
+      // node (see check_timestamp()); the user function is returned in
+      // `deferred` and called after the critical section.
       void
-      timer_node::action (void)
+      timer_node::expire (deferred_action& deferred)
       {
         this->unlink ();
-        tmr.internal_callback ();
+        tmr.internal_expire_ (deferred);
       }
 
 #endif
@@ -500,6 +509,7 @@ namespace os
         for (;;)
           {
             timestamp_node* node = nullptr;
+            timestamp_node::deferred_action deferred;
             {
               // ----- Enter critical section ---------------------------------
               interrupts::critical_section ics;
@@ -519,6 +529,11 @@ namespace os
                 {
                   node = const_cast<timestamp_node*> (head ());
                   node->unlink ();
+
+                  // Perform the action in the same critical section,
+                  // so that on SMP the node cannot be reused (a thread
+                  // stack) or relinked (a stopped timer) meanwhile.
+                  node->expire (deferred);
                 }
               else
                 {
@@ -533,7 +548,14 @@ namespace os
                 trace::printf ("%s() %u \n", __func__,
                                static_cast<uint32_t> (sysclock.now ()));
 #endif
-                node->action ();
+                // The deferred work (the user timer function) runs
+                // with interrupts enabled, and does not access the
+                // node, which may already be reused or relinked.
+                if (deferred.func != nullptr)
+                  {
+                    deferred.func (deferred.args);
+                    instrumentation::timer::callback_return (deferred.timer);
+                  }
               }
           }
       }

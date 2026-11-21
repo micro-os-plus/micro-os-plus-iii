@@ -448,6 +448,17 @@ namespace
 
   // --------------------------------------------------------------------------
 
+  // Timer callback counter for the timers tests.
+  uint32_t volatile tm_count;
+
+  void
+  tm_count_func (void* args __attribute__ ((unused)))
+  {
+    tm_count = tm_count + 1;
+  }
+
+  // --------------------------------------------------------------------------
+
   // Threads for the kill() tests.
   void*
   kill_sleeper_func (void* args __attribute__ ((unused)))
@@ -2035,6 +2046,56 @@ test_cpp_api (void)
         return 1;
       }
     printf ("%s - cooperative sleep_for() ok\n", test_name);
+  }
+
+  {
+    // Periodic timer: called on each period, and no more after stop().
+    timer tm{ "tm-per", tm_count_func, nullptr, timer::periodic_initializer };
+    tm_count = 0;
+    sysclock.sleep_for (1); // Sync
+    tm.start (2);
+    sysclock.sleep_for (11);
+
+    uint32_t count = tm_count;
+    result_t res = tm.stop ();
+    if (count < 4 || res != result::ok)
+      {
+        printf ("%s - periodic timer called %u times, stop() returned %d\n",
+                test_name, static_cast<unsigned int> (count),
+                static_cast<int> (res));
+        return 1;
+      }
+
+    sysclock.sleep_for (10);
+    res = tm.stop ();
+    if (tm_count != count || res != EAGAIN)
+      {
+        printf ("%s - stopped periodic timer called %u more times, stop() "
+                "returned %d\n",
+                test_name, static_cast<unsigned int> (tm_count - count),
+                static_cast<int> (res));
+        return 1;
+      }
+  }
+
+  {
+    // One-shot timer: called once, then completed.
+    timer tm{ "tm-once", tm_count_func, nullptr };
+    tm_count = 0;
+    sysclock.sleep_for (1); // Sync
+    tm.start (2);
+    sysclock.sleep_for (10);
+
+    result_t res = tm.stop ();
+    if (tm_count != 1 || res != EAGAIN)
+      {
+        printf ("%s - one-shot timer called %u times, stop() returned %d\n",
+                test_name, static_cast<unsigned int> (tm_count),
+                static_cast<int> (res));
+        return 1;
+      }
+
+    printf ("%s - periodic and one-shot timers ok\n", test_name);
   }
 
   // ==========================================================================

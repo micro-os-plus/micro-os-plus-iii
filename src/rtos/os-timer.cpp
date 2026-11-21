@@ -209,6 +209,11 @@ namespace os
      *
      * If the timer is running, it must be automatically stopped.
      *
+     * @note On SMP, if the timer expires on another CPU at the same
+     *  time, the timer function may still be called once after the
+     *  destructor returns, with the original arguments; keep them valid
+     *  until then.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     timer::~timer ()
@@ -312,7 +317,11 @@ namespace os
      * Remove the timer from the clock schedule list, so that the next
      * execution of the function is cancelled.
      *
-     * A stopped timer can be restarted later with start()`.
+     * A stopped timer can be restarted later with `start()`.
+     *
+     * @note On SMP, if the timer expires on another CPU at the same
+     *  time, the timer function may still be called once after
+     *  `stop()` returns; the timer is not rescheduled afterwards.
      *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
@@ -346,7 +355,10 @@ namespace os
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
+        // Under the same lock as the expiry (see internal_expire_()),
+        // which may have relinked a periodic timer.
         timer_node_.unlink ();
+        state_ = state::stopped;
         // ----- Exit critical section ----------------------------------------
       }
       res = result::ok;
@@ -365,8 +377,16 @@ namespace os
      * @cond ignore
      */
 
+    // Called by timer_node::expire(), in the interrupts critical
+    // section that unlinked the timer node. Only the bookkeeping is done
+    // here; the user function is returned in `deferred` and called after
+    // the critical section. Relinking a periodic timer in the same
+    // critical section means that on SMP a stop() or a destruction on
+    // another CPU either happens before (the node is not found) or
+    // after (the relinked node is removed), never in between.
     void
-    timer::internal_callback (void)
+    timer::internal_expire_ (
+        internal::timestamp_node::deferred_action& deferred)
     {
       instrumentation::timer::callback (this);
 
@@ -381,24 +401,18 @@ namespace os
               timer_node_.timestamp = now + period_;
             }
 
-          {
-            interrupts::critical_section ics;
-            clock_->steady_list ().link (timer_node_);
-          }
+          clock_->steady_list ().link (timer_node_);
         }
       else
         {
           state_ = state::completed;
         }
 
-#if defined(OS_USE_RTOS_PORT_TIMER)
-      trace::puts (name ());
-#endif
-
-      // Call the user function.
-      func_ (func_args_);
-
-      instrumentation::timer::callback_return (this);
+      // The user function, called after the critical section; copied,
+      // so that the timer object is not accessed after it.
+      deferred.func = func_;
+      deferred.args = func_args_;
+      deferred.timer = this;
     }
 
     /**

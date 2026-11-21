@@ -381,7 +381,7 @@ namespace os
 #if !defined(OS_USE_RTOS_PORT_TIMER)
 
       void
-      internal_callback (void);
+      internal_expire_ (internal::timestamp_node::deferred_action& deferred);
 
 #endif
 

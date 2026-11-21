@@ -172,14 +172,44 @@ namespace os
          */
 
         /**
+         * @brief Work deferred until after the critical section.
+         */
+        struct deferred_action
+        {
+          /**
+           * @brief Function to call, or `nullptr` if none.
+           */
+          void (*func) (void* args) = nullptr;
+
+          /**
+           * @brief Function arguments.
+           */
+          void* args = nullptr;
+
+          /**
+           * @brief Timer, for instrumentation only; on SMP it may have
+           * been destroyed by the time the function returns.
+           */
+          rtos::timer* timer = nullptr;
+        };
+
+        /**
          * @brief Action to perform when the time stamp is reached.
-         * @par Parameters
-         *  None.
+         * @param [out] deferred Work to perform after the critical
+         *  section, if any.
          * @par Returns
          *  Nothing.
+         *
+         * @details
+         * Called by `clock_timestamps_list::check_timestamp()` in the
+         * interrupts critical section that unlinked the node, so that
+         * on SMP the node cannot be reused or relinked meanwhile. The
+         * work that may take long (the user timer function) is
+         * returned in `deferred` and performed after the critical
+         * section, without accessing the node.
          */
         virtual void
-        action (void)
+        expire (deferred_action& deferred)
             = 0;
 
         /**
@@ -265,13 +295,13 @@ namespace os
 
         /**
          * @brief Action to perform when the time stamp is reached.
-         * @par Parameters
-         *  None.
+         * @param [out] deferred Work to perform after the critical
+         *  section, if any.
          * @par Returns
          *  Nothing.
          */
         virtual void
-        action (void) override;
+        expire (deferred_action& deferred) override;
 
         /**
          * @}
@@ -354,13 +384,13 @@ namespace os
 
         /**
          * @brief Action to perform when the time stamp is reached.
-         * @par Parameters
-         *  None.
+         * @param [out] deferred Work to perform after the critical
+         *  section, if any.
          * @par Returns
          *  Nothing.
          */
         virtual void
-        action (void) override;
+        expire (deferred_action& deferred) override;
 
         /**
          * @}
