@@ -641,10 +641,19 @@ namespace os
      * @details
      * Internal, used in the implementation of synchronisation objects.
      *
+     * Only a suspended (or just created) thread is added to the
+     * ready list. Calling it for a thread which is running or
+     * already ready has no effect, and the call is not remembered:
+     * if the thread suspends afterwards, it stays suspended.
+     *
      * @par POSIX compatibility
      *  Extension to standard, no POSIX similar functionality identified.
      *
      * @note Can be invoked from Interrupt Service Routines.
+     *
+     * @warning To wake a thread reliably, use the thread event flags
+     * (`flags_raise()` and `this_thread::flags_wait()`), which
+     * remember the event until the thread waits for it.
      */
     void
     thread::resume (void)
@@ -681,6 +690,12 @@ namespace os
         // If the thread is not already in the ready list, enqueue it.
         // In SMP, a running thread has ready_node_.next() == nullptr;
         // it must not be re-enqueued while actively executing.
+        //
+        // A wake-up for a running (or ready) thread is therefore not
+        // remembered: the waits must test their condition and set
+        // `state::suspended` in the same critical section, so that a
+        // `resume()` arriving before the suspend finds the thread
+        // already suspended.
         if (state_ == state::suspended || state_ == state::initializing)
           {
             if (ready_node_.next () == nullptr)
@@ -1590,11 +1605,25 @@ namespace os
                 instrumentation::thread::flags_wait_retval (this, result::ok);
                 return result::ok;
               }
+
+            // Check and suspend under the same lock. `resume()` does
+            // not remember a wake-up for a running thread, so if the
+            // state were set in a separate critical section, a
+            // `flags_raise()` from an interrupt (or from another CPU)
+            // arriving between the two would be lost and the thread
+            // would sleep with the flags raised.
+
+            // Remove this thread from the ready list, if there.
+            port::this_thread::prepare_suspend ();
+
+            state_ = state::suspended;
             // ----- Exit critical section ------------------------------------
           }
 
-          internal_suspend_ (
-              OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_THREAD_FLAGS);
+          instrumentation::thread::suspended (
+              this, OS_INTEGER_INSTRUMENTATION_SUSPEND_CAUSE_THREAD_FLAGS);
+
+          port::scheduler::reschedule ();
 
           if (interrupted ())
             {
@@ -1951,6 +1980,13 @@ namespace os
        * threads with at least the same priority are ready).
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
+       *
+       * @warning A `thread::resume()` called before `suspend()` (for
+       * example from an interrupt, while the thread is still running)
+       * is not remembered, and the thread remains suspended until the
+       * next `resume()`. When the event may occur before the wait, use
+       * the thread event flags (`flags_raise()` and
+       * `this_thread::flags_wait()`) instead.
        */
       // NOTE: NOT 'inline'. It is declared non-inline in os-thread.h, and its
       // body lives only here (not in a header), so other TUs (e.g. the C API

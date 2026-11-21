@@ -91,6 +91,138 @@ tmfunc (void* args __attribute__ ((unused)))
   // fflush(stdout);
 }
 
+// ----------------------------------------------------------------------------
+
+namespace
+{
+  // Lost wake-up stress test: a thread event flag raised from a timer
+  // callback (an interrupt context) must wake a thread which is
+  // entering flags_wait(), even if the interrupt arrives between the
+  // flags test and the suspend. The window is a few instructions wide,
+  // so the test cannot hit it deterministically; it varies the moment
+  // the waiter enters flags_wait() around the timer tick, to make the
+  // race likely to show if the implementation has it.
+
+  constexpr flags::mask_t lost_wakeup_flag = 0x1;
+  constexpr uint32_t lost_wakeup_iterations = 2000;
+  // The waiter enters flags_wait() up to this many calibration loops
+  // before the tick.
+  constexpr uint32_t lost_wakeup_offsets = 16;
+
+  uint32_t volatile lost_wakeup_progress;
+  bool volatile lost_wakeup_done;
+
+  void
+  lost_wakeup_raise (void* args)
+  {
+    static_cast<thread*> (args)->flags_raise (lost_wakeup_flag);
+  }
+
+  // Busy wait for the next tick; return the number of loops.
+  uint32_t
+  lost_wakeup_wait_tick (void)
+  {
+    clock::timestamp_t begin = sysclock.now ();
+    uint32_t loops = 0;
+    while (sysclock.now () == begin)
+      {
+        ++loops;
+      }
+    return loops;
+  }
+
+  // Busy wait for the given number of loops, each the same as one
+  // in lost_wakeup_wait_tick().
+  void
+  lost_wakeup_spin (uint32_t loops)
+  {
+    clock::timestamp_t begin = sysclock.now ();
+    for (uint32_t i = 0; i < loops; ++i)
+      {
+        if (sysclock.now () != begin)
+          {
+            break;
+          }
+      }
+  }
+
+  void*
+  lost_wakeup_func (void* args __attribute__ ((unused)))
+  {
+    timer tm{ "tm-lw", lost_wakeup_raise, &this_thread::thread () };
+
+    // Calibrate: the number of loops in one tick.
+    lost_wakeup_wait_tick ();
+    uint32_t loops_per_tick = lost_wakeup_wait_tick ();
+    for (int i = 0; i < 3; ++i)
+      {
+        loops_per_tick = std::min (loops_per_tick, lost_wakeup_wait_tick ());
+      }
+    uint32_t offsets = std::min (lost_wakeup_offsets, loops_per_tick);
+
+    for (uint32_t i = 0; i < lost_wakeup_iterations; ++i)
+      {
+        this_thread::flags_clear (lost_wakeup_flag);
+
+        // The waiter is normally just past a tick, either at the end of
+        // the calibration or woken by the previous timer callback.
+        // Raise the flag on the next tick, from the timer callback.
+        tm.start (1);
+        lost_wakeup_spin (loops_per_tick - (i % offsets));
+
+        this_thread::flags_wait (lost_wakeup_flag);
+        lost_wakeup_progress = lost_wakeup_progress + 1;
+      }
+
+    tm.stop ();
+    lost_wakeup_done = true;
+
+    return nullptr;
+  }
+
+  int
+  test_lost_wakeup (const char* name)
+  {
+    printf ("\n%s - Thread event flags raised from interrupts\n", name);
+
+    lost_wakeup_progress = 0;
+    lost_wakeup_done = false;
+
+    // Above the current thread, so that it is not delayed by it.
+    thread::attributes attr;
+    attr.th_priority = thread::priority::above_normal;
+    thread th{ "th-lw", lost_wakeup_func, nullptr, attr };
+
+    uint32_t lost = 0;
+    while (!lost_wakeup_done)
+      {
+        uint32_t progress = lost_wakeup_progress;
+        sysclock.sleep_for (20);
+        if (!lost_wakeup_done && lost_wakeup_progress == progress
+            && th.state () == thread::state::suspended)
+          {
+            // The flag was raised long ago, but the waiter sleeps.
+            ++lost;
+            th.flags_raise (lost_wakeup_flag);
+          }
+      }
+
+    th.join ();
+
+    if (lost != 0)
+      {
+        printf ("%s - %u lost wake-ups in %u iterations\n", name,
+                static_cast<unsigned int> (lost),
+                static_cast<unsigned int> (lost_wakeup_iterations));
+        return 1;
+      }
+
+    printf ("%s - no lost wake-ups in %u iterations\n", name,
+            static_cast<unsigned int> (lost_wakeup_iterations));
+    return 0;
+  }
+} // namespace
+
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
 void
@@ -426,6 +558,11 @@ test_cpp_api (void)
     this_thread::thread ().flags_raise (0x3);
     this_thread::flags_timed_wait (0x3, 10);
   }
+
+  if (test_lost_wakeup (test_name) != 0)
+    {
+      return 1;
+    }
 
   // ==========================================================================
 
