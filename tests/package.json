@@ -107,8 +107,10 @@
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
       ],
+      "link-helper": [
+        "xpm link @micro-os-plus/build-helper"
+      ],
       "link-deps": [
-        "xpm link @micro-os-plus/build-helper",
         "xpm link @xpacks/arm-cmsis-rtos-validator",
         "xpm link @xpacks/chan-fatfs"
       ],
