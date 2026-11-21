@@ -26,6 +26,7 @@
 #include <cmsis-plus/estd/mutex>
 
 #include <algorithm>
+#include <cstdint>
 
 #include <test-cpp-api.h>
 
@@ -290,6 +291,159 @@ namespace
     p->done = true;
 
     return nullptr;
+  }
+
+  // --------------------------------------------------------------------------
+
+  // Waiters for the single wake-up tests: the releasing call wakes
+  // only one waiter; if it leaves (timeout, interrupt) before it runs,
+  // the wake-up must be passed on to the next one.
+
+  using lw_pool = memory_pool_inclusive<std::uintptr_t, 1>;
+  using lw_queue = message_queue_inclusive<std::uintptr_t, 1>;
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wpadded"
+#endif
+
+  struct lw_args
+  {
+    semaphore* sem;
+    lw_pool* pool;
+    lw_queue* queue;
+    clock::duration_t timeout; // 0 for the untimed calls
+    result_t res;
+    std::uintptr_t* blk;
+    std::uintptr_t msg;
+    bool volatile done;
+  };
+
+#pragma GCC diagnostic pop
+
+  void*
+  lw_sem_func (void* args)
+  {
+    lw_args* p = static_cast<lw_args*> (args);
+    p->res = (p->timeout != 0) ? p->sem->timed_wait (p->timeout)
+                               : p->sem->wait ();
+    p->done = true;
+    return nullptr;
+  }
+
+  void*
+  lw_pool_func (void* args)
+  {
+    lw_args* p = static_cast<lw_args*> (args);
+    p->blk = (p->timeout != 0) ? p->pool->timed_alloc (p->timeout)
+                               : p->pool->alloc ();
+    p->res = (p->blk != nullptr) ? static_cast<result_t> (result::ok)
+                                 : static_cast<result_t> (ETIMEDOUT);
+    p->done = true;
+    return nullptr;
+  }
+
+  void*
+  lw_queue_func (void* args)
+  {
+    lw_args* p = static_cast<lw_args*> (args);
+    p->res = (p->timeout != 0) ? p->queue->timed_receive (&p->msg, p->timeout)
+                               : p->queue->receive (&p->msg);
+    p->done = true;
+    return nullptr;
+  }
+
+  // Busy wait with the scheduler locked, so that a woken thread cannot
+  // run until its deadline has passed.
+  void
+  lw_busy_wait (clock::duration_t ticks)
+  {
+    clock::timestamp_t begin = sysclock.now ();
+    while (sysclock.now () - begin < ticks)
+      {
+        __asm__ volatile ("" ::: "memory");
+      }
+  }
+
+  // The block allocated by the main thread in the pool test.
+  std::uintptr_t* lw_main_blk;
+
+  void
+  lw_sem_release (lw_args& p)
+  {
+    p.sem->post ();
+  }
+
+  void
+  lw_pool_release (lw_args& p)
+  {
+    p.pool->free (lw_main_blk);
+  }
+
+  void
+  lw_queue_release (lw_args& p)
+  {
+    std::uintptr_t m = 42;
+    // Non-blocking, it is called with the scheduler locked.
+    p.queue->try_send (&m);
+  }
+
+  // Waiter A (high) and waiter C (above_normal) block with `func`. With
+  // the scheduler locked, `release` wakes A, the head of the waiting
+  // list, and A is made to leave, by an interrupt or by its timeout
+  // expiring, before it can run. C must then get the resource.
+  int
+  lw_run (const char* name, const char* what, void* (*func) (void*),
+          void (*release) (lw_args&), lw_args& a, lw_args& c, bool interrupt)
+  {
+    thread::attributes attr;
+    attr.th_priority = thread::priority::high;
+    thread tha{ "th-lwa", func, &a, attr };
+    attr.th_priority = thread::priority::above_normal;
+    thread thc{ "th-lwc", func, &c, attr };
+    // Let both run and block.
+    sysclock.sleep_for (1);
+
+    {
+      // ----- Enter critical section -----------------------------------------
+      scheduler::critical_section scs;
+
+      release (a);
+      if (interrupt)
+        {
+          tha.interrupt ();
+        }
+      else
+        {
+          lw_busy_wait (2 * a.timeout);
+        }
+      // ----- Exit critical section ------------------------------------------
+    }
+
+    // Let both waiters run.
+    sysclock.sleep_for (2);
+
+    bool lost = !c.done;
+    if (lost)
+      {
+        // Release the remaining waiter.
+        thc.interrupt ();
+      }
+    tha.join ();
+    thc.join ();
+
+    result_t expected = interrupt ? EINTR : ETIMEDOUT;
+    if (a.res != expected || lost || c.res != result::ok)
+      {
+        printf ("%s - %s: first waiter returned %d, next waiter %s\n", name,
+                what, static_cast<int> (a.res), lost ? "not woken" : "woken");
+        return 1;
+      }
+
+    printf ("%s - %s passes the wake-up on ok\n", name, what);
+    return 0;
   }
 
   // --------------------------------------------------------------------------
@@ -1657,6 +1811,66 @@ test_cpp_api (void)
     semaphore sp{ "sp3", semaphore::initializer_binary };
 
     sp.post ();
+  }
+
+  // A waiter woken by a single wake-up and then leaving (timeout,
+  // interrupt) must pass the wake-up on to the next waiter.
+  {
+    semaphore sem{ "sem-lw1" };
+    lw_args a{ &sem, nullptr, nullptr, 5, ENOTRECOVERABLE, nullptr, 0, false };
+    lw_args c{ &sem, nullptr, nullptr, 0, ENOTRECOVERABLE, nullptr, 0, false };
+    if (lw_run (test_name, "semaphore timed_wait() timeout", lw_sem_func,
+                lw_sem_release, a, c, false)
+        != 0)
+      {
+        return 1;
+      }
+  }
+
+  {
+    semaphore sem{ "sem-lw2" };
+    lw_args a{ &sem, nullptr, nullptr, 0, ENOTRECOVERABLE, nullptr, 0, false };
+    lw_args c{ &sem, nullptr, nullptr, 0, ENOTRECOVERABLE, nullptr, 0, false };
+    if (lw_run (test_name, "semaphore wait() interrupted", lw_sem_func,
+                lw_sem_release, a, c, true)
+        != 0)
+      {
+        return 1;
+      }
+  }
+
+  {
+    lw_pool pool{ "mp-lw" };
+    lw_main_blk = pool.alloc ();
+    lw_args a{
+      nullptr, &pool, nullptr, 5, ENOTRECOVERABLE, nullptr, 0, false
+    };
+    lw_args c{
+      nullptr, &pool, nullptr, 0, ENOTRECOVERABLE, nullptr, 0, false
+    };
+    if (lw_run (test_name, "memory pool timed_alloc() timeout", lw_pool_func,
+                lw_pool_release, a, c, false)
+        != 0)
+      {
+        return 1;
+      }
+    pool.free (c.blk);
+  }
+
+  {
+    lw_queue queue{ "mq-lw" };
+    lw_args a{
+      nullptr, nullptr, &queue, 5, ENOTRECOVERABLE, nullptr, 0, false
+    };
+    lw_args c{
+      nullptr, nullptr, &queue, 0, ENOTRECOVERABLE, nullptr, 0, false
+    };
+    if (lw_run (test_name, "message queue timed_receive() timeout",
+                lw_queue_func, lw_queue_release, a, c, false)
+        != 0)
+      {
+        return 1;
+      }
   }
 
   {

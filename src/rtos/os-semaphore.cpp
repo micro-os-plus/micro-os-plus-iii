@@ -503,10 +503,16 @@ namespace os
 
           // Remove the thread from the semaphore waiting list,
           // if not already removed by post().
-          scheduler::internal_unlink_node (node);
+          bool woken = scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
+              // post() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
               trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
 #endif
@@ -713,10 +719,16 @@ namespace os
           // Remove the thread from the semaphore waiting list,
           // if not already removed by post() and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::internal_unlink_node (node, timeout_node);
+          bool woken = scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
+              // post() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
 #pragma GCC diagnostic push
 #if defined(__clang__)
@@ -734,6 +746,12 @@ namespace os
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+              // post() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_SEMAPHORE)
 #pragma GCC diagnostic push
 #if defined(__clang__)

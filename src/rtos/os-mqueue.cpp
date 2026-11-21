@@ -1013,10 +1013,16 @@ namespace os
 
           // Remove the thread from the message queue send waiting list,
           // if not already removed by receive().
-          scheduler::internal_unlink_node (node);
+          bool woken = scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
+              // receive() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  send_list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_MQUEUE)
               trace::printf ("%s(%p,%d,%d) EINTR @%p %s\n", __func__, msg,
                              nbytes, mprio, this, name ());
@@ -1263,10 +1269,16 @@ namespace os
           // Remove the thread from the message queue send waiting list,
           // if not already removed by receive() and from the clock timeout
           // list, if not already removed by the timer.
-          scheduler::internal_unlink_node (node, timeout_node);
+          bool woken = scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
+              // receive() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  send_list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_MQUEUE)
               trace::printf ("%s(%p,%u,%u,%u) EINTR @%p %s\n", __func__, msg,
                              nbytes, mprio, timeout, this, name ());
@@ -1277,6 +1289,12 @@ namespace os
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+              // receive() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  send_list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_MQUEUE)
               trace::printf ("%s(%p,%u,%u,%u) ETIMEDOUT @%p %s\n", __func__,
                              msg, nbytes, mprio, timeout, this, name ());
@@ -1413,10 +1431,16 @@ namespace os
 
           // Remove the thread from the message queue receive waiting list,
           // if not already removed by send().
-          scheduler::internal_unlink_node (node);
+          bool woken = scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
+              // send() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  receive_list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_MQUEUE)
               trace::printf ("%s(%p,%u) EINTR @%p %s\n", __func__, msg, nbytes,
                              this, name ());
@@ -1676,10 +1700,16 @@ namespace os
           // Remove the thread from the semaphore waiting list,
           // if not already removed by send()and from the clock
           // timeout list, if not already removed by the timer.
-          scheduler::internal_unlink_node (node, timeout_node);
+          bool woken = scheduler::internal_unlink_node (node, timeout_node);
 
           if (crt_thread.interrupted ())
             {
+              // send() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  receive_list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_MQUEUE)
               trace::printf ("%s(%p,%u,%u) EINTR @%p %s\n", __func__, msg,
                              nbytes, timeout, this, name ());
@@ -1691,6 +1721,12 @@ namespace os
 
           if (clock_->steady_now () >= timeout_timestamp)
             {
+              // send() wakes a single waiter; if it was this
+              // thread, which leaves now, pass the wake-up on.
+              if (woken)
+                {
+                  receive_list_.resume_one ();
+                }
 #if defined(OS_TRACE_RTOS_MQUEUE)
               trace::printf ("%s(%p,%u,%u) ETIMEDOUT @%p %s\n", __func__, msg,
                              nbytes, timeout, this, name ());
