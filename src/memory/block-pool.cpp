@@ -137,6 +137,18 @@ namespace os
       return block_size_bytes_ * blocks_;
     }
 
+    /**
+     * @details
+     * All blocks in the pool have the same size, so the usable size
+     * does not depend on the address.
+     */
+    std::size_t
+    block_pool::do_usable_size (void* addr) const noexcept
+    {
+      static_cast<void> (addr);
+      return block_size_bytes_;
+    }
+
     void
     block_pool::do_reset (void) noexcept
     {

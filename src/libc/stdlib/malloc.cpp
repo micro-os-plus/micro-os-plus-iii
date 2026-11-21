@@ -311,9 +311,14 @@ realloc (void* ptr, size_t bytes)
         // it in the chunk header). Copying `bytes` unconditionally would read
         // past the end of the old block whenever the new size is larger,
         // i.e. on every growing `realloc()`.
+        // A resource that does not override `do_usable_size()` returns 0
+        // (unknown); in that case fall back to copying the new size, as
+        // in 7.0.0, which preserves the contents but may read past the
+        // end of the old block.
         std::size_t old_bytes
             = estd::pmr::get_default_resource ()->usable_size (ptr);
-        std::size_t copy_bytes = (bytes < old_bytes) ? bytes : old_bytes;
+        std::size_t copy_bytes
+            = (old_bytes == 0 || bytes < old_bytes) ? bytes : old_bytes;
         memcpy (mem, ptr, copy_bytes);
         estd::pmr::get_default_resource ()->deallocate (ptr, 0);
       }
@@ -386,6 +391,43 @@ free (void* ptr)
 }
 
 /**
+ * @brief Get the usable size of an allocated memory block.
+ * @headerfile malloc.h <malloc.h>
+ * @param ptr Pointer to a block returned by `malloc()`, `calloc()`
+ *  or `realloc()`, or a null pointer.
+ * @return The number of usable bytes in the block, which may be larger
+ *  than the requested size; 0 if _ptr_ is a null pointer or if the
+ *  default memory resource does not know the block size.
+ *
+ * @details
+ * The size is obtained from the default memory resource, via
+ * `usable_size()`. The shipped `first_fit_top`, `lifo` and
+ * `block_pool` resources know it; other resources return 0 unless
+ * they override `do_usable_size()`.
+ *
+ * @par Standard compliance
+ *   Extension to standard (also available in glibc and newlib).
+ *
+ * @warning Cannot be invoked from Interrupt Service Routines.
+ */
+size_t
+malloc_usable_size (void* ptr)
+{
+  assert (!rtos::interrupts::in_handler_mode ());
+
+  if (ptr == nullptr)
+    {
+      return 0;
+    }
+
+  // ----- Begin of critical section ------------------------------------------
+  rtos::scheduler::critical_section scs;
+
+  return estd::pmr::get_default_resource ()->usable_size (ptr);
+  // ----- End of critical section --------------------------------------------
+}
+
+/**
  * @}
  */
 
@@ -426,6 +468,13 @@ _realloc_r (/* struct */ _reent* impure __attribute__ ((unused)), void* ptr,
   return realloc (ptr, size);
 }
 
+size_t
+_malloc_usable_size_r (/* struct */ _reent* impure __attribute__ ((unused)),
+                       void* ptr)
+{
+  return malloc_usable_size (ptr);
+}
+
 /**
  * @endcond
  */
@@ -453,13 +502,6 @@ _mallinfo_r (/* struct */ _reent* impure __attribute__ ((unused)))
 
 void
 _malloc_stats_r (/* struct */ _reent* impure __attribute__ ((unused)))
-{
-  abort ();
-}
-
-size_t
-_malloc_usable_size_r (/* struct */ _reent* reent __attribute__ ((unused)),
-                       void* ptr __attribute__ ((unused)))
 {
   abort ();
 }

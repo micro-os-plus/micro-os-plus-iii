@@ -448,7 +448,14 @@ namespace os
          *
          * @details
          * The default implementation returns 0 (unknown); allocators that
-         * keep the block size, like `first_fit_top`, override it.
+         * keep the block size, like `first_fit_top` and `block_pool`,
+         * override it.
+         *
+         * Resources used as the default memory resource should override
+         * it: `realloc()` uses it to copy at most the old contents (when
+         * it returns 0, `realloc()` copies the new size, which may read
+         * past the end of the old block), and `malloc_usable_size()`
+         * returns its value.
          */
         virtual std::size_t
         do_usable_size (void* addr) const noexcept;

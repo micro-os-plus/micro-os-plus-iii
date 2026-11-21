@@ -177,6 +177,14 @@ namespace os
       do_max_size (void) const noexcept override;
 
       /**
+       * @brief Implementation of the function to get the usable block size.
+       * @param [in] addr Address of a previously allocated block.
+       * @return The size of a pool block, in bytes.
+       */
+      virtual std::size_t
+      do_usable_size (void* addr) const noexcept override;
+
+      /**
        * @brief Implementation of the function to reset the memory manager.
        * @par Parameters
        *  None.
