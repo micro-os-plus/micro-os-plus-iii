@@ -82,6 +82,19 @@ extern "C"
 #define AngelSWIAsm swi
 #endif
 
+// The trap instruction is a property of the debugger, not of the CPU:
+// for example OpenOCD `cortex_a` targets expect the SVC trap, while
+// `aarch64` targets (also used for ARMv8 cores running AArch32 code)
+// expect HLT. Define SEMIHOST_TRAP_HLT to select the HLT trap (A32
+// HLT #0xF000, T32 HLT #0x3C). HLT is UNDEFINED on ARMv7-A, and does not
+// exist on M-profile cores, which always use BKPT #0xAB.
+#if defined(SEMIHOST_TRAP_HLT) \
+    && (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) \
+        || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__) \
+        || defined(__ARM_ARCH_8M_BASE__))
+#error "SEMIHOST_TRAP_HLT is not available on M-profile cores, which use BKPT."
+#endif
+
 #if defined(OS_DEBUG_SEMIHOSTING_FAULTS)
 // Testing the local semihosting handler cannot use another BKPT, since this
 // configuration cannot trigger HaedFault exceptions while the debugger is
@@ -105,8 +118,13 @@ extern "C"
 #if defined(OS_DEBUG_SEMIHOSTING_FAULTS)
         " " AngelSWITestFault " \n"
 #elif defined(SEMIHOST_TRAP_HLT)
-      " .arm \n"
-      " .inst 0xE10F0070 \n"
+  // Use the encoding of the current instruction set; switching to
+  // `.arm` here would leave the following instructions in A32.
+#if defined(__thumb__)
+      " .inst.n 0xBABC \n" // T32 HLT #0x3C
+#else
+      " .inst 0xE10F0070 \n" // A32 HLT #0xF000
+#endif
 #else
       " " AngelSWIInsn " %[swi] \n"
 #endif
