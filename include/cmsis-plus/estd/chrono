@@ -245,28 +245,11 @@ namespace os
 
       // ======================================================================
 
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wreserved-identifier"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Waggregate-return"
-#endif
-
-      template <class _To, class Rep_T, class Period_T>
-      constexpr typename std::enable_if<std::chrono::__is_duration<_To>::value,
-                                        _To>::type
-      ceil (std::chrono::duration<Rep_T, Period_T> d)
-      {
-        using namespace std::chrono;
-        _To r = std::chrono::duration_cast<_To> (d);
-        if (r < d)
-          {
-            ++r;
-          }
-        return r;
-      }
-
-#pragma GCC diagnostic pop
+      // The smallest duration of the destination type which is greater
+      // than or equal to the argument. The standard one is available
+      // since C++17; the previous local version depended on internal
+      // names of the standard library (`std::chrono::__is_duration`).
+      using std::chrono::ceil;
 
       // ----------------------------------------------------------------------
 
