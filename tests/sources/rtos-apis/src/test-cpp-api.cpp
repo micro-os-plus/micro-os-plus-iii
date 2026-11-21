@@ -1203,8 +1203,25 @@ test_cpp_api (void)
   }
 
   {
-    scheduler::preemptive (false);
-    scheduler::preemptive (true);
+    // Cooperative mode: while this thread sleeps, idle runs; the tick
+    // interrupt that ends the sleep cannot switch context, so only
+    // idle's yield() can bring this thread back. If idle does not
+    // yield when exactly one thread is ready, this hangs.
+    bool was_preemptive = scheduler::preemptive (false);
+
+    clock::timestamp_t begin = sysclock.now ();
+    sysclock.sleep_for (2);
+    clock::timestamp_t end = sysclock.now ();
+
+    scheduler::preemptive (was_preemptive);
+
+    if (end - begin < 2)
+      {
+        printf ("%s - cooperative sleep_for(2) returned after %u ticks\n",
+                test_name, static_cast<unsigned int> (end - begin));
+        return 1;
+      }
+    printf ("%s - cooperative sleep_for() ok\n", test_name);
   }
 
   // ==========================================================================

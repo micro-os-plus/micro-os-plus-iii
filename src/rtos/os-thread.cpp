@@ -1921,9 +1921,11 @@ namespace os
 
 #else
 
-        // TODO: further investigate why this fails on the native port.
-        // if (os::rtos::scheduler::ready_threads_list_.head ()
-        //     != os::rtos::scheduler::ready_threads_list_.tail ())
+        // An earlier `head() != tail()` test here failed on the native
+        // port: the running thread is not in the ready list, so with
+        // exactly one ready thread the test is false and the yield is
+        // lost. `!empty()` would be the correct test, but yield() is
+        // not a hot path, so it reschedules unconditionally.
         {
           port::scheduler::reschedule ();
         }

@@ -17,8 +17,12 @@
 #include <cmsis-plus/diag/instrumentation.h>
 
 #if !defined(OS_DISABLE_WAIT_FOR_INTERRUPT) \
-    && (defined(OS_USE_TRACE_SEGGER_RTT) || defined(SEGGER_SYSVIEW_VERSION))
-// When using SEGGER RTT (for trace or SystemView), the core cannot enter WFI.
+    && (defined(OS_INCLUDE_INSTRUMENTATION) \
+        || defined(OS_USE_TRACE_SEGGER_RTT) \
+        || defined(SEGGER_SYSVIEW_VERSION))
+// Instrumentation and SEGGER RTT (for trace or SystemView) need the
+// debugger to read the RAM buffers continuously, so the core must not
+// enter WFI.
 #define OS_DISABLE_WAIT_FOR_INTERRUPT (1)
 #endif
 
@@ -183,21 +187,23 @@ os_idle (thread::func_args_t args __attribute__ ((unused)))
     {
       os_rtos_idle_actions ();
 
-#if defined(OS_INCLUDE_INSTRUMENTATION)
-      // If during sleep there were threads that were resumed,
-      // the ready list may contain more than one entry.
-      // Probably too conservative, normally awakened threads were
-      // already scheduled after the interrupts that triggered them
-      // completed.
-      // However this saves a lot of instrumentation events.
-      if (os::rtos::scheduler::ready_threads_list_.head ()
-          != os::rtos::scheduler::ready_threads_list_.tail ())
+      // The idle thread has the lowest priority and is not in the ready
+      // list while it runs, so yield only if some thread is ready.
+      //
+      // This is needed: in cooperative mode, and on ports that do not
+      // switch context from the tick handler (POSIX), a thread resumed
+      // by an interrupt can start only when idle yields.
+      //
+      // The test also avoids a yield (and its instrumentation event and
+      // context switch request) on each iteration when nothing is ready,
+      // which matters when WFI is disabled and idle spins.
+      //
+      // Note: testing `head() != tail()` is not equivalent; it is false
+      // when exactly one thread is ready.
+      if (!os::rtos::scheduler::ready_threads_list_.empty ())
         {
           this_thread::yield ();
         }
-#else
-      this_thread::yield ();
-#endif
     }
 }
 
