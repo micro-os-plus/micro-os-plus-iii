@@ -14,6 +14,9 @@
 #include <cmsis-plus/rtos/os-hooks.h>
 #include <cmsis_device.h>
 
+#include <stdint.h>
+#include <stdlib.h>
+
 // ----------------------------------------------------------------------------
 
 // This is the application hardware initialisation routine,
@@ -28,12 +31,34 @@
 // Warning: The HAL requires the system timer, running at 1000 Hz
 // and calling HAL_IncTick().
 
+// Incremented by SysTick_Handler().
+extern volatile uint32_t qemu_early_ticks;
+
 void
 os_startup_initialize_hardware (void)
 {
   // Call the CMSIS system clock routine to store the clock frequency
   // in the SystemCoreClock global RAM location.
   SystemCoreClockUpdate ();
+
+  // Do what the STM32 HAL_Init() does: start SysTick at 1 kHz, before
+  // the static constructors and the scheduler. Then wait for two ticks,
+  // as HAL_Delay() would, to check that the interrupts are enabled at
+  // this point and that the SysTick handler (which also calls
+  // os_systick_handler()) is safe before the clocks are constructed.
+  // The scheduler reprograms SysTick when it starts.
+  SysTick_Config (SystemCoreClock / 1000u);
+
+  uint32_t begin = qemu_early_ticks;
+  for (uint32_t i = 0; (qemu_early_ticks - begin) < 2u; ++i)
+    {
+      if (i >= 100000000u)
+        {
+          // The SysTick interrupt did not run; the interrupts are
+          // probably still masked.
+          abort ();
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------

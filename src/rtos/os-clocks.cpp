@@ -32,12 +32,23 @@ using namespace os::rtos;
 /**
  * @details
  * Must be called from the physical interrupt handler.
+ *
+ * Until the scheduler is started, it returns without doing anything:
+ * the system tick may be started early by vendor HAL code (like the
+ * STM32 `HAL_Init()`), possibly before the static constructors of the
+ * clocks have run.
  */
 void
 os_systick_handler (void)
 {
   using namespace os::rtos;
   using namespace os;
+
+  // `scheduler::started()` reads a plain bool, valid from reset.
+  if (!scheduler::started ())
+    {
+      return;
+    }
 
   instrumentation::interrupt::entered ();
 
@@ -96,11 +107,19 @@ os_systick_handler (void)
 /**
  * @details
  * Must be called from the physical RTC interrupt handler.
+ *
+ * Until the scheduler is started, it returns without doing anything,
+ * as `os_systick_handler()` does.
  */
 void
 os_rtc_handler (void)
 {
   using namespace os;
+
+  if (!rtos::scheduler::started ())
+    {
+      return;
+    }
 
   instrumentation::interrupt::entered ();
 

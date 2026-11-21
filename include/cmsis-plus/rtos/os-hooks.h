@@ -54,6 +54,10 @@ extern "C"
    *  None.
    * @par Returns
    *  Nothing.
+   *
+   * @details
+   * Called with interrupts masked, before the DATA and BSS sections
+   * are initialised; it must only access registers.
    */
   void
   os_startup_initialize_hardware_early (void);
@@ -64,6 +68,13 @@ extern "C"
    *  None.
    * @par Returns
    *  Nothing.
+   *
+   * @details
+   * Called with interrupts enabled, after the DATA and BSS sections
+   * are initialised and before the static constructors; vendor HAL
+   * initialisations (like `HAL_Init()` and `SystemClock_Config()`)
+   * belong here. The RTOS ignores the system tick until the scheduler
+   * is started.
    */
   void
   os_startup_initialize_hardware (void);

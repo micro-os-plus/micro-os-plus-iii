@@ -83,6 +83,11 @@ Reset_Handler (void)
   // For just in case, when started via QEMU.
   __asm__ (" MSR msp, %0 " : : "r"(&__stack) :);
 
+  // A hardware reset leaves all interrupts disabled, but a soft start
+  // (a debugger loading and running without a reset, or a jump from a
+  // bootloader) may leave SysTick or NVIC interrupts enabled. Their
+  // handlers must not run before the DATA and BSS sections are
+  // initialised; `_start()` enables the interrupts after that.
   __disable_irq ();
 
   // SCB

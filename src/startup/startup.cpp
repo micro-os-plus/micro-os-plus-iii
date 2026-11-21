@@ -237,6 +237,21 @@ static uint32_t volatile
  *
  * Debugging new startup configurations usually begins with placing
  * a breakpoint at `_start()`, and stepping through the routine.
+ *
+ * @par Interrupts
+ * - `Reset_Handler` masks the interrupts (PRIMASK);
+ *   `os_startup_initialize_hardware_early()` and the DATA and BSS
+ *   initialisation run with interrupts masked.
+ * - The interrupts are enabled right after the DATA and BSS
+ *   initialisation, so `os_startup_initialize_hardware()`, the static
+ *   constructors and `main()` run with interrupts enabled, until
+ *   the default `main()` calls `scheduler::initialize()`, which masks
+ *   them again until `scheduler::start()`.
+ * - `os_systick_handler()` and `os_rtc_handler()` do nothing until the
+ *   scheduler is started, so a SysTick started early (for example by
+ *   the STM32 `HAL_Init()`) is safe.
+ * - Interrupt handlers that run before the static constructors must
+ *   not use C++ objects that need construction.
  */
 void __attribute__ ((section (".after_vectors"), noreturn, weak))
 _start (void)
@@ -338,6 +353,13 @@ _start (void)
     }
 
 #endif
+
+  // The C runtime memory is initialised; enable the interrupts masked
+  // by `Reset_Handler`, so that vendor HAL code (like `HAL_Init()` and
+  // `HAL_Delay()`, which need the SysTick interrupt) can be used in the
+  // hardware initialisation and in the static constructors. The RTOS
+  // ignores the system tick until the scheduler is started.
+  __enable_irq ();
 
   // Hook to continue the initialisations. Usually compute and store the
   // clock frequency in the global CMSIS variable, cleared above.
