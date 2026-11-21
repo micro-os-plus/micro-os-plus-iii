@@ -1404,6 +1404,12 @@ namespace os
      *  ([IEEE Std 1003.1, 2013
      * Edition](http://pubs.opengroup.org/onlinepubs/9699919799/nframe.html)).
      *
+     * @note The thread is destroyed on the spot, by the caller. If the
+     *  thread already terminated itself and the idle thread has
+     *  started to destroy it, `kill()` waits until the destruction is
+     *  complete (on one CPU this cannot happen, since idle destroys a
+     *  thread under the scheduler lock).
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     result_t
@@ -1467,10 +1473,17 @@ namespace os
           {
             // The idle reaper already claimed this thread for destruction.
             // Wait with lock released until it is completely destroyed.
+            //
+            // On one CPU this is not reachable, since idle claims and
+            // destroys the thread under the scheduler lock; on SMP, the
+            // idle thread of another CPU may be destroying it. Sleep
+            // rather than yield(): yield() never gives the CPU to lower
+            // priority threads, such as this CPU's idle, so it could
+            // wait forever.
             while (state_ != state::destroyed)
               {
                 scheduler::uncritical_section sucs;
-                this_thread::yield ();
+                sysclock.sleep_for (1);
               }
             instrumentation::thread::kill_retval (this, result::ok);
             return result::ok;

@@ -77,24 +77,37 @@ os_rtos_idle_actions (void)
 
   while (!scheduler::terminated_threads_list_.empty ())
     {
-      internal::waiting_thread_node* node;
       {
         // ----- Enter critical section ---------------------------------------
-        interrupts::critical_section ics;
-        node = const_cast<internal::waiting_thread_node*> (
-            scheduler::terminated_threads_list_.head ());
-        thread* th = node->thread_;
-        if (th->state_ == thread::state::destroying
-            || th->state_ == thread::state::destroyed)
-          {
-            node->unlink ();
-            continue;
-          }
-        th->state_ = thread::state::destroying;
-        node->unlink ();
+        // Claim and destroy the thread as one step for this CPU's
+        // scheduler, as kill() does. Otherwise a higher priority thread
+        // could preempt idle half-way through internal_destroy_(), find
+        // the thread `destroying` in kill() and wait for idle, which
+        // would not run again while that thread is ready. Interrupts
+        // remain enabled; a context switch requested meanwhile is
+        // performed by the yield() below.
+        scheduler::critical_section scs;
+
+        internal::waiting_thread_node* node;
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+          node = const_cast<internal::waiting_thread_node*> (
+              scheduler::terminated_threads_list_.head ());
+          thread* th = node->thread_;
+          if (th->state_ == thread::state::destroying
+              || th->state_ == thread::state::destroyed)
+            {
+              node->unlink ();
+              continue;
+            }
+          th->state_ = thread::state::destroying;
+          node->unlink ();
+          // ----- Exit critical section --------------------------------------
+        }
+        node->thread_->internal_destroy_ ();
         // ----- Exit critical section ----------------------------------------
       }
-      node->thread_->internal_destroy_ ();
 
       this_thread::yield ();
     }

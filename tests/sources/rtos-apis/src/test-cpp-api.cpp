@@ -242,6 +242,24 @@ namespace
 
 #pragma GCC diagnostic pop
 
+  // --------------------------------------------------------------------------
+
+  // Threads for the kill() tests.
+  void*
+  kill_sleeper_func (void* args __attribute__ ((unused)))
+  {
+    sysclock.sleep_for (100);
+    return nullptr;
+  }
+
+  void*
+  kill_quick_func (void* args __attribute__ ((unused)))
+  {
+    return nullptr;
+  }
+
+  // --------------------------------------------------------------------------
+
   void*
   cv_timed_wait_func (void* args)
   {
@@ -517,6 +535,62 @@ test_cpp_api (void)
         rtos::memory::allocator_typed<thread> (), "th11", func, nullptr);
 
     th2->join ();
+  }
+
+  {
+    // kill() a thread blocked in a wait.
+    thread th{ "th-kill1", kill_sleeper_func, nullptr };
+    // Let it start and block in sleep_for().
+    sysclock.sleep_for (1);
+
+    result_t res = th.kill ();
+    if (res != result::ok || th.state () != thread::state::destroyed)
+      {
+        printf ("%s - kill() of a waiting thread returned %d, state %u\n",
+                test_name, static_cast<int> (res),
+                static_cast<unsigned int> (th.state ()));
+        return 1;
+      }
+  }
+
+  {
+    // kill() a thread which terminated itself, before the idle thread
+    // destroys it. Above the current thread, so it runs to completion
+    // at once; idle cannot run meanwhile.
+    thread::attributes attr;
+    attr.th_priority = thread::priority::above_normal;
+    thread th{ "th-kill2", kill_quick_func, nullptr, attr };
+
+    if (th.state () != thread::state::terminated)
+      {
+        printf ("%s - self-terminated thread state %u\n", test_name,
+                static_cast<unsigned int> (th.state ()));
+        return 1;
+      }
+
+    result_t res = th.kill ();
+    if (res != result::ok || th.state () != thread::state::destroyed)
+      {
+        printf ("%s - kill() of a terminated thread returned %d, state %u\n",
+                test_name, static_cast<int> (res),
+                static_cast<unsigned int> (th.state ()));
+        return 1;
+      }
+
+    // Already destroyed.
+    res = th.kill ();
+    if (res != result::ok)
+      {
+        printf ("%s - kill() of a destroyed thread returned %d\n", test_name,
+                static_cast<int> (res));
+        return 1;
+      }
+
+    // Let idle run; the thread is no longer on the terminated list, so
+    // it must not be destroyed again.
+    sysclock.sleep_for (2);
+
+    printf ("%s - kill() ok\n", test_name);
   }
 
   // --------------------------------------------------------------------------
