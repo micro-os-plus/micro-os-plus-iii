@@ -135,6 +135,22 @@ __posix_read (int fildes, void* buf, size_t nbyte)
 ssize_t
 __posix_write (int fildes, const void* buf, size_t nbyte)
 {
+  if (os::rtos::interrupts::in_handler_mode ())
+    {
+      // Device drivers and the descriptors table lock cannot be used
+      // from interrupt handlers (including timer callbacks, which run
+      // in the tick handler). Send STDOUT & STDERR to the trace channel;
+      // without TRACE, trace_write() is an empty inline stub, so the
+      // output is discarded (as for threads, when no device is
+      // registered).
+      if (fildes == 1 || fildes == 2)
+        {
+          return trace_write (buf, nbyte);
+        }
+      errno = EPERM;
+      return -1;
+    }
+
   auto* const io = posix::file_descriptors_manager::io (fildes);
   if (io == nullptr)
     {
