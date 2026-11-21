@@ -168,22 +168,24 @@ where it differs.
 
 | # | Severity | File | Issue |
 | --- | --- | --- | --- |
-| #1 | important | `src/rtos/os-thread.cpp:684` | Lost wake-up: `resume()` ignores running threads |
-| #2 | important | `src/rtos/os-thread.cpp:1428` | `kill()` livelocks yielding to the lower-priority idle thread |
-| #3 | important | `src/rtos/os-condvar.cpp:621` | Condition variable wait error path leaves the thread `suspended` |
-| #4 | minor | `src/rtos/os-condvar.cpp:831` | `timed_wait()` reports a timeout for signalled waits |
-| #5 | important | `src/rtos/os-idle.cpp:193` | Idle does not yield when exactly one thread is ready |
+| #1 | important | `src/rtos/os-thread.cpp:684` | Lost wake-up: `resume()` ignores running threads (**fixed**) |
+| #2 | important | `src/rtos/os-thread.cpp:1428` | `kill()` livelocks yielding to the lower-priority idle thread (**fixed**) |
+| #3 | important | `src/rtos/os-condvar.cpp:621` | Condition variable wait error path leaves the thread `suspended` (**fixed**) |
+| #4 | minor | `src/rtos/os-condvar.cpp:831` | `timed_wait()` reports a timeout for signalled waits (**fixed**) |
+| #5 | important | `src/rtos/os-idle.cpp:193` | Idle does not yield when exactly one thread is ready (**fixed**) |
 | #6 | important | `src/rtos/os-evflags.cpp:598` | Port event flags branch calls an undeclared function (**fixed**) |
-| #7 | narrow | `src/libc/stdlib/malloc.cpp:315` | `realloc()` copies 0 bytes when the usable size is unknown |
-| #8 | decision | `src/startup/exception-handlers.c:86` | `Reset_Handler` masks interrupts until the scheduler starts |
-| #9 | important | `include/cmsis-plus/arm/semihosting.h:108` | HLT trap switches to `.arm` and never back to Thumb |
-| #10 | decision | `src/rtos/os-c-wrapper.cpp:1511` | C API default timer changed from periodic to one-shot |
-| #11 | docs | `include/cmsis-plus/rtos/os-thread.h:1281` | `flags_raise()` documented both as ISR-safe and as returning `EPERM` in ISRs |
-| #12 | important | `src/startup/initialize-hardware.c:67` | `SystemClock_Config()` runs before DATA and BSS are initialised |
-| #13 | important | `src/posix-io/file-descriptors-manager.cpp:94` | `printf()` from a timer callback fails with POSIX I/O syscalls |
-| #14 | pre-existing | `src/rtos/os-mutex.cpp:1427` | `timed_lock()` failure path recomputes the boost without a lock and sets the assigned priority |
-| #15 | SMP only | `src/rtos/internal/os-lists.cpp:536` | `check_timestamp()` runs `action()` outside the critical section |
-| #16 | nit | `src/startup/startup.cpp:358` | American spelling "initialization" in a new comment |
+| #7 | narrow | `src/libc/stdlib/malloc.cpp:315` | `realloc()` copies 0 bytes when the usable size is unknown (**fixed**) |
+| #8 | decision | `src/startup/exception-handlers.c:86` | `Reset_Handler` masks interrupts until the scheduler starts (**fixed**) |
+| #9 | important | `include/cmsis-plus/arm/semihosting.h:108` | HLT trap switches to `.arm` and never back to Thumb (**fixed**) |
+| #10 | decision | `src/rtos/os-c-wrapper.cpp:1511` | C API default timer changed from periodic to one-shot (**decided: one-shot**) |
+| #11 | docs | `include/cmsis-plus/rtos/os-thread.h:1281` | `flags_raise()` documented both as ISR-safe and as returning `EPERM` in ISRs (**fixed**) |
+| #12 | important | `src/startup/initialize-hardware.c:67` | `SystemClock_Config()` runs before DATA and BSS are initialised (**fixed**) |
+| #13 | important | `src/posix-io/file-descriptors-manager.cpp:94` | `printf()` from a timer callback fails with POSIX I/O syscalls (**fixed**) |
+| #14 | pre-existing | `src/rtos/os-mutex.cpp:1427` | `timed_lock()` failure path recomputes the boost without a lock and sets the assigned priority (**fixed**) |
+| #15 | SMP only | `src/rtos/internal/os-lists.cpp:536` | `check_timestamp()` runs `action()` outside the critical section (**fixed**) |
+| #16 | nit | `src/startup/startup.cpp:358` | American spelling "initialization" in a new comment (**fixed**) |
+| #17 | pre-existing | `src/rtos/os-semaphore.cpp:735` | Waiter woken by a single wake-up leaves without passing it on (semaphore, memory pool, message queue) (**fixed**) |
+| #18 | pre-existing | `src/rtos/os-thread.cpp:1144` | `interrupt()` before the thread waits is lost (**fixed**, behaviour change) |
 
 Severity values:
 
@@ -205,26 +207,28 @@ Severity values:
 Phase 1, small and contained:
 
 1. #6 - one-line rename (**fixed**).
-2. #11, #16 - documentation and comments only.
-3. #7 - one-line fallback in `realloc()`.
-4. #5 - one-line condition change in idle.
-5. #13 - make the descriptor lookups usable from handler mode.
+2. #11 (**fixed**), #16 (**fixed**) - documentation and comments only.
+3. #7 - one-line fallback in `realloc()` (**fixed**).
+4. #5 - one-line condition change in idle (**fixed**).
+5. #13 - make the descriptor lookups usable from handler mode (**fixed**, in `__posix_write()` instead).
 
 Phase 2, decide first, then fix:
 
-1. #10 - keep the one-shot default and document it, or revert.
+1. #10 - keep the one-shot default and document it, or revert (**decided: one-shot, documented and tested**).
 2. #12 and #8 together - both concern the STM32 startup sequence;
    decide where `SystemClock_Config()` runs and when the HAL tick may
-   start.
-3. #9 - only affects AArch32 builds with `SEMIHOST_TRAP_HLT`.
+   start (#12 and #8 **fixed**).
+3. #9 - only affects AArch32 builds with `SEMIHOST_TRAP_HLT` (**fixed**).
 
 Phase 3, scheduler and synchronisation core, one at a time, with tests
 between them:
 
-1. #1 - sets the thread state rules the others depend on.
-2. #3 - same state rule in the condition variable error path.
-3. #4 - same file as #3.
-4. #2 - needs the largest design change.
+1. #1 - sets the thread state rules the others depend on (**fixed**,
+   b885477a, issue #144).
+2. #3 - same state rule in the condition variable error path (**fixed**,
+   e126b043, issue #145).
+3. #4 - same file as #3 (**fixed**, 7627491a, issue #146).
+4. #2 - needs the largest design change (**fixed**, 456815ae, issue #147).
 
 After each step in phase 3, run `test-native-cmake-sys` and at least
 one QEMU Cortex-M configuration, and check the Cortex-M and POSIX
@@ -234,15 +238,23 @@ same code.
 Separately, not tied to this change:
 
 - #14 - pre-existing; fix together with the mutex changes, or in its
-  own commit.
-- #15 - only relevant when the SMP work is merged; fix it on the `smp`
-  branch.
+  own commit (**fixed**, 5abc2758, issue #148).
+- #15 - only relevant when the SMP work is merged; fixed here in the
+  common code so the `smp` branch inherits it (**fixed**, 3b4ccff3, issue
+  #150).
+- #17 - pre-existing; found while fixing #14, same pattern in the
+  semaphore, memory pool and message queue (**fixed**, e38aee07, issue #149).
+- #18 - pre-existing; the older `interrupt()` race noted under #1 and
+  met again while testing #14 (**fixed**, 5551d96a, issue #151).
 
 ---
 
 ## #1 - Lost wake-up: `resume()` ignores running threads
 
 **File:** `src/rtos/os-thread.cpp:684`
+
+**Status:** fixed in b885477a (issue #144), with the first option,
+check and suspend under one lock; see "Fix applied" below.
 
 ### Problem
 
@@ -315,11 +327,89 @@ Reverting `resume()` to link a `running` thread (the old
 `ready_node_.next() == nullptr` test) also fixes it on one CPU, but
 reintroduces the problem the change was made for on SMP.
 
+### Analysis before fixing
+
+The window is narrower than described above:
+
+- Only the untimed `flags_wait()` has it. `flags_timed_wait()` already
+  tests the flags, links the timeout node and sets `state::suspended`
+  in one critical section, and the other synchronisation objects link
+  the waiting node and set the state in the critical section of the
+  test (`scheduler::internal_link_node()`).
+- The old `resume()` hid the race only partly. `prepare_suspend()` is
+  empty on Cortex-M and POSIX, so a running thread that `resume()` put
+  into the ready list stayed there after it suspended, and was picked
+  again. If the thread was preempted inside the window, its ready node
+  was already linked, `resume()` did nothing, and the wake-up was lost
+  before bb04e002 too.
+- `thread::interrupt()` is not affected by bb04e002: it cannot be
+  called from interrupts, so on one CPU it can reach the window only
+  after a preemption, which was already lost before. Testing
+  `interrupted_` before suspending would close that older race in all
+  objects, but would also change what a wait entered with the flag
+  already set does (return `EINTR` instead of blocking); it is left for
+  a separate issue.
+- `this_thread::suspend()` has no condition to test, so a `resume()`
+  arriving before it cannot be caught by a lock. It is documented
+  instead.
+
+### Fix applied
+
+- `src/rtos/os-thread.cpp`, `internal_flags_wait_()`: the loop now calls
+  `prepare_suspend()` and sets `state_ = state::suspended` in the same
+  critical section that found the flags not raised, then calls the
+  `suspended` instrumentation hook and `reschedule()`, as
+  `internal_flags_timed_wait_()` does. A `flags_raise()` from an
+  interrupt (or another CPU) in the old window now finds the thread
+  `suspended` and links it.
+- `thread::resume()`: unchanged. The comment and the documentation now
+  say that a wake-up for a running or ready thread is not remembered,
+  so waits must test and suspend under one lock, and recommend the
+  thread event flags.
+- `this_thread::suspend()`: `@warning` that a `resume()` before the
+  suspend is not remembered.
+- No port, C API or data layout changes.
+
+### Verification
+
+`tests/sources/rtos-apis/src/test-cpp-api.cpp`, new
+`test_lost_wakeup()`, run after the thread event flags checks:
+
+- a waiter thread, above the main thread priority, calibrates a busy
+  loop against the tick, then 2000 times arms a one-shot timer for the
+  next tick (the callback runs in the tick interrupt and raises a
+  thread flag), spins until just before that tick (varying the offset)
+  and calls the untimed `flags_wait()`;
+- the main thread checks every 20 ticks; if the waiter made no progress
+  and is `suspended`, it counts a lost wake-up and raises the flag
+  again, so the test always ends.
+
+The window cannot be reached deterministically, so this is a stress
+test. With the old `internal_flags_wait_()` it failed in every native
+run (2 to 7 lost wake-ups in 2000 iterations, 5 of 5 runs) and in about
+two thirds of the QEMU Cortex-M7F runs (0 to 3 lost wake-ups; the
+timing jitter, not the offset range, dominates). With the fix: no lost
+wake-ups in 8 repeated native runs, and `test-native-cmake-clang`,
+`test-qemu-cortex-m7f-cmake` and `test-qemu-cortex-m0-cmake` pass
+(debug and release). The test adds about 2 seconds per run.
+
+`test-native-cmake-gcc` does not build on this machine, for an
+unrelated reason: it uses `/usr/bin/g++` (Apple clang), whose libc++
+no longer has `std::chrono::__is_duration`, used by
+`include/cmsis-plus/estd/chrono` (also fails in `src/libcpp/mutex.cpp`). Fixed later in ac1ab52e (issue #153), by
+using `std::chrono::ceil`; `test-native-cmake-gcc` now builds and passes.
+
+Still to do: the same change on the `smp` branch.
+
 ---
 
 ## #2 - `kill()` livelocks yielding to the lower-priority idle thread
 
 **File:** `src/rtos/os-thread.cpp:1428`
+
+**Status:** fixed in 456815ae (issue #147): idle claims and destroys under
+the scheduler lock, and the losing `kill()` sleeps instead of yielding; see
+"Fix applied" below.
 
 ### Problem
 
@@ -390,11 +480,70 @@ the caller).
 The alternative is to block on a real wake-up instead of polling (for
 example a join-style wait that `internal_destroy_()` signals).
 
+### Analysis before fixing
+
+- The window is narrower than described: the stack deallocation already
+  runs under a scheduler lock
+  (`allocator_stateless_default_resource::deallocate()`), so idle can
+  be preempted only in the gaps between its critical sections (after
+  the claim, after the deallocation, after the owned-mutex loop and
+  before `destroyed` is set). Real, but a few instructions wide.
+- Letting `kill()` finish the destruction is not safe: idle may already
+  be half-way through `internal_destroy_()` (for example the stack
+  already freed), so the killer cannot take over. Making the
+  `destroying` state unobservable on one CPU is simpler.
+- On Cortex-M, unlocking the scheduler does not perform a context
+  switch requested while it was locked; it waits for the next
+  reschedule. Idle calls `this_thread::yield()` right after each
+  destroy, so a higher priority thread is delayed by at most one
+  destroy, the same as with `kill()`, which already runs
+  `internal_destroy_()` under the scheduler lock.
+
+### Fix applied
+
+- `src/rtos/os-idle.cpp`, `os_rtos_idle_actions()`: the claim (still in
+  its interrupts critical section) and `internal_destroy_()` run under
+  one `scheduler::critical_section`, followed by `yield()`. On one CPU
+  no other thread can observe a thread claimed by idle in
+  `destroying`; it goes from `terminated` to `destroyed`.
+- `src/rtos/os-thread.cpp`, `kill()`: when idle won the claim, wait with
+  `sysclock.sleep_for (1)` instead of `this_thread::yield()`, so lower
+  priority threads, including this CPU's idle, can run and the loop
+  always ends. After the change above this branch is reachable only on
+  SMP (another CPU's idle). Documented with a `@note` on `kill()`.
+- No port, C API or data layout changes.
+
+### Verification
+
+The window cannot be forced deterministically: the only hook inside
+`internal_destroy_()` is the memory resource, which already runs under
+the scheduler lock, and simulating a preemption there (with an
+`uncritical_section`) would defeat the fix as well. The fix rests on
+the code argument above.
+
+New tests in `tests/sources/rtos-apis/src/test-cpp-api.cpp` (threads
+section) for the `kill()` paths, which were not tested before:
+
+- `kill()` of a thread blocked in `sleep_for (100)` returns `ok` and the
+  state is `destroyed`;
+- a thread above the main priority returns at once, so it is
+  `terminated` and on the terminated list; `kill()` before idle runs
+  (the path where `kill()` wins the claim) returns `ok` and `destroyed`;
+  a second `kill()` returns `ok`; then `sleep_for (2)` lets idle run,
+  which must not destroy it again.
+
+These cover the paths around the fix, not the window itself.
+`test-native-cmake-clang`, `test-qemu-cortex-m7f-cmake` and
+`test-qemu-cortex-m0-cmake` pass (debug and release).
+
 ---
 
 ## #3 - Condition variable wait error path leaves the thread `suspended`
 
 **File:** `src/rtos/os-condvar.cpp:621` (and line 813 in `timed_wait()`)
+
+**Status:** fixed in e126b043 (issue #145), with the first option,
+restoring the state in the error path; see "Fix applied" below.
 
 ### Problem
 
@@ -450,11 +599,65 @@ Either:
 - unlock the mutex before linking the node (keeping the ordering safe
   against lost signals).
 
+### Analysis before fixing
+
+- The second option is not safe: the link must stay before the unlock.
+  As the comment in `wait()` explains, on SMP another CPU can take the
+  mutex and call `signal()` as soon as it is released; a thread not yet
+  linked would miss that signal.
+- `unlock()` fails with `EPERM` (error-checking, recursive or robust
+  mutex not owned), with `ENOTRECOVERABLE` (normal mutex not owned, or
+  an unrecoverable mutex), and also with `ENOTRECOVERABLE` after
+  actually releasing a robust mutex whose owner died. In all cases the
+  thread does not block.
+- Unlinking the waiting node and setting `running` is not enough on its
+  own: between the link and the error path, a timeout (in
+  `timed_wait()`, with a short timeout, also on one CPU) or, on SMP, a
+  `signal()` from another CPU may already have resumed the thread,
+  putting it in the ready list as `ready`.
+
+### Fix applied
+
+- New private `thread::internal_cancel_suspend_()`
+  (`include/cmsis-plus/rtos/os-thread.h`, `src/rtos/os-thread.cpp`),
+  called by the current thread in an interrupts critical section: it
+  unlinks `ready_node_` if a `resume()` linked it (not with
+  `OS_USE_RTOS_PORT_SCHEDULER`), sets `state::running` and reports
+  `instrumentation::thread::active()`, balancing the `suspended` event
+  reported by `internal_link_node()`.
+- `src/rtos/os-condvar.cpp`: the `unlock()` error paths of `wait()` and
+  `timed_wait()` now unlink the waiting node (and, in `timed_wait()`,
+  the timeout node) and call `internal_cancel_suspend_()`, all in one
+  interrupts critical section, instead of `internal_unlink_node()`.
+- In the SMP case, a `signal()` that already woke the thread is consumed
+  by a call that returns an error; acceptable, since the call itself is
+  a programming error.
+- No port, C API or data layout changes.
+
+### Verification
+
+`tests/sources/rtos-apis/src/test-cpp-api.cpp`, condition variables
+section: with a `mutex::type::errorcheck` mutex not owned by the
+caller, `cv.wait (mx)` and `cv.timed_wait (mx, 10)` must return `EPERM`
+with `this_thread::thread ().state ()` still `running`, checked before
+`yield()` and `sleep_for (1)`, so a regression fails instead of losing
+the thread.
+
+Negative check: with the old `os-condvar.cpp`, the test fails
+deterministically (`wait()` returned `EPERM`, state 3, `suspended`).
+With the fix, `test-native-cmake-clang`, `test-qemu-cortex-m7f-cmake`
+and `test-qemu-cortex-m0-cmake` pass (debug and release). The timeout
+expiring inside the window cannot be reached deterministically; it is
+handled by the same helper.
+
 ---
 
 ## #4 - `timed_wait()` reports a timeout for signalled waits
 
 **File:** `src/rtos/os-condvar.cpp:831`
+
+**Status:** fixed in 7627491a (issue #146), with the first option,
+deciding from what woke the thread; see "Fix applied" below.
 
 ### Problem
 
@@ -503,11 +706,56 @@ Alternatively, keep the current behaviour and correct the comment in
 `estd::condition_variable::wait_for()`, documenting that a timeout may
 be reported for a wait that was signalled close to the deadline.
 
+### Fix applied
+
+`signal()` and `broadcast()` (`waiting_threads_list::resume_one()`)
+unlink the thread's waiting node before resuming it; the clock
+(`timeout_thread_node::action()`) unlinks only the timeout node. So,
+after `reschedule()`:
+
+| `node` | `timeout_node` | Meaning | Result |
+| --- | --- | --- | --- |
+| unlinked | any | signalled (the signal was consumed) | `ok` |
+| linked | unlinked | timeout expired | `ETIMEDOUT` |
+| linked | linked | spurious wake-up (for example an explicit `resume()`) | `ok` |
+
+- `src/rtos/os-condvar.cpp`, `timed_wait()`: the result is decided as
+  `!node.unlinked () && timeout_node.unlinked ()` in the critical
+  section that unlinks both nodes, before `mutex.lock()`, instead of
+  comparing `steady_now()` with the deadline after the lock.
+- `include/cmsis-plus/rtos/os-condvar.h` and `os-c-api.h`: `ETIMEDOUT`
+  means the timeout expired before the condition variable was
+  signalled; a note says that a signal before the deadline is reported
+  as success even if re-acquiring the mutex takes longer, and that the
+  mutex is always re-acquired.
+- The comment in `estd::condition_variable::wait_for()` ("trust the
+  kernel's verdict") is now accurate and was not changed.
+
+### Verification
+
+`tests/sources/rtos-apis/src/test-cpp-api.cpp`, condition variables
+section:
+
+- not signalled: `cv.timed_wait (mx, 2)` returns `ETIMEDOUT` with `mx`
+  owned again by the caller;
+- signalled before the deadline, mutex held past it: a waiter thread
+  above the main priority calls `cv.timed_wait (mx, 5)`; the main
+  thread locks `mx`, calls `signal()` (the waiter wakes and blocks
+  re-acquiring `mx`), holds `mx` for 10 ticks, unlocks and joins; the
+  waiter must get `result::ok`. Deterministic, by priorities.
+
+Negative check: with the old `os-condvar.cpp` the second case returns
+`ETIMEDOUT` (60 on macOS). With the fix, `test-native-cmake-clang`,
+`test-qemu-cortex-m7f-cmake` and `test-qemu-cortex-m0-cmake` pass
+(debug and release).
+
 ---
 
 ## #5 - Idle does not yield when exactly one thread is ready
 
 **File:** `src/rtos/os-idle.cpp:193`
+
+**Status:** fixed in c3f90286 (issue #138); see "Fix applied" below.
 
 ### Problem
 
@@ -565,13 +813,69 @@ tail()` and idle does not yield.
 
 Test `!ready_threads_list_.empty()` instead of `head() != tail()`.
 
+### History
+
+The condition comes from c77b6c46 ("os-idle.cpp: optimise call to
+yield()", 2025-09-08), which applied it to all builds to avoid a flood
+of instrumentation events: with instrumentation, WFI is disabled
+(354464c5), idle spins, and an unconditional `yield()` produces an
+event and a PendSV on every iteration. 1d0d0877 ("revert empty list
+optimisation, it fails on native", 2025-09-24) restored the
+unconditional `yield()` for builds without instrumentation, kept the
+condition under `OS_INCLUDE_INSTRUMENTATION`, and left a TODO in
+`this_thread::yield()`, where the same test had also been added. The
+native failure was this off-by-one: `head() == tail()` both when the
+list is empty and when it holds exactly one thread.
+
+### Fix applied
+
+- `os_idle()` uses `!ready_threads_list_.empty()` in all builds; the
+  `OS_INCLUDE_INSTRUMENTATION` special case is removed. Idle still
+  avoids a yield on each iteration when nothing is ready (no
+  instrumentation event, no PendSV), which keeps the benefit of
+  c77b6c46, and now yields when exactly one thread is ready. Since
+  every configuration uses this condition, all tests exercise it.
+- `OS_DISABLE_WAIT_FOR_INTERRUPT` is now also defined when
+  `OS_INCLUDE_INSTRUMENTATION` is defined. Before, it depended on
+  `SEGGER_SYSVIEW_VERSION`, which `instrumentation.h` brings in
+  indirectly (via `instrumentation-sysview-micro-os-plus-iii.h` and
+  `SEGGER_SYSVIEW.h`); the behaviour does not change for the current
+  SystemView back-end, but the rule (the debugger must read the RAM
+  buffers, so the core must not sleep) no longer depends on the
+  include chain.
+- The TODO in `this_thread::yield()` is replaced by an explanation of
+  the native failure; `yield()` still reschedules unconditionally.
+- `test-cpp-api.cpp`: the `scheduler::preemptive(false)` block now
+  sleeps for 2 ticks in cooperative mode and checks the elapsed time;
+  the previous mode is restored from the return value.
+
+The gap between the ready check and WFI (an interrupt that readies a
+thread after the check sleeps until the next interrupt) is unchanged
+from 7.0.0, and does not exist when WFI is disabled.
+
+### Verification
+
+- `xpm run test-native-cmake-clang -C tests` and
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` pass (debug and
+  release).
+- Negative check, with the old `head() != tail()` condition in all
+  builds:
+  - native clang debug hangs at the first `sleep_for()` with no other
+    ready thread (after `test_cpp_mem()`), as described above for
+    POSIX;
+  - QEMU Cortex-M7F debug passes all sections up to "Timers" and then
+    times out in the new cooperative block.
+- `OS_INCLUDE_INSTRUMENTATION` is not built by any native or QEMU
+  configuration (it needs SystemView); the WFI guard change was
+  checked by review only.
+
 ---
 
 ## #6 - Port event flags branch calls an undeclared function
 
 **File:** `src/rtos/os-evflags.cpp:598`
 
-**Status:** fixed (not committed).
+**Status:** fixed in 93f34e1f (issue #135).
 
 ### Problem
 
@@ -677,6 +981,8 @@ as in the verification above.
 
 **File:** `src/libc/stdlib/malloc.cpp:315`
 
+**Status:** fixed in 96c18a3f (issue #137); see "Fix applied" below.
+
 ### Problem
 
 `realloc()` now copies `min(bytes, usable_size(old))` bytes. The base
@@ -731,11 +1037,61 @@ shipped resource that can be the default (`block_pool`,
 `malloc_memory_resource`, `new_delete_memory_resource`), and keep the
 fallback only for third-party resources.
 
+### Fix applied
+
+- `realloc()` copies `bytes` when `usable_size()` returns 0, and
+  `min(bytes, usable_size)` otherwise. For resources without the
+  override this is the 7.0.0 behaviour: the contents are kept, but a
+  growing `realloc()` may read past the end of the old block.
+- `block_pool::do_usable_size()` is added; it returns the block size.
+- `malloc_memory_resource` and `new_delete_memory_resource` are not
+  changed: on Arm, `malloc()` and `operator new` allocate from the
+  default resource, so either of them used as the default would
+  recurse forever. They can never be the default where `malloc.cpp`
+  is built.
+- `malloc_usable_size()` is implemented with
+  `get_default_resource()->usable_size()` (0 for a null pointer), and
+  `_malloc_usable_size_r()` calls it instead of `abort()`.
+- `usable_size()` and `do_usable_size()` were already documented,
+  including the meaning of 0, so this part of the suggestion was not
+  needed. The `do_usable_size()` documentation now says that
+  resources used as the default resource should override it, and
+  why.
+
+C++ has no equivalent: `std::pmr::memory_resource` has no size query,
+and C++23 `allocate_at_least()` only reports the size when allocating
+(libc++ 21 does not provide it for `memory_resource` or
+`polymorphic_allocator`). Querying the size later is a C library
+extension (glibc `malloc_usable_size()`, newlib-nano
+`nano_malloc_usable_size()`), which is the model used here.
+
+### Verification
+
+- `test_cpp_mem()` in `tests/sources/rtos-apis` (previously empty and
+  disabled in `main.cpp`) now checks that a growing `realloc()` keeps
+  the contents, that `block_pool::usable_size()` returns the block
+  size and, in cross builds only (`OS_IS_CROSS_BUILD`), that
+  `malloc_usable_size()` returns at least the requested size and 0 for
+  a null pointer. Native builds use the host C library; macOS has no
+  `malloc_usable_size()`.
+- `malloc.cpp` itself is still guarded by `__ARM_EABI__`, like several
+  other bare-metal sources; see the note after #16.
+- `xpm run test-native-cmake-clang -C tests` and
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` pass (debug and
+  release).
+- The Arm test image links the µOS++ `malloc_usable_size()`; no
+  newlib-nano allocator symbols are present.
+- The fallback path (a default resource without the override) is
+  checked by review only.
+
 ---
 
 ## #8 - `Reset_Handler` masks interrupts until the scheduler starts
 
 **File:** `src/startup/exception-handlers.c:86`
+
+**Status:** fixed in f06f9252 (issue #142), with the second option (HAL tick
+runs early, RTOS side protected); see "Fix applied" below.
 
 ### Problem
 
@@ -814,11 +1170,67 @@ Decide which startup contract is intended, and document it.
 The second option keeps the protection without changing behaviour for
 applications that need the HAL before the scheduler.
 
+### Fix applied
+
+The masking at reset is kept, but limited to the time before the C
+runtime memory is initialised, and the RTOS tick is protected instead:
+
+- `Reset_Handler` keeps `__disable_irq()`, now with a comment giving a
+  reason: a hardware reset leaves all interrupts disabled, but a soft
+  start (a debugger loading and running without a reset, or a jump
+  from a bootloader) may leave SysTick or NVIC interrupts enabled, and
+  their handlers must not run before DATA and BSS are initialised.
+- `_start()` calls `__enable_irq()` right after the DATA and BSS
+  initialisation (and the guard checks), before
+  `os_startup_initialize_hardware()`. Hardware initialisation, static
+  constructors and `main()` run with interrupts enabled, until the
+  default `main()` calls `scheduler::initialize()`, as in 7.0.0.
+  `startup.cpp` already included `cmsis_device.h` and used `__NOP()`.
+- `os_systick_handler()` and `os_rtc_handler()` return immediately
+  while `!scheduler::started()` (`is_started_` is a plain `bool`,
+  valid from reset), so a SysTick started early by vendor HAL code is
+  safe, even before the clocks are constructed. Ticks before the
+  scheduler starts are not counted, which in practice was also the
+  case in 7.0.0, because `main()` masks interrupts first. The existing
+  `OS_USE_RTOS_PORT_SCHEDULER` checks are now redundant but left in.
+- The startup contract is documented in the `_start()` details
+  ("Interrupts") and in `os-hooks.h` for
+  `os_startup_initialize_hardware_early()` (interrupts masked, before
+  DATA and BSS, registers only) and `os_startup_initialize_hardware()`
+  (interrupts enabled, before constructors, vendor HAL initialisation
+  belongs here).
+- The Cortex-M port needs no change; `port::scheduler::initialize()`
+  and `start()` keep their masking.
+- `tests/device-qemu-cortexm` (shared by all QEMU Cortex-M platforms)
+  now behaves like the STM32 HAL: `SysTick_Handler` increments a
+  counter before calling `os_systick_handler()`, and
+  `os_startup_initialize_hardware()` starts SysTick at 1 kHz and waits,
+  with a bounded loop, for two ticks; on timeout it calls `abort()`.
+
+### Verification
+
+- `xpm run test-native-cmake-clang -C tests`,
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` and
+  `xpm run test-qemu-cortex-m0-cmake -C tests` pass (debug and
+  release).
+- Negative checks on `qemu-cortex-m7f-cmake-gcc-debug`:
+  - without the `__enable_irq()` in `_start()`, the test fails with
+    "abort(), exiting..." in the hardware initialisation;
+  - without the guard in `os_systick_handler()`, the test still
+    passes: on QEMU, ticks on the zero-filled, not yet constructed
+    clocks happen to be harmless. The guard is defensive; it is not
+    shown to be required by a test.
+- `nucleo-f411re-cmake-gcc-debug` and `-release` build without
+  warnings. Not run on the board.
+
 ---
 
 ## #9 - HLT trap switches to `.arm` and never back to Thumb
 
 **File:** `include/cmsis-plus/arm/semihosting.h:108`
+
+**Status:** fixed in 45584103 (issue #143), with the first option; see "Fix
+applied" below.
 
 ### Problem
 
@@ -826,6 +1238,13 @@ With `SEMIHOST_TRAP_HLT`, `call_host()` emits the `.arm` directive
 inside always-inline inline assembly and never switches back. In a
 Thumb build, the following `mov %[val], r0` and all code the compiler
 generates after the inlined call in that function are assembled as A32.
+
+Correction (from the disassembly done for the fix): GCC switches back
+to Thumb after the `asm` statement, so the code after the inlined call
+is correct. Only the trap and the `mov %[val], r0` are A32 words
+(`e10f0070`, `e1a04000`, after a 2-byte alignment pad), but they are
+executed in Thumb state, which is enough to run garbage at the first
+semihosting call.
 
 ### Scenario
 
@@ -850,12 +1269,90 @@ Either:
 - wrap the A32 sequence so the original state is restored
   (`.arm` ... `.thumb`, or save and restore the state around it).
 
+### Fix applied
+
+- `call_host()` uses the encoding of the current instruction set and
+  does not switch state: `.inst.n 0xBABC` (T32 `HLT #0x3C`) when
+  `__thumb__` is defined, `.inst 0xE10F0070` (A32 `HLT #0xF000`)
+  otherwise. These are the AArch32 HLT encodings defined by the Arm
+  semihosting specification.
+- `SEMIHOST_TRAP_HLT` with an M-profile architecture macro is now an
+  `#error`: M-profile cores have no HLT and always use `BKPT #0xAB`.
+  Without it, the fixed Thumb path would assemble silently there and
+  fault at run time.
+- A comment documents that the trap depends on the debugger, not the
+  CPU (OpenOCD `cortex_a` targets expect SVC, `aarch64` targets, also
+  used for ARMv8 cores in AArch32, expect HLT), and that HLT is
+  UNDEFINED on ARMv7-A.
+
+### Verification
+
+No test configuration builds for an A-profile core, so the header was
+compiled with the project's `arm-none-eabi-gcc` and disassembled:
+
+| Options | Trap | Next instruction |
+| --- | --- | --- |
+| `-mcpu=cortex-a53 -mthumb` (before the fix) | `.short 0x0000`, `e10f0070` | `e1a04000` (A32 in Thumb code) |
+| `-mcpu=cortex-a53 -mthumb` | `babc` `hlt 0x003c` | `4604` `mov r4, r0` |
+| `-mcpu=cortex-a53 -marm` | `e10f0070` `hlt 0xf000` | `e1a04000` `mov r4, r0` |
+| `-march=armv7-a -mthumb` | `babc` `hlt 0x003c` | `4604` `mov r4, r0` |
+| `-mcpu=cortex-m4 -mthumb` (no HLT) | `beab` `bkpt 0x00ab` | unchanged |
+
+- `-mcpu=cortex-m4` and `-mcpu=cortex-m33` with `-DSEMIHOST_TRAP_HLT`
+  stop at the new `#error`.
+- `xpm run test-native-cmake-clang -C tests` and
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` pass (debug and
+  release); they use the BKPT path.
+- Not fixed here: the AArch32 port has its own
+  `include/semihosting.hpp` (`micro-os-plus-iii-aarch32.git`, `smp`
+  branch) whose `UOS_SEMIHOST_TRAP` also uses `.arm` without
+  switching back; it matters only if that port is built for Thumb.
+
+### Other packages
+
+The local repositories that implement a semihosting trap were checked
+for the same problem:
+
+| Package | Trap | Result |
+| --- | --- | --- |
+| `micro-os-plus-iii-cortexm.git` (`smp`) | none of its own; `semihosting-exit.cpp` includes the core `cmsis-plus/arm/semihosting.h` | covered by #143 |
+| `micro-os-plus-iii-aarch32.git` (`smp`), `include/semihosting.hpp` | `.arm` + `svc 0x123456` (QEMU and default), `.arm` + `.inst 0xE10F0070` (`SEMIHOST_TRAP_HLT`), never switched back | **same bug, latent**: every board builds with `-marm`; compiled with `-mthumb`, both variants put an A32 word (`ef123456` or `e10f0070`) inside Thumb code. In Thumb, the SVC trap must also use `0xAB`, not `0x123456` |
+| `micro-os-plus-iii-aarch64.git` (`smp`), `include/semihosting.hpp` | A64 `hlt #0xF000` | not affected (single instruction set) |
+| `micro-os-plus-iii-riscv.git` | no semihosting code | - |
+| `architecture-aarch32-xpack` (IVe), `src/semihosting.cpp` | `svc` with `0xAB` in Thumb, `0x123456` in Arm, no state switch | correct |
+| `architecture-aarch64-xpack` (IVe) | A64 `hlt 0xF000` | correct |
+| `architecture-cortexm-xpack` (IVe) | `bkpt 0xAB`, `#error` if not Thumb | correct |
+| `architecture-riscv-xpack` (IVe) | `slli`/`ebreak`/`srai` with `.balign 16` and `.option push`/`norvc`/`pop` | correct (the analogous RISC-V requirement, uncompressed and not crossing a page, is met and the option is restored) |
+| `semihosting-xpack` (IVe) | none; calls the architecture `call_host()` | - |
+| `devices-cortexm-xpack` (IVe), `src/exception-handlers.cpp` | none; recognises a trapped `bkpt 0xAB` by its T16 encoding `0xBE00 + 0xAB` | correct |
+
+The whole `xPacks` folder was searched for inline assembly that issues a
+trap (`svc`, `swi`, `bkpt`, `hlt`, `ebreak`, `.inst`, `.arm`, `.thumb`,
+`.code`). The four `architecture-*` xPacks above are the only
+first-party matches; the other hits are configuration macros
+(`semihosting-defines.h`, `trace-defines.h`), breakpoint helpers
+(`bkpt 0`, `ebreak`) and third-party code (CMSIS, STM32CubeMX, the
+Raspberry Pi Pico SDK), which is not maintained here. None of the
+xPacks needed a change.
+
+The IVe AArch32 architecture has no HLT variant at all (it always uses
+`svc`), so, unlike the IIIe port, it cannot be used under OpenOCD with
+an `aarch64` target (for example the Raspberry Pi 3 or Zero 2 W running
+AArch32 code). That is a missing feature, not this bug.
+
+Only the AArch32 port needed a change: fixed in f17f65e on its local `smp` branch (micro-os-plus/micro-os-plus-iii-aarch32#1), with the same per-state encodings (`svc 0xAB` or `.inst.n 0xBABC` in Thumb, `svc 0x123456` or `.inst 0xE10F0070` in Arm); checked by compiling and disassembling, the port tests were not run.
+
 ---
 
 ## #10 - C API default timer changed from periodic to one-shot
 
 **File:** `src/rtos/os-c-wrapper.cpp:1511` (and line 1554 in
 `os_timer_new()`)
+
+**Status:** decided: keep one-shot. The C++ implementation is the
+reference, so the periodic default of the released C wrapper was a
+bug, and 445513d3 is a fix, not a regression. Documented and tested
+in fdd5b71b (issue #140); see "Decision and changes" below.
 
 ### Problem
 
@@ -911,12 +1408,60 @@ Decide which default is intended:
 - **Revert to periodic**: restore `periodic_initializer` and document
   the difference from C++ in `os-c-api.h`.
 
+### History
+
+- The periodic default is in every release checked: 6.3.17, 7.0.0,
+  7.0.1 and 7.1.0.
+- It was changed by 445513d3 ("fix(rtos): C API timers default to
+  one-shot", 2026-10-06), cherry-picked from 4d2b8e3a on the `smp`
+  branch of the `dan-maio` fork.
+- Its comment said "The C++ and CMSIS defaults are one-shot timers".
+  The C++ part is correct (`os-timer.h:263`, `once_initializer`); the
+  CMSIS part is not: CMSIS RTOS v1 `osTimerCreate()` and v2
+  `osTimerNew()` have no default, the caller always passes the type,
+  and the µOS++ `osTimerCreate()` copies it (`attr.tm_type = type`).
+
+### Decision and changes
+
+The C++ implementation is the reference; a C wrapper that behaves
+differently is wrong. One-shot is kept, and:
+
+- the comment in `os_timer_construct()` and `os_timer_new()` now says
+  that the default matches C++, that releases up to 7.1.0 created
+  periodic timers, which was wrong, and to use
+  `os_timer_attr_get_periodic()` for periodic timers (the CMSIS claim
+  is removed);
+- `os-c-api.h` and the wrapper definitions document that `NULL`
+  attributes create a one-shot timer, as in C++, with a note about
+  the behaviour up to 7.1.0;
+- `CHANGELOG.md` has a "Behaviour change" entry for 445513d3, so C
+  applications that relied on the periodic default know to pass
+  `os_timer_attr_get_periodic()`;
+- `test-c-api.c` checks, with a counting callback, that a timer with
+  `NULL` attributes fires exactly once in 5 ticks, and that a timer
+  with `os_timer_attr_get_periodic()` fires at least twice.
+
+### Verification
+
+- `xpm run test-native-cmake-clang -C tests` and
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` pass (debug and
+  release).
+- Negative check: with `periodic_initializer` restored in the wrapper,
+  native clang debug fails with "default timer fired 5 times,
+  expected 1".
+- The `smp` branch still has 4d2b8e3a with the old comment; a later
+  merge should keep the comment from this branch.
+
 ---
 
 ## #11 - `flags_raise()` documented both as ISR-safe and as returning `EPERM` in ISRs
 
 **Files:** `include/cmsis-plus/rtos/os-thread.h:1281`,
 `include/cmsis-plus/rtos/os-c-api.h:578`
+
+**Status:** fixed in bf0b1551 (issue #136), together with a wider
+update of the event flags and thread flags documentation; see "Fix
+applied" below.
 
 ### Problem
 
@@ -951,11 +1496,82 @@ Remove the `@retval EPERM` line from both declarations, and add
 `@note Can be invoked from Interrupt Service Routines.` there, so the
 header and the implementation agree.
 
+### Fix applied
+
+The documentation of all the flags raise and clear functions was
+updated, in the C++ declarations and definitions and in the C API
+declarations and wrappers:
+
+| C++ | C | ISR |
+| --- | --- | --- |
+| `event_flags::raise()` | `os_evflags_raise()` | yes |
+| `event_flags::clear()` | `os_evflags_clear()` | yes |
+| `thread::flags_raise()` | `os_thread_flags_raise()` | yes |
+| `this_thread::flags_clear()` | `os_this_thread_flags_clear()` | no |
+| `thread::flags_clear()` (only with `OS_INCLUDE_RTOS_THREAD_PUBLIC_FLAGS_CLEAR`) | - | yes (code changed, see below) |
+
+Each now states, consistently with the code (`os_assert_err()` in
+`internal::event_flags::raise()`/`clear()` and in
+`thread::internal_flags_clear_()`):
+
+- the mask must not be zero; when `NDEBUG` is not defined a zero mask
+  triggers an assertion, and when `NDEBUG` is defined the function
+  returns `EINVAL` without changing the flags;
+- whether it can be invoked from Interrupt Service Routines.
+  `this_thread::flags_clear()` and `os_this_thread_flags_clear()`
+  cannot: the check is in `this_thread::thread()`, which uses
+  `os_assert_throw()`, so when `NDEBUG` is not defined an assertion
+  fails, and when `NDEBUG` is defined a `std::system_error` is thrown
+  (or `abort()` is called if exceptions are disabled); they never
+  return `EPERM`;
+- `oflags` receives the value of the flags before the change.
+
+Other documentation errors corrected in the same blocks:
+
+- `event_flags::raise()` and `os_evflags_raise()` said `oflags`
+  receives the new value of the flags; the code stores the previous
+  value.
+- `os_evflags_clear()` said "Zero means 'all'" for the mask, which
+  contradicted its own `EINVAL` line and the code.
+- The `event_flags::raise()` details said it sets bits in "the thread
+  current signal mask"; it is the event flags mask.
+- `thread::flags_clear()` had no documentation.
+
+Code changes made together with the documentation:
+
+- `thread::internal_flags_clear_()` no longer rejects calls from
+  interrupt handlers (`os_assert_err (!in_handler_mode (), EPERM)` was
+  removed). The clear runs in an interrupt critical section, as in
+  `event_flags::clear()`, so nothing in it needs the restriction. The
+  only function whose behaviour changes is `thread::flags_clear()`,
+  which can now be invoked from Interrupt Service Routines.
+  `this_thread::flags_clear()` is still rejected in handler mode by
+  `this_thread::thread()`, and the CMSIS RTOS v1 `osSignalClear()`
+  wrapper keeps its own `in_handler_mode()` check, so it still returns
+  `0x80000000` from an ISR, as the validator expects.
+- `internal::event_flags::clear()` now asserts
+  `port::interrupts::is_priority_valid ()`, as `raise()` already did.
+  On Cortex-M with `OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY`
+  the critical section does not mask interrupts with a higher priority,
+  so a clear from such an interrupt could lose an update made by the
+  code it interrupted. This applies to `event_flags::clear()` too,
+  which was already documented as ISR-safe.
+
+Checks: the six changed files are clang-format clean, the
+`native-cmake-clang-debug` build has no errors or warnings, and Doxygen
+reports no warnings for the edited blocks, with the new text present on
+the class, namespace and C API group pages. (Doxygen with the project
+configuration stops on an unrelated existing error in
+`src/rtos/os-timer.cpp:315`, an unclosed back-quote; it was run with
+`WARN_AS_ERROR=NO` for this check.)
+
 ---
 
 ## #12 - `SystemClock_Config()` runs before DATA and BSS are initialised
 
 **File:** `src/startup/initialize-hardware.c:67`
+
+**Status:** fixed in e9552cee (issue #141); see "Fix applied" below.
 
 ### Problem
 
@@ -1035,12 +1651,62 @@ If early clock switching is wanted for speed, it must use only register
 accesses (no HAL), and must not rely on `SystemCoreClock` surviving the
 DATA copy.
 
+### History
+
+The call was added by 017e4745 ("#89: call SystemClock_Config() during
+early inits", 2025-09-09), to run the startup at full clock speed, and
+was released in 7.1.0. It shows up in this review only because `xpack`
+is still at 7.0.1.
+
+### Fix applied
+
+- `src/startup/initialize-hardware.c`: the default
+  `os_startup_initialize_hardware_early()` no longer calls
+  `SystemClock_Config()`. Its documentation has a warning: it runs
+  before DATA and BSS initialisation, so it must only access
+  registers, and must not use initialised globals or vendor HAL
+  functions, which belong in `os_startup_initialize_hardware()`. The
+  incorrect "CMSIS system clock configuration routine" comment is gone
+  (CMSIS only defines `SystemInit()` and `SystemCoreClockUpdate()`).
+- `OS_HAS_SYSTEMCLOCK_CONFIG` is now an `#error`, with a message saying
+  what to call from `os_startup_initialize_hardware()`, so applications
+  built on 7.1.0 that relied on the library call fail at compile time
+  instead of silently running at the reset clock.
+- `nucleo-f411re`: `os_startup_initialize_hardware()` calls
+  `HAL_Init()`, `SystemClock_Config()`, `SystemCoreClockUpdate()` and
+  `MX_GPIO_Init()`, in the CubeMX order; `OS_HAS_SYSTEMCLOCK_CONFIG` is
+  removed from the two targets in its `CMakeLists.txt`. As a side
+  effect, the board targets that did not define the macro (for example
+  `rtos-apis-test`, `blinky-test`) now also run at the CubeMX clock
+  instead of the reset clock.
+- `CHANGELOG.md`: "Behaviour change" entry.
+
+Only the DATA copy and BSS clearing still run at the reset clock; the
+static constructors and `main()` run at full speed.
+
+### Verification
+
+- `nucleo-f411re-cmake-gcc-debug` and `-release` build without
+  warnings; in the debug `rtos-apis-test` listing,
+  `os_startup_initialize_hardware()` calls `HAL_Init`,
+  `SystemClock_Config` and `SystemCoreClockUpdate` in this order, and
+  `os_startup_initialize_hardware_early()` calls only `SystemInit`.
+- Compiling `initialize-hardware.c` with `-DOS_HAS_SYSTEMCLOCK_CONFIG`
+  stops with the `#error` message.
+- `xpm run test-native-cmake-clang -C tests` and
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` pass (debug and
+  release).
+- Not run on the board (manual tests).
+
 ---
 
 ## #13 - `printf()` from a timer callback fails with POSIX I/O syscalls
 
 **File:** `src/posix-io/file-descriptors-manager.cpp:94` (also `valid()`,
 `allocate()`, `deallocate()`, `socket()` and `used()`)
+
+**Status:** fixed in 5ff38de3 (issue #139), with the alternative fix in
+`__posix_write()`; see "Fix applied" below.
 
 ### Problem
 
@@ -1109,11 +1775,77 @@ the table and are not expected from interrupt handlers.
 Alternatively, have `__posix_write()` go straight to `trace_write()` for
 fd 1 and 2 when in handler mode.
 
+### Fix applied
+
+The alternative was chosen. Making `io()` usable from handler mode
+would fix the trace fallback, but when a device is registered on fd 1
+or 2, a `printf()` from a timer callback would then call the device
+`write()` from the tick handler; drivers may block or take the
+scheduler lock, so the failure would only move into driver code. 7.0.0
+never reached a device from an interrupt either.
+
+`__posix_write()` now starts with:
+
+- in handler mode, fd 1 and 2 go to `trace_write()`, without looking up
+  the descriptors table;
+- in handler mode, any other descriptor returns -1 with `errno` set to
+  `EPERM` (safe in handler mode, since `__errno()` returns `isr_errno`).
+
+`trace_write()` is a real function only when `TRACE` is defined;
+otherwise it is an empty inline stub that returns `nbyte`, so interrupt
+output is discarded, as thread output already is when no device is
+registered. The comment in the code says so.
+
+The descriptors manager is unchanged: its scheduler lock and
+`!in_handler_mode()` asserts (ffe35b98) still catch other syscalls
+called from interrupts. When a device is registered on fd 1 or 2,
+interrupt output goes to trace, not to the device.
+
+### Verification
+
+- `xpm run test-native-cmake-clang -C tests` and
+  `xpm run test-qemu-cortex-m7f-cmake -C tests` pass (debug and
+  release). They do not take this path (`OS_USE_SEMIHOSTING_SYSCALLS`).
+- One-off check, not committed: `qemu-cortex-m7f-cmake-gcc-debug` with
+  `OS_USE_SEMIHOSTING_SYSCALLS` removed from the platform `platform.h`,
+  so `c-syscalls-posix.cpp` is used; `exit()` then resets the MCU, so
+  the result was read from the output, not from ctest.
+  - Without the fix: stops at the first timer callback ("Test C++ API -
+    Timers") with `assertion "!rtos::interrupts::in_handler_mode ()"
+    failed` in `file_descriptors_manager::io()`, line 94, as described
+    above.
+  - With the fix: the `>> tmfunc` lines from the timer callbacks are
+    printed, and the C++ API, C API and ISO C++ API tests complete.
+  - The release build prints nothing (without `TRACE`, all `printf()`
+    output, from threads too, goes to the empty stub), so it does not
+    show the result.
+- Found during the check, not related to this fix: the POSIX I/O test
+  "Block device - C API" (`test-posix-io-api.cpp:463`, compiled only
+  when `OS_USE_SEMIHOSTING_SYSCALLS` is not defined, so never run by
+  the tests) fails `assert (res >= 0)` after
+  `read (open ("/dev/mb2", 0), buff, bsz)`, in thread mode.
+  - Cause: a bug in the test, already present in 7.0.0. The partition
+    is registered as `"mb-p2"` (the registry links `/dev/mb-p2`), but
+    the test opens `/dev/mb2`, so `open()` returns -1 and `read()`
+    fails with `EBADF`. The `// /dev/mb1` and `// /dev/mb2` comments
+    above the partitions have the same old names.
+  - Fix (not committed): open `/dev/mb-p2`, assert `fd >= 0`, and
+    correct the two comments.
+  - With the fix, the same one-off build runs through "Block device -
+    C API" and the rest of the application to `done` without
+    assertions, so the POSIX block device path (`open()`, `read()` of
+    one block, `EINVAL` for a partial block, `close()`) works.
+
 ---
 
 ## #14 - `timed_lock()` failure path recomputes the boost without a lock and sets the assigned priority
 
 **File:** `src/rtos/os-mutex.cpp:1427`
+
+**Status:** fixed in 5abc2758 (issue #148), with the suggested fix plus two
+related problems found while fixing (protect mutexes, lost wake-up), also in the
+`EINTR` path of `lock()`; see "Fix applied" and "Extension to `lock()`"
+below. The same lost wake-up in other objects is #17.
 
 ### Problem
 
@@ -1160,11 +1892,124 @@ once and skip the update when it is `nullptr`, and call
 `owner_->priority_inherited(max_prio)` instead of `priority()`. When no
 waiters are left, also reset the inherited priority, as `unlock()` does.
 
+### Further problems found while fixing
+
+- **Protect mutexes.** The recompute ran whenever `boosted_prio_ !=
+  none`. For a `protocol::protect` mutex, `boosted_prio_` holds the
+  priority ceiling, so a timed-out waiter replaced the ceiling with the
+  highest waiter priority. Only `protocol::inherit` mutexes must
+  recompute.
+- **Lost wake-up.** `unlock()` wakes a single waiter
+  (`list_.resume_one()`) and does not hand the mutex over. If that
+  waiter then finds its deadline passed (or is interrupted) before it
+  runs, it returned `ETIMEDOUT` (or `EINTR`) with the mutex free and
+  the other waiters still blocked, possibly forever. Same pattern as
+  #4.
+
+### Fix applied
+
+- New private `static mutex::internal_owned_boost_ (thread*)`
+  (`include/cmsis-plus/rtos/os-mutex.h`, `src/rtos/os-mutex.cpp`): the
+  highest `boosted_prio_` of the mutexes owned by a thread; the loop
+  moved out of `internal_unlock_()`, which now calls it, so the two
+  paths cannot diverge.
+- `timed_lock()`: after `reschedule()`, record whether `unlock()` woke
+  the thread (`node.unlinked ()`, before the nodes are unlinked). On
+  `ETIMEDOUT` / `EINTR`, under a `scheduler::critical_section`:
+  - if this thread was woken by `unlock()` and the mutex is still free,
+    `list_.resume_one()` passes the wake-up on;
+  - read `owner_` once; only for `protocol::inherit` with an owner, set
+    `boosted_prio_` to the highest remaining waiter priority (or
+    `none`), and call `owner->priority_inherited
+    (internal_owned_boost_ (owner))`; the assigned priority is no longer
+    changed.
+- `priority_inherited()` under the scheduler lock is the same as in
+  `internal_unlock_()`; the `yield()` it ends with is deferred.
+- Lowering the owner's priority is not propagated along a chain of
+  inheritance mutexes (the owner itself blocked on another inheritance
+  mutex); `unlock()` does not do that either, so this is unchanged.
+- No port, C API or data layout changes.
+
+### Verification
+
+`tests/sources/rtos-apis/src/test-cpp-api.cpp`, mutexes section, all
+deterministic by priorities:
+
+1. the main thread locks an inheritance mutex; a `high` waiter calls
+   `timed_lock (5)` (main is boosted to `high`); after 10 ticks the
+   waiter returned `ETIMEDOUT` and main is back to `normal`;
+2. two waiters, `high` with `timed_lock (5)` and `above_normal` with
+   `timed_lock (100)`; after the first times out main must be
+   `above_normal`; after `unlock()` the second gets the mutex and main
+   is back to `normal`;
+3. main locks a mutex; waiter A (`high`) calls `timed_lock (5)`, waiter
+   C (`above_normal`) calls `lock ()`; main locks the scheduler, unlocks
+   the mutex (A is woken but cannot run), busy-waits past A's deadline,
+   unlocks the scheduler and sleeps; A must return `ETIMEDOUT` and C
+   must get the mutex (otherwise the test reports it and releases C).
+
+Negative check with the old `os-mutex.cpp` (failures made non-fatal):
+case 1 leaves main at `high` (160); case 2 leaves main at `high` after
+the timeout and at `above_normal` (128) after `unlock()`, its assigned
+priority changed; case 3 reports "next waiter not woken". With the fix,
+`test-native-cmake-clang`, `test-qemu-cortex-m7f-cmake` and
+`test-qemu-cortex-m0-cmake` pass (debug and release), including
+`mutex-stress`.
+
+### Extension to `lock()`
+
+Checking where else the two problems occur:
+
+- **Protect mutexes:** no other place. `boosted_prio_` is otherwise set
+  at the first lock of a protect mutex (the ceiling), only for inherit
+  mutexes in `internal_try_lock_()`, and cleared by `internal_unlock_()`
+  and `reset()`, all protocol-correct.
+- **Lost wake-up and boost not undone:** `lock()` returns `EINTR` after
+  `interrupt()`, with neither the boost recompute nor the wake-up
+  hand-over; the interrupted waiter's boost stayed on the owner until
+  `unlock()`.
+
+Changes:
+
+- `scheduler::internal_unlink_node()` (both overloads,
+  `include/cmsis-plus/rtos/internal/os-lists.h`, friends in
+  `os-thread.h`, `src/rtos/os-core.cpp`) now returns `true` if the
+  waiting node was already unlinked, by the object that resumed the
+  thread (`unlock()`, `post()`, ...), tested in the same critical
+  section; the timeout node does not count. Not used by the ports.
+- The failure block of `timed_lock()` moved to a private
+  `mutex::internal_leave_wait_ (bool woken_by_unlock)`, called by
+  `timed_lock()` (`ETIMEDOUT`, `EINTR`) and now also by `lock()`
+  (`EINTR`), with `woken_by_unlock` taken from
+  `internal_unlink_node()`.
+
+Tests (`test-cpp-api.cpp`, mutexes section):
+
+4. main locks a mutex; a `high` waiter calls `lock ()` (main is boosted)
+   and is interrupted; it must return `EINTR` and main must be back to
+   `normal`, still owning the mutex;
+5. waiters A (`high`) and C (`above_normal`) call `lock ()`; with the
+   scheduler locked main unlocks (waking A) and interrupts A; A must
+   return `EINTR` and C must get the mutex.
+
+Negative check with the previous #14 version: case 4 leaves main at
+`high` (160) after `EINTR`, case 5 reports "next waiter not woken".
+
+While writing case 4, the waiter's boost of the owner to its own
+priority ends in a `yield()` that runs the owner before the waiter has
+linked itself to the waiting list; an `interrupt()` at that moment is
+lost (the older `interrupt()` race noted under #1, left for a separate
+issue). The test waits until the waiter has blocked.
+
 ---
 
 ## #15 - `check_timestamp()` runs `action()` outside the critical section
 
 **File:** `src/rtos/internal/os-lists.cpp:536`
+
+**Status:** fixed in 3b4ccff3 (issue #150), in the common code rather than
+only on the `smp` branch: the expiry is split into bookkeeping inside the critical
+section and the user timer function after it; see "Fix applied" below.
 
 ### Problem
 
@@ -1213,11 +2058,68 @@ needs) while still inside the critical section, run only the user timer
 function outside it, and have `timer::internal_callback()` check
 `state_` before relinking a periodic timer.
 
+### Analysis before fixing
+
+- On the `smp` branch the interrupts critical section also takes a
+  recursive kernel lock shared by all CPUs (`_smp_klock` in the SMP
+  POSIX port), so work done inside it is serialised against the other
+  CPUs and nesting is allowed.
+- The `smp` branch has the same `check_timestamp()`,
+  `timeout_thread_node::action()` and `timer::internal_callback()`, so
+  fixing the common code here gives it a correct version at the next
+  merge, and the branches do not diverge.
+- No port subclasses the node classes or calls `action()`.
+
+### Fix applied
+
+- `include/cmsis-plus/rtos/internal/os-lists.h`: `timestamp_node::action()`
+  becomes `expire (deferred_action&)`, called in the interrupts critical
+  section that unlinked the node; `deferred_action` is `{ func, args,
+  timer }` (an out parameter, to avoid `-Waggregate-return`).
+- `src/rtos/internal/os-lists.cpp`, `check_timestamp()`: calls `expire()`
+  inside the critical section, then, if `deferred.func` is set, calls it
+  and `instrumentation::timer::callback_return (deferred.timer)` after
+  the critical section, without accessing the node.
+- `timeout_thread_node::expire()` resumes the thread inside the critical
+  section, as in 7.0.0, so the "must be called in a critical section"
+  contract holds again.
+- `timer::internal_callback()` becomes `timer::internal_expire_
+  (deferred)`, called by `timer_node::expire()`: relinks a periodic
+  timer or sets `completed`, reports `instrumentation::timer::callback`,
+  and returns a copy of `func_` / `func_args_`. Relinking in the same
+  critical section as the unlink means a `stop()` or destruction on
+  another CPU happens either before or after, never in between.
+- `timer::stop()` sets `stopped` in the same critical section as the
+  unlink.
+- `stop()` and `~timer()` document that on SMP the timer function may
+  still be called once after they return, if it expired on another CPU
+  at the same time; waiting for a running callback would need a new
+  timer member (and an `os_timer_t` size change), left for the `smp`
+  branch if needed.
+- No port, C API or data layout changes (only the vtable of these
+  internal node classes).
+
+### Verification
+
+On one CPU nothing observable changes, and the SMP races cannot be
+reproduced with this branch's ports, so the tests are regression checks:
+new `tests/sources/rtos-apis/src/test-cpp-api.cpp` timer cases (a
+periodic timer of 2 ticks is called at least 4 times in 11 ticks and
+not after `stop()`, after which `stop()` returns `EAGAIN`; a one-shot
+timer is called once and `stop()` then returns `EAGAIN`), plus the
+existing C API timer checks and all timed waits.
+`test-native-cmake-clang`, `test-qemu-cortex-m7f-cmake` and
+`test-qemu-cortex-m0-cmake` pass (debug and release). These tests also
+pass without the change; the real check is the SMP stress tests on the
+`smp` branch with the SMP POSIX port.
+
 ---
 
 ## #16 - American spelling "initialization" in a new comment
 
 **File:** `src/startup/startup.cpp:358`
+
+**Status:** fixed (not committed).
 
 ### Problem
 
@@ -1233,3 +2135,283 @@ The project uses British English in comments (`CLAUDE.md`,
 ### Suggested fix
 
 Change it to "initialisation".
+
+### Fix applied
+
+The comment now reads:
+
+```cpp
+// Start recording to catch system initialisation.
+```
+
+No other American spellings were added by the change in this file;
+the `os_initialize_*()` and `trace_initialize()` function names are
+public identifiers and stay as they are.
+
+---
+
+## #17 - Waiter woken by a single wake-up leaves without passing it on
+
+**Files:** `src/rtos/os-semaphore.cpp`, `src/rtos/os-mempool.cpp`,
+`src/rtos/os-mqueue.cpp`
+
+**Status:** fixed in e38aee07 (issue #149). Found while fixing #14;
+already present in 7.0.0.
+
+### Problem
+
+The releasing calls wake only the head waiter (`resume_one()`) and do
+not hand the resource over; the waiter takes it when it runs. If that
+waiter returns `EINTR` (interrupted) or `ETIMEDOUT` (deadline passed)
+before it runs, the resource remains available but the other waiters
+stay blocked until the next release, possibly forever.
+
+| Object | Paths | Releaser |
+| --- | --- | --- |
+| semaphore | `wait()` `EINTR`; `timed_wait()` `EINTR`, `ETIMEDOUT` | `post()` |
+| memory pool | `alloc()` `EINTR`; `timed_alloc()` `EINTR`, `ETIMEDOUT` | `free()` |
+| message queue | `send()`, `receive()` `EINTR`; `timed_send()`, `timed_receive()` `EINTR`, `ETIMEDOUT` | `receive()` / `send()` |
+
+Not affected: condition variables (a signal is consumed and, after #4,
+reported as `ok`; no `EINTR`), event flags (`resume_all()`), thread
+flags and `join()` (no waiting list). The mutex is #14.
+
+### Fix applied
+
+In each waiting path, `bool woken = scheduler::internal_unlink_node
+(...)` (see #14); in each `EINTR` / `ETIMEDOUT` branch, `if (woken)` the
+same list's `resume_one()` passes the wake-up on (`list_` for the
+semaphore and the memory pool, `send_list_` / `receive_list_` for the
+message queue). A spurious wake-up of the next waiter is harmless,
+since every wait loop re-checks the resource.
+
+### Verification
+
+`tests/sources/rtos-apis/src/test-cpp-api.cpp`, `lw_run()`: waiter A
+(`high`) and waiter C (`above_normal`) block; with the scheduler locked,
+the main thread releases once (`post()`, `free()`, `try_send()`), which
+wakes A, then makes A leave, by `interrupt()` or by busy-waiting past
+its deadline; after unlocking, A must return `EINTR` / `ETIMEDOUT` and C
+must get the resource (otherwise C is interrupted to end the test).
+Cases: semaphore `timed_wait()` timeout and `wait()` interrupted, memory
+pool `timed_alloc()` timeout, message queue `timed_receive()` timeout.
+
+Negative check with the old files: all four report "next waiter not
+woken". With the fix, `test-native-cmake-clang`,
+`test-qemu-cortex-m7f-cmake` and `test-qemu-cortex-m0-cmake` pass (debug
+and release).
+
+---
+
+## #18 - `interrupt()` before the thread waits is lost
+
+**Files:** `src/rtos/os-thread.cpp`, `os-clocks.cpp`, `os-semaphore.cpp`,
+`os-mutex.cpp`, `os-mqueue.cpp`, `os-mempool.cpp`, `os-evflags.cpp`
+
+**Status:** fixed in 5551d96a (issue #151); a documented behaviour change. Already
+present in 7.0.0; noted under #1 and met again while testing #14.
+
+### Problem
+
+`thread::interrupt()` sets `interrupted_` and calls `resume()`. If the
+target is not yet suspended (running, ready, or preempted on its way
+into a wait), `resume()` does nothing, and since #1 deliberately
+remembers nothing. All the waits tested `interrupted()` only after
+`reschedule()`, so the thread then blocked until its event, possibly
+forever. The window includes any preemption before the wait and any
+`yield()` inside it (the owner boost in `mutex::lock()` ends in one,
+which is how the #14 test hit it).
+
+### Fix applied
+
+The flag is already documented as sticky ("after the thread detects
+the interrupted condition, it must clear the interrupted flag"), so it
+is treated as a pending request: each wait that returns `EINTR` tests
+`interrupted()` in the critical section that decides to block, after
+the non-blocking attempt failed and before linking, and returns `EINTR`
+without blocking:
+
+- thread event flags `flags_wait()`, `flags_timed_wait()`;
+- clocks, once in `clock::internal_wait_until_()`, which covers
+  `sleep_for()`, `sleep_until()`, `wait_for()` and the adjustable
+  clock `sleep_until()`;
+- semaphore `wait()`, `timed_wait()`; memory pool `alloc()`,
+  `timed_alloc()`; message queue `send()`, `receive()`, `timed_send()`,
+  `timed_receive()`; event flags `wait()`, `timed_wait()`;
+- mutex `lock()`, `timed_lock()`, through `internal_leave_wait_ (false)`
+  to undo the boost `internal_try_lock_()` may have given the owner.
+
+Not changed: condition variables (documented never to return `EINTR`),
+`join()`, the `try_*` calls, `this_thread::suspend()` (documented in
+#1). A wait that can complete without blocking still succeeds. On SMP
+the flag is written before `resume()` takes the kernel lock, so either
+the waiter sees the flag or `resume()` finds it suspended.
+
+`interrupt()` documents the pending behaviour; `CHANGELOG.md` has a
+"Behaviour change" entry: a wait entered with the flag set used to block
+until its event and then return `EINTR`; now it returns `EINTR` at once.
+Code that never clears the flag and keeps waiting now spins instead of
+blocking (it never got the resource before either). In this repository
+only `mutex-stress` uses `interrupt()`, to stop workers that loop on
+`interrupted()`; it stops sooner.
+
+### Verification
+
+`tests/sources/rtos-apis/src/test-cpp-api.cpp`, `test_pending_interrupt()`:
+the current thread interrupts itself, then each wait (thread flags
+`flags_timed_wait()`, `sleep_for()`, semaphore `timed_wait()` and
+`wait()` (a helper posts later, so the old behaviour does not hang),
+mutex `timed_lock()` on a mutex owned by another thread, memory pool
+`timed_alloc()`, message queue `timed_receive()`, event flags
+`timed_wait()`) must return `EINTR` in less than half of its 10-tick
+timeout; with a token available, the semaphore wait still returns `ok`;
+after `interrupt (false)` a wait times out normally and the helper token
+is delivered.
+
+Negative check with the old files: all eight report the full wait
+(10 ticks, 5 for the untimed one), `sleep_for()` even returning
+`ETIMEDOUT`. With the fix, `test-native-cmake-clang`,
+`test-qemu-cortex-m7f-cmake` and `test-qemu-cortex-m0-cmake` pass (debug
+and release), including `mutex-stress` and the CMSIS validator.
+
+---
+
+## Note - `__ARM_EABI__` used as a "bare-metal" guard
+
+**Severity:** pre-existing; not part of the reviewed change. Found
+while fixing #7.
+
+**Status:** fixed in cd01aa9b (issue #152): every guard now tests what the
+code needs (`OS_IS_CROSS_BUILD`, the `OS_USE_*` feature macros, or the Cortex-M
+profile), not the toolchain; see "Change applied".
+
+### Problem
+
+Many sources that are generic bare-metal support, not Arm-specific,
+are compiled only when `__ARM_EABI__` is defined. The aarch64
+(`aarch64-none-elf`) and RISC-V (`riscv-none-elf`) toolchains do not
+define it, so with those ports these files compile to nothing, and the
+application silently gets the newlib versions instead (for example
+newlib-nano `malloc()`, which ignores the µOS++ memory resources and
+does not use the scheduler critical sections that the µOS++ version
+uses).
+
+The project already has a better macro: `OS_IS_CROSS_BUILD`
+(`include/cmsis-plus/os-versions.h:86`), defined for everything that is
+not macOS or GNU/Linux, and already used by `src/rtos/os-memory.cpp`.
+The `test_cpp_mem()` test added for #7 uses it.
+
+### Affected files
+
+Generic bare-metal code, which should probably use `OS_IS_CROSS_BUILD`:
+
+- `src/libc/stdlib/malloc.cpp`, `atexit.cpp`, `atexit.h`, `exit.c`
+- `src/libc/_sbrk.c`
+- `src/libc/newlib/c-newlib-reent.cpp`
+- `src/startup/startup.cpp`, `initialise-free-store.cpp`
+- `src/diag/trace.cpp:184` (aliases for embedded platforms)
+- `src/posix-io/c-syscalls-posix.cpp:1008` (syscall aliases)
+
+Arm or Cortex-M specific code, where `__ARM_EABI__` (or a narrower
+test) is correct:
+
+- `src/startup/exception-handlers.c`, `initialize-hardware.c`,
+  `reset-hardware.c` (CMSIS `SCB`, `NVIC_SystemReset()`,
+  `cmsis_device.h`)
+- `src/diag/trace-itm.cpp` (Cortex-M ITM)
+- `include/cmsis-plus/diag/trace.h:52` (`bkpt` instruction)
+
+Code that is generic in principle but has Arm-specific parts:
+
+- `src/diag/trace-semihosting.cpp`,
+  `src/semihosting/c-syscalls-semihosting.cpp` (semihosting also exists
+  on aarch64 and RISC-V, with a different trap sequence)
+- `src/diag/trace-segger-rtt.cpp` (RTT also works on RISC-V)
+
+### Suggested fix
+
+Replace `__ARM_EABI__` with `OS_IS_CROSS_BUILD` in the generic files,
+keep it in the Cortex-M specific ones, and leave the semihosting
+and RTT files for when the corresponding ports are tested. This
+touches the startup and libc code of every Arm application, so it
+should be a separate change, tested on all Cortex-M platforms; it
+cannot be tested on aarch64 or RISC-V until those ports build.
+
+### History
+
+A first attempt kept `__ARM_EABI__` and added an opt-in
+`OS_INCLUDE_BARE_METAL_RUNTIME` for other ports. It was rejected: the
+code is meant to be portable to Cortex-M, AArch32, AArch64, RISC-V and
+POSIX native, so it must not depend on the toolchain at all.
+
+### Change applied
+
+Rule: guard by what the code needs. Portable bare-metal code uses
+`OS_IS_CROSS_BUILD`; optional features their `OS_USE_*` macro; Cortex-M
+code `defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')`, with
+Mainline / Baseline told apart by `__ARM_ARCH_ISA_THUMB == 2 / == 1`.
+AArch32, AArch64 and RISC-V are not implemented yet and cannot be built,
+so where code needs an architecture-specific implementation they get an
+explicit `#error "... not yet implemented for this architecture"`.
+
+- Bare-metal runtime, now `OS_IS_CROSS_BUILD` (with `os-app-config.h` and
+  `os-versions.h` included before the guard): `startup.cpp`,
+  `initialise-free-store.cpp`, `_sbrk.c`, `malloc.cpp`, `exit.c`,
+  `atexit.cpp`, `atexit.h`, `c-newlib-reent.cpp`, `cxx.cpp`,
+  `initialize-hardware.c`, and the syscall aliases in
+  `c-syscalls-posix.cpp`. Inside them the Cortex-M lines are isolated:
+  `<cmsis_device.h>`, `__enable_irq()` in `_start()` (on other
+  architectures the port boot code owns the interrupts mask), the
+  `CoreDebug` / `__BKPT()` check and the `__NOP()` loops in `exit.c`, the
+  default `os_terminate()` (`NVIC_SystemReset()`; elsewhere the port must
+  define it).
+- `initialize-hardware.c`: one weak default for each hook, on all cross
+  builds, with the CMSIS calls inside the Cortex-M `#if`:
+  `os_startup_initialize_hardware_early()` (`SystemInit()`, VTOR, FPU,
+  unchanged code) and `os_startup_initialize_hardware()`
+  (`SystemCoreClockUpdate()`), which was disabled with `#if 0`; elsewhere
+  both do nothing. Behaviour change, in `CHANGELOG.md`: an application
+  that does not define `os_startup_initialize_hardware()` now gets the
+  default instead of a link error.
+- Cortex-M only, by profile: `exception-handlers.c`, `reset-hardware.c`,
+  `cortexm/exception-handlers.h` (which now `#error`s elsewhere).
+- `trace-itm.cpp`: selected only by `OS_USE_TRACE_ITM`, `#error` if not
+  Cortex-M, ITM code on Mainline.
+- `trace-segger-rtt.cpp`: selected only by `OS_USE_TRACE_SEGGER_RTT`
+  (portable); the Cortex-M `SCB->SCR` SLEEPDEEP clear and `__NOP()`
+  isolated.
+- Semihosting: `trace-semihosting.cpp` and `c-syscalls-semihosting.cpp`
+  selected only by their `OS_USE_*` macros; `arm/semihosting.h` tests
+  the Cortex-M profile and `#error`s when not 32-bit Arm (AArch64 and
+  RISC-V use other traps and 64-bit parameter blocks); the semihosting
+  `os_terminate()` keeps `__disable_irq()` on Cortex-M, `#error`
+  elsewhere.
+- `trace.cpp`: the mangled-name aliases are kept only for 32-bit Arm
+  embedded builds (their names depend on the Arm ABI); all other
+  targets use the existing plain C wrappers.
+- `trace.h`: `trace_dbg_bkpt()` emits `bkpt 0` only on 32-bit Arm
+  embedded builds.
+- `estd/system_error`, `os-thread.h`: `!OS_IS_CROSS_BUILD` instead of
+  `!__ARM_EABI__`.
+- The legacy lists (`__ARM_ARCH_7M__ || __ARM_ARCH_7EM__ || ...`) became
+  ACLE tests, checked against every Cortex-M core with GCC 11 / 15 and
+  clang 13 / 21: identical for all GCC cores, plus two fixes, v8-M
+  Baseline (Cortex-M23) now gets the v6-M branch (before: neither), and
+  with clang Armv8.1-M (M52, M55, M85, `__ARM_ARCH_8_1M_MAIN__`) is now
+  recognised (before: missed by every list, for example `semihosting.h`
+  would emit `svc` instead of `bkpt`). `exit.c` and
+  `initialize-hardware.c` used only v7-M; they now also cover v8-M Main.
+- Side effect: 32-bit Arm Linux (`arm-linux-gnueabihf` also defines
+  `__ARM_EABI__`) no longer compiles the bare-metal runtime in native
+  builds, since `OS_IS_CROSS_BUILD` excludes GNU/Linux.
+
+### Verification
+
+- Release builds (`native-cmake-clang-release`, QEMU Cortex-M0, M3, M4F,
+  M7F) before and after, loadable contents compared: `rtos-apis` and
+  `mutex-stress` identical everywhere; `cmsis-os-validator` differs only
+  in 3-4 bytes, the `__TIME__` string the validator embeds
+  (`cmsis_rv.c`).
+- `test-native-cmake-clang` and the QEMU Cortex-M7F, M0, M3 and M4F
+  suites (debug and release).
+- AArch32, AArch64 and RISC-V cannot be built until their ports exist.
