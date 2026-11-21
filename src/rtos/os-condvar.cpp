@@ -849,14 +849,33 @@ namespace os
 
       port::scheduler::reschedule ();
 
-      // Remove the thread from the condition variable waiting list,
-      // if not already removed by signal() / broadcast() and from the clock
-      // timeout list, if not already removed by the timer.
-      scheduler::internal_unlink_node (node, timeout_node);
+      bool timed_out;
+      {
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
+
+        // Decide what woke the thread before the nodes are unlinked:
+        // signal() / broadcast() unlink `node`, the clock unlinks
+        // `timeout_node`. A signal takes precedence, since it was
+        // consumed; the time needed to re-acquire the mutex below does
+        // not change the result.
+        timed_out = !node.unlinked () && timeout_node.unlinked ();
+
+        // Remove the thread from the clock timeout list,
+        // if not already removed by the timer.
+        timeout_node.thread.clock_node_ = nullptr;
+        timeout_node.unlink ();
+
+        // Remove the thread from the condition variable waiting list,
+        // if not already removed by signal() / broadcast().
+        crt_thread.waiting_node_ = nullptr;
+        node.unlink ();
+        // ----- Exit critical section ----------------------------------------
+      }
 
       res = mutex.lock ();
 
-      if (res == result::ok && clk->steady_now () >= timeout_timestamp)
+      if (res == result::ok && timed_out)
         {
           res = ETIMEDOUT;
         }

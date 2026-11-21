@@ -221,6 +221,38 @@ namespace
             static_cast<unsigned int> (lost_wakeup_iterations));
     return 0;
   }
+
+  // --------------------------------------------------------------------------
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wpadded"
+#endif
+
+  // Shared with the condition variable timed_wait() waiter.
+  struct cv_timed_wait_args
+  {
+    mutex* mx;
+    condition_variable* cv;
+    clock::duration_t timeout;
+    result_t res;
+  };
+
+#pragma GCC diagnostic pop
+
+  void*
+  cv_timed_wait_func (void* args)
+  {
+    cv_timed_wait_args* p = static_cast<cv_timed_wait_args*> (args);
+
+    p->mx->lock ();
+    p->res = p->cv->timed_wait (*p->mx, p->timeout);
+    p->mx->unlock ();
+
+    return nullptr;
+  }
 } // namespace
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
@@ -1012,6 +1044,51 @@ test_cpp_api (void)
     sysclock.sleep_for (1);
 
     printf ("%s - wait() with a mutex not owned ok\n", test_name);
+  }
+
+  {
+    mutex mx{ "mx-tw" };
+    condition_variable cv{ "cv-tw" };
+
+    // Not signalled: the timeout expires, and the mutex is re-acquired.
+    mx.lock ();
+    result_t res = cv.timed_wait (mx, 2);
+    if (res != ETIMEDOUT || mx.owner () != &this_thread::thread ())
+      {
+        printf ("%s - timed_wait() not signalled returned %d\n", test_name,
+                static_cast<int> (res));
+        return 1;
+      }
+    mx.unlock ();
+
+    // Signalled before the deadline, but the mutex is held past it: the
+    // result must be ok, the signal was consumed.
+    cv_timed_wait_args args{ &mx, &cv, 5, ENOTRECOVERABLE };
+
+    // Above the current thread, so it starts at once, locks the mutex
+    // and blocks in timed_wait(), which releases the mutex.
+    thread::attributes attr;
+    attr.th_priority = thread::priority::above_normal;
+    thread th{ "th-tw", cv_timed_wait_func, &args, attr };
+
+    mx.lock ();
+    // The waiter wakes and blocks re-acquiring the mutex.
+    cv.signal ();
+    // Hold the mutex past the waiter deadline.
+    sysclock.sleep_for (2 * args.timeout);
+    mx.unlock ();
+
+    th.join ();
+
+    if (args.res != result::ok)
+      {
+        printf ("%s - timed_wait() signalled before the deadline returned "
+                "%d\n",
+                test_name, static_cast<int> (args.res));
+        return 1;
+      }
+
+    printf ("%s - timed_wait() ok\n", test_name);
   }
 
   // ==========================================================================

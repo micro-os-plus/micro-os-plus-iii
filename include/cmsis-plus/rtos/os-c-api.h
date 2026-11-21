@@ -1647,9 +1647,15 @@ extern "C"
    *  while holding the mutex lock. The mutex lock shall be
    *  acquired by the calling thread and it is up to the new
    *  owner to make the state consistent.
-   * @retval ETIMEDOUT The timeout has passed.
+   * @retval ETIMEDOUT The timeout expired before the condition
+   *  variable was signalled.
    * @par Errors
    *  The function shall not fail with an error code of `EINTR`.
+   *
+   * @note A signal received before the timeout expired is reported
+   *  as `os_ok`, even if re-acquiring the mutex takes until after
+   *  the deadline. In all cases the mutex is re-acquired before
+   *  returning.
    */
   os_result_t
   os_condvar_timed_wait (os_condvar_t* condvar, os_mutex_t* mutex,
