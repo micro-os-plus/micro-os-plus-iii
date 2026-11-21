@@ -26,6 +26,10 @@ and close existing issues and pull requests.
   such a wait blocked until its event, then returned `EINTR`. The flag
   stays set until cleared with `interrupt (false)`; code that leaves it
   set and keeps waiting now returns at once instead of blocking.
+* **Behaviour change:** `os_startup_initialize_hardware()` has a weak
+  default again (on Cortex-M it calls `SystemCoreClockUpdate()`;
+  elsewhere it does nothing). Up to now there was no default, so an
+  application that did not define it failed to link.
 
 ## 2025-09-24
 

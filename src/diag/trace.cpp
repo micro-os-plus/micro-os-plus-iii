@@ -181,9 +181,11 @@ trace_flush (void)
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
+#if defined(OS_IS_CROSS_BUILD) && defined(__arm__)
 
-// For embedded platforms, optimise with aliases.
+// For 32-bit Arm embedded platforms, optimise with aliases.
+// The mangled names depend on the Arm ABI (`va_list` is
+// `std::__va_list`); other platforms use the functions below.
 //
 // Aliases can only refer symbols defined in the same translation unit
 // and C++ de-mangling must be done manually.

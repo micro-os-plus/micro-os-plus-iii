@@ -18,7 +18,9 @@
 
 // ----------------------------------------------------------------------------
 
-#if !defined(__ARM_EABI__)
+#include <cmsis-plus/os-versions.h>
+
+#if !defined(OS_IS_CROSS_BUILD)
 #include <system_error>
 #endif
 

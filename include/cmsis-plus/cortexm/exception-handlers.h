@@ -12,6 +12,10 @@
 #ifndef CMSIS_PLUS_CORTEXM_EXCEPTION_HANDLERS_H_
 #define CMSIS_PLUS_CORTEXM_EXCEPTION_HANDLERS_H_
 
+#if !(defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M'))
+#error "This header is specific to Cortex-M."
+#endif
+
 #include <stdint.h>
 
 #if defined(DEBUG)
@@ -34,8 +38,8 @@ extern "C"
   extern void
   HardFault_Handler (void);
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
   extern void
   MemManage_Handler (void);
@@ -51,7 +55,8 @@ extern "C"
 
 #endif
 
-#if defined(__ARM_ARCH_8M_MAIN__)
+// Mainline v8: v8-M Main, v8.1-M (M33, M35P, M52, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2) && (__ARM_ARCH >= 8)
 
   extern void
   SecureFault_Handler (void);
@@ -78,30 +83,32 @@ extern "C"
     uint32_t lr;
     uint32_t pc;
     uint32_t psr;
-#if defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline with DSP or v8: v7E-M, v8-M Main, v8.1-M (M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2) \
+    && ((__ARM_ARCH >= 8) || defined(__ARM_FEATURE_DSP))
     uint32_t s[16];
 #endif
   } exception_stack_frame_t;
 
 #if defined(TRACE)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   void
   dump_exception_stack (exception_stack_frame_t* frame, uint32_t cfsr,
                         uint32_t mmfar, uint32_t bfar, uint32_t lr);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) ||
-          defined(__ARM_ARCH_8M_MAIN__) */
-#if defined(__ARM_ARCH_6M__)
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
+// Baseline: v6-M, v8-M Base (M0, M0+, M1, M23).
+#if (__ARM_ARCH_ISA_THUMB == 1)
   void
   dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr);
-#endif // defined(__ARM_ARCH_6M__)
+#endif // (__ARM_ARCH_ISA_THUMB == 1)
 #endif // defined(TRACE)
 
   void
   HardFault_Handler_C (exception_stack_frame_t* frame, uint32_t lr);
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
   void
   UsageFault_Handler_C (exception_stack_frame_t* frame, uint32_t lr);
@@ -109,8 +116,7 @@ extern "C"
   void
   BusFault_Handler_C (exception_stack_frame_t* frame, uint32_t lr);
 
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) ||
-          defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 
 #if defined(__cplusplus)
 }

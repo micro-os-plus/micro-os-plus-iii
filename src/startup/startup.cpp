@@ -15,20 +15,25 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
-
-// ----------------------------------------------------------------------------
-
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
+#include <cmsis-plus/os-versions.h>
+
+// Part of the bare-metal runtime, compiled for all cross (embedded)
+// builds; the native builds use the host C library.
+#if defined(OS_IS_CROSS_BUILD)
+
+// ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os.h>
 
 #include <cmsis-plus/diag/trace.h>
 #include <cmsis-plus/diag/instrumentation.h>
 
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 #include <cmsis_device.h>
+#endif
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -354,12 +359,16 @@ _start (void)
 
 #endif
 
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
   // The C runtime memory is initialised; enable the interrupts masked
   // by `Reset_Handler`, so that vendor HAL code (like `HAL_Init()` and
   // `HAL_Delay()`, which need the SysTick interrupt) can be used in the
   // hardware initialisation and in the static constructors. The RTOS
   // ignores the system tick until the scheduler is started.
+  // On other architectures the port boot code manages the interrupts
+  // mask.
   __enable_irq ();
+#endif
 
   // Hook to continue the initialisations. Usually compute and store the
   // clock frequency in the global CMSIS variable, cleared above.
@@ -462,4 +471,4 @@ os_startup_initialize_args (int* p_argc, char*** p_argv)
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(__ARM_EABI__) */
+#endif /* defined(OS_IS_CROSS_BUILD) */

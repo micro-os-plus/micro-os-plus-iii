@@ -15,10 +15,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
-
-// ----------------------------------------------------------------------------
-
 #if defined(TRACE)
 
 #if defined(OS_USE_OS_APP_CONFIG_H)
@@ -26,6 +22,10 @@
 #endif
 
 #if defined(OS_USE_TRACE_ITM)
+
+#if !(defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M'))
+#error "OS_USE_TRACE_ITM: ITM is available only on Cortex-M."
+#endif
 
 #include <cmsis-plus/diag/trace.h>
 
@@ -50,7 +50,9 @@ namespace os
 
     // ------------------------------------------------------------------------
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// ITM is present on Mainline: v7-M, v7E-M, v8-M Main, v8.1-M
+// (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
     // ITM is the ARM standard mechanism, running over SWD/SWO on Cortex-M3/M4
     // devices, and is the recommended setting, if available.
@@ -102,14 +104,10 @@ namespace os
 
 #error "ITM available only on ARCH 7M"
 
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 
   } /* namespace trace */
 } /* namespace os */
 
 #endif /* defined(OS_USE_TRACE_ITM) */
 #endif /* defined(TRACE) */
-
-// ----------------------------------------------------------------------------
-
-#endif /* defined(__ARM_EABI__) */

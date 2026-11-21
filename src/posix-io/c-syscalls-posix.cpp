@@ -1021,7 +1021,8 @@ initialise_monitor_handles (void)
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0)
+// For all cross (embedded) builds with a hosted C library.
+#if defined(OS_IS_CROSS_BUILD) && (__STDC_HOSTED__ != 0)
 
 // The aliases must be in the same compilation unit as the names
 // they alias.
@@ -1043,7 +1044,7 @@ initialise_monitor_handles (void)
 
 #endif
 
-#endif /* defined(__ARM_EABI__) && (__STDC_HOSTED__ != 0) */
+#endif /* defined(OS_IS_CROSS_BUILD) && (__STDC_HOSTED__ != 0) */
 
 #endif /* !defined(OS_USE_SEMIHOSTING_SYSCALLS) */
 

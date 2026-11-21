@@ -15,7 +15,10 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
+// Cortex-M specific; Mainline (v7-M, v7E-M, v8-M Main, v8.1-M) is
+// identified by `__ARM_ARCH_ISA_THUMB == 2`, Baseline (v6-M,
+// v8-M Base) by `__ARM_ARCH_ISA_THUMB == 1`.
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 
 // ----------------------------------------------------------------------------
 
@@ -96,8 +99,8 @@ Reset_Handler (void)
   // SCB->VTOR
   // https://developer.arm.com/documentation/dui0552/a/cortex-m3-peripherals/system-control-block/vector-table-offset-register
   // Mandatory when running from RAM. Not available on Cortex-M0.
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   *((uint32_t*)0xE000ED08)
       = ((uint32_t)_interrupt_vectors & (uint32_t)(~0x3F));
 #endif
@@ -125,16 +128,15 @@ void __attribute__ ((section (".after_vectors"), weak))
 NMI_Handler (void)
 {
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -147,8 +149,8 @@ NMI_Handler (void)
 
 #if defined(TRACE)
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
 // The values of BFAR and MMFAR remain unchanged if the BFARVALID or
 // MMARVALID is set. However, if a new fault occurs during the
@@ -192,10 +194,10 @@ dump_exception_stack (exception_stack_frame_t* frame, uint32_t cfsr,
   trace_printf (" LR/EXC_RETURN = %08X\n", lr);
 }
 
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 
-#if defined(__ARM_ARCH_6M__)
+// Baseline: v6-M, v8-M Base (M0, M0+, M1, M23).
+#if (__ARM_ARCH_ISA_THUMB == 1)
 
 void
 dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr)
@@ -213,14 +215,14 @@ dump_exception_stack (exception_stack_frame_t* frame, uint32_t lr)
   trace_printf (" LR/EXC_RETURN = %08X\n", lr);
 }
 
-#endif /* defined(__ARM_ARCH_6M__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 1) */
 
 #endif /* defined(TRACE) */
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
 #if defined(OS_USE_SEMIHOSTING_SYSCALLS) \
     || defined(OS_USE_TRACE_SEMIHOSTING_STDOUT) \
@@ -481,16 +483,15 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
 #endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -499,10 +500,10 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
     }
 }
 
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 
-#if defined(__ARM_ARCH_6M__)
+// Baseline: v6-M, v8-M Base (M0, M0+, M1, M23).
+#if (__ARM_ARCH_ISA_THUMB == 1)
 
 // Hard Fault handler wrapper in assembly.
 // It extracts the location of stack frame and passes it to handler
@@ -546,16 +547,15 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
 #endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -564,25 +564,24 @@ HardFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
     }
 }
 
-#endif /* defined(__ARM_ARCH_6M__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 1) */
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
 void __attribute__ ((section (".after_vectors"), weak))
 MemManage_Handler (void)
 {
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -622,16 +621,15 @@ BusFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
 #endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -686,16 +684,15 @@ UsageFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
 #endif /* defined(TRACE) */
 
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -710,16 +707,15 @@ void __attribute__ ((section (".after_vectors"), weak))
 SVC_Handler (void)
 {
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -728,8 +724,8 @@ SVC_Handler (void)
     }
 }
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
 void __attribute__ ((section (".after_vectors"), weak))
 DebugMon_Handler (void)
@@ -747,23 +743,21 @@ DebugMon_Handler (void)
     }
 }
 
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 
 void __attribute__ ((section (".after_vectors"), weak))
 PendSV_Handler (void)
 {
 #if defined(DEBUG)
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       __BKPT (0);
     }
 #else
   __BKPT (0);
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_8M_MAIN__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 #endif /* defined(DEBUG) */
 
   while (true)
@@ -781,4 +775,4 @@ SysTick_Handler (void)
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(__ARM_EABI__) */
+#endif /* Cortex-M */

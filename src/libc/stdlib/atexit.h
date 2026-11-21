@@ -9,7 +9,9 @@
  * obtained from https://opensource.org/licenses/mit.
  */
 
-#if defined(__ARM_EABI__)
+#include <cmsis-plus/os-versions.h>
+
+#if defined(OS_IS_CROSS_BUILD)
 
 // ----------------------------------------------------------------------------
 
@@ -50,4 +52,4 @@ extern "C"
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(__ARM_EABI__) */
+#endif /* defined(OS_IS_CROSS_BUILD) */

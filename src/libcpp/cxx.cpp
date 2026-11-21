@@ -15,7 +15,14 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
+#if defined(OS_USE_OS_APP_CONFIG_H)
+#include <cmsis-plus/os-app-config.h>
+#endif
+#include <cmsis-plus/os-versions.h>
+
+// Part of the bare-metal runtime, compiled for all cross (embedded)
+// builds; the native builds use the host C library.
+#if defined(OS_IS_CROSS_BUILD)
 
 // ----------------------------------------------------------------------------
 
@@ -65,4 +72,4 @@ void* __dso_handle __attribute__ ((weak));
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(__ARM_EABI__) */
+#endif /* defined(OS_IS_CROSS_BUILD) */

@@ -62,7 +62,13 @@ extern "C"
 
   };
 
-// ----------------------------------------------------------------------------
+  // ----------------------------------------------------------------------------
+
+#if !defined(__arm__)
+// AArch64 (HLT #0xF000) and RISC-V (SLLI/EBREAK/SRAI) use different
+// traps and 64-bit parameter blocks; to be added with their ports.
+#error "Semihosting is not yet implemented for this architecture."
+#endif
 
 // SWI numbers and reason codes for RDI (Angel) monitors.
 #define AngelSWI_ARM 0x123456
@@ -71,10 +77,9 @@ extern "C"
 #else
 #define AngelSWI AngelSWI_ARM
 #endif
-// For thumb only architectures use the BKPT instruction instead of SWI.
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) \
-    || defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_MAIN__) \
-    || defined(__ARM_ARCH_8M_BASE__)
+// For thumb only architectures (Cortex-M) use the BKPT instruction
+// instead of SWI.
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 #define AngelSWIInsn "bkpt"
 #define AngelSWIAsm bkpt
 #else
@@ -88,10 +93,8 @@ extern "C"
 // expect HLT. Define SEMIHOST_TRAP_HLT to select the HLT trap (A32
 // HLT #0xF000, T32 HLT #0x3C). HLT is UNDEFINED on ARMv7-A, and does not
 // exist on M-profile cores, which always use BKPT #0xAB.
-#if defined(SEMIHOST_TRAP_HLT) \
-    && (defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) \
-        || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__) \
-        || defined(__ARM_ARCH_8M_BASE__))
+#if defined(SEMIHOST_TRAP_HLT) && defined(__ARM_ARCH_PROFILE) \
+    && (__ARM_ARCH_PROFILE == 'M')
 #error "SEMIHOST_TRAP_HLT is not available on M-profile cores, which use BKPT."
 #endif
 

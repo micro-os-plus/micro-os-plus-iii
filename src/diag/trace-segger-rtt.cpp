@@ -15,10 +15,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
-
-// ----------------------------------------------------------------------------
-
 #if defined(TRACE)
 
 #if defined(OS_USE_OS_APP_CONFIG_H)
@@ -30,7 +26,9 @@
 #include <cmsis-plus/rtos/os.h>
 #include <cmsis-plus/diag/trace.h>
 
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 #include <cmsis_device.h>
+#endif
 
 #include "SEGGER_RTT.h"
 
@@ -58,7 +56,9 @@ namespace os
 #pragma GCC diagnostic ignored "-Wold-style-cast"
 #endif
 #endif
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
       SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
+#endif
 #if defined(__GNUC__)
 #pragma GCC diagnostic pop
 #endif
@@ -98,7 +98,9 @@ namespace os
       // Busy wait until all data is sent.
       while (SEGGER_RTT_HasData (0) != 0)
         {
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
           __NOP ();
+#endif
         }
     }
 
@@ -107,7 +109,3 @@ namespace os
 
 #endif /* defined(OS_USE_TRACE_SEGGER_RTT) */
 #endif /* defined(TRACE) */
-
-// ----------------------------------------------------------------------------
-
-#endif /* defined(__ARM_EABI__) */

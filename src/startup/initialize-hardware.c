@@ -15,22 +15,30 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
-
-// ----------------------------------------------------------------------------
-
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
+#include <cmsis-plus/os-versions.h>
 
-#include <cmsis-plus/rtos/os-hooks.h>
-#include <cmsis_device.h>
+// Part of the bare-metal runtime, compiled for all cross (embedded)
+// builds; the native builds use the host C library.
+#if defined(OS_IS_CROSS_BUILD)
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+#include <cmsis-plus/rtos/os-hooks.h>
+
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
+
+// Cortex-M: the defaults below use CMSIS.
+#include <cmsis_device.h>
+
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 extern unsigned int __vectors_start;
 #endif
+
+#endif /* Cortex-M */
 
 // ----------------------------------------------------------------------------
 
@@ -68,10 +76,13 @@ extern unsigned int __vectors_start;
 void __attribute__ ((weak))
 os_startup_initialize_hardware_early (void)
 {
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
+
   // Call the CSMSIS system initialisation routine.
   SystemInit ();
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, M55, M85).
+#if (__ARM_ARCH_ISA_THUMB == 2)
 
   // Set VTOR to the actual address, provided by the linker script.
   // Override the manual, possibly wrong, SystemInit() setting.
@@ -79,7 +90,7 @@ os_startup_initialize_hardware_early (void)
   // Ensure all subsequence instructions use the new configuration.
   __DSB ();
 
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* (__ARM_ARCH_ISA_THUMB == 2) */
 
   // The current version of SystemInit() leaves the value of the clock
   // in a RAM variable (SystemCoreClock), which will be cleared shortly,
@@ -108,10 +119,13 @@ os_startup_initialize_hardware_early (void)
   SCB->SHCSR |= SCB_SHCSR_USGFAULTENA_Msk;
 
 #endif
+
+#endif /* Cortex-M */
+
+  // Other architectures: by default there is nothing to do this early;
+  // the port or the application may redefine it.
 }
 
-// Temporarily disabled, to help identify missing application inits.
-#if 0 || defined(__DOXYGEN__)
 /**
  * @details
  * This is the default implementation for the second hardware
@@ -125,15 +139,21 @@ os_startup_initialize_hardware_early (void)
  * require custom inits (before constructors), otherwise these inits can
  * be done in main().
  */
-void __attribute__((weak))
+void __attribute__ ((weak))
 os_startup_initialize_hardware (void)
 {
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
+
   // Call the CSMSIS system clock routine to store the clock frequency
   // in the SystemCoreClock global RAM location.
   SystemCoreClockUpdate ();
+
+#endif /* Cortex-M */
+
+  // Other architectures: by default there is nothing to do; the port or
+  // the application may redefine it.
 }
-#endif /* 0 || defined(__DOXYGEN__) */
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(__ARM_EABI__) */
+#endif /* defined(OS_IS_CROSS_BUILD) */

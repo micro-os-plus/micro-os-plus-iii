@@ -13,17 +13,22 @@
 #pragma clang diagnostic ignored "-Wempty-translation-unit"
 #endif
 
-#if defined(__ARM_EABI__)
-
-// ----------------------------------------------------------------------------
-
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
+#include <cmsis-plus/os-versions.h>
+
+// Part of the bare-metal runtime, compiled for all cross (embedded)
+// builds; the native builds use the host C library.
+#if defined(OS_IS_CROSS_BUILD)
+
+// ----------------------------------------------------------------------------
 
 #include <cmsis-plus/rtos/os-hooks.h>
 #include <cmsis-plus/diag/trace.h>
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 #include <cmsis_device.h>
+#endif
 
 #include <cmsis-plus/diag/instrumentation.h>
 
@@ -90,7 +95,9 @@ exit (int code)
   // If it does not want o die, loop.
   while (true)
     {
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
       __NOP ();
+#endif
     }
   /* NOTREACHED */
 }
@@ -129,13 +136,15 @@ _Exit (int code)
 // to terminate properly.
 #if defined(DEBUG) && defined(OS_ENABLE_BKPT_ON_EXIT)
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Cortex-M Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33...).
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M') \
+    && (__ARM_ARCH_ISA_THUMB == 2)
   if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0)
     {
       // Break only if the debugger is connected.
       __BKPT (0);
     }
-#endif /* defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) */
+#endif /* Cortex-M Mainline */
 
 #endif /* defined(DEBUG) */
 
@@ -144,7 +153,9 @@ _Exit (int code)
 
   while (true)
     {
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
       __NOP ();
+#endif
     }
   /* NOTREACHED */
 }
@@ -164,6 +175,8 @@ _exit (int status);
 // Semihosting defines this function to terminate the semihosting session.
 #if !defined(OS_USE_SEMIHOSTING_SYSCALLS)
 
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
+
 /**
  * @details
  * The freestanding version of this function resets the MCU core,
@@ -178,8 +191,15 @@ os_terminate (int code __attribute__ ((unused)))
   /* NOTREACHED */
 }
 
+#else
+
+// On other architectures there is no default; the port must define
+// os_terminate(), since resetting the core is architecture specific.
+
+#endif
+
 #endif
 
 // ----------------------------------------------------------------------------
 
-#endif /* defined(__ARM_EABI__) */
+#endif /* defined(OS_IS_CROSS_BUILD) */

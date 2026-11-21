@@ -27,6 +27,8 @@
 
 #include <sys/types.h>
 
+#include <cmsis-plus/os-versions.h>
+
 #if defined(__cplusplus)
 
 // To be effective, <stdio.h> must be included *before* this patch.
@@ -49,9 +51,10 @@
 inline void __attribute__ ((always_inline))
 trace_dbg_bkpt (void)
 {
-#if defined(__ARM_EABI__)
+#if defined(OS_IS_CROSS_BUILD) && defined(__arm__)
   __asm__ volatile ("bkpt 0");
 #endif
+  // Other architectures: to be added with their ports.
 }
 
 #if defined(TRACE)

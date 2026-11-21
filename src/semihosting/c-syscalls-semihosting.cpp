@@ -21,10 +21,6 @@
 
 // ----------------------------------------------------------------------------
 
-#if defined(__ARM_EABI__)
-
-// ----------------------------------------------------------------------------
-
 #if defined(OS_USE_OS_APP_CONFIG_H)
 #include <cmsis-plus/os-app-config.h>
 #endif
@@ -41,7 +37,9 @@
 #include <cmsis-plus/posix/dirent.h>
 #include <cmsis-plus/posix/sys/socket.h>
 
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 #include "cmsis_device.h"
+#endif
 
 #include <cstring>
 
@@ -1128,7 +1126,12 @@ void __attribute__ ((noreturn, weak))
 os_terminate (int code __attribute__ ((unused)))
 {
   /* Disable interrupts, otherwise SysTick will continue to occur. */
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
   __disable_irq ();
+#else
+#error \
+    "os_terminate() for semihosting is not yet implemented for this architecture."
+#endif
 
   /* There is only one SWI for both _exit and _kill. For _exit, call
    the SWI with the second argument set to -1, an invalid value for
@@ -1328,7 +1331,3 @@ initialise_monitor_handles (void)
 
 #endif /* (__STDC_HOSTED__ != 0) */
 #endif /* defined(OS_USE_SEMIHOSTING_SYSCALLS) */
-
-// ----------------------------------------------------------------------------
-
-#endif /* defined(__ARM_EABI__) */
