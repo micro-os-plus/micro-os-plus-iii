@@ -448,6 +448,194 @@ namespace
 
   // --------------------------------------------------------------------------
 
+  // Pending interrupt tests: a wait entered with the interrupt flag
+  // already set must return EINTR without blocking.
+
+  constexpr clock::duration_t pi_timeout = 10;
+
+  // Check the result, then clear the flag.
+  bool
+  pi_check (const char* name, const char* what, result_t res,
+            clock::timestamp_t begin)
+  {
+    clock::duration_t elapsed
+        = static_cast<clock::duration_t> (sysclock.now () - begin);
+    this_thread::thread ().interrupt (false);
+    // Without blocking, well before the timeout.
+    if (res != EINTR || elapsed >= pi_timeout / 2)
+      {
+        printf ("%s - interrupted %s returned %d after %u ticks\n", name, what,
+                static_cast<int> (res), static_cast<unsigned int> (elapsed));
+        return false;
+      }
+    return true;
+  }
+
+  void*
+  pi_mutex_owner_func (void* args)
+  {
+    mutex* mx = static_cast<mutex*> (args);
+    mx->lock ();
+    sysclock.sleep_for (2 * pi_timeout);
+    mx->unlock ();
+    return nullptr;
+  }
+
+  void*
+  pi_post_func (void* args)
+  {
+    sysclock.sleep_for (pi_timeout / 2);
+    static_cast<semaphore*> (args)->post ();
+    return nullptr;
+  }
+
+  int
+  test_pending_interrupt (const char* name)
+  {
+    printf ("\n%s - Pending interrupts\n", name);
+
+    thread& crt = this_thread::thread ();
+    clock::timestamp_t begin;
+    result_t res;
+
+    // Thread event flags.
+    crt.interrupt ();
+    begin = sysclock.now ();
+    res = this_thread::flags_timed_wait (0x1, pi_timeout);
+    if (!pi_check (name, "flags_timed_wait()", res, begin))
+      {
+        return 1;
+      }
+
+    // Clock sleep.
+    crt.interrupt ();
+    begin = sysclock.now ();
+    res = sysclock.sleep_for (pi_timeout);
+    if (!pi_check (name, "sleep_for()", res, begin))
+      {
+        return 1;
+      }
+
+    // Semaphore.
+    semaphore sem{ "sem-pi" };
+    crt.interrupt ();
+    begin = sysclock.now ();
+    res = sem.timed_wait (pi_timeout);
+    if (!pi_check (name, "semaphore timed_wait()", res, begin))
+      {
+        return 1;
+      }
+
+    // A wait that completes without blocking still succeeds.
+    sem.post ();
+    crt.interrupt ();
+    res = sem.timed_wait (pi_timeout);
+    crt.interrupt (false);
+    if (res != result::ok)
+      {
+        printf ("%s - interrupted semaphore timed_wait() with a token "
+                "returned %d\n",
+                name, static_cast<int> (res));
+        return 1;
+      }
+
+    // After the flag is cleared, waits block again.
+    res = sem.timed_wait (2);
+    if (res != ETIMEDOUT)
+      {
+        printf ("%s - semaphore timed_wait() after interrupt(false) returned "
+                "%d\n",
+                name, static_cast<int> (res));
+        return 1;
+      }
+
+    // Untimed: a helper posts later, so that a wait which blocks does
+    // not hang the test.
+    {
+      thread th{ "th-pi-post", pi_post_func, &sem };
+      crt.interrupt ();
+      begin = sysclock.now ();
+      res = sem.wait ();
+      if (!pi_check (name, "semaphore wait()", res, begin))
+        {
+          return 1;
+        }
+      // The helper token is still delivered.
+      res = sem.wait ();
+      th.join ();
+      if (res != result::ok)
+        {
+          printf ("%s - semaphore wait() after interrupt(false) returned "
+                  "%d\n",
+                  name, static_cast<int> (res));
+          return 1;
+        }
+    }
+
+    // Mutex owned by another thread.
+    {
+      mutex mx{ "mx-pi" };
+      thread th{ "th-pi-mx", pi_mutex_owner_func, &mx };
+      // Let the owner lock it.
+      sysclock.sleep_for (1);
+
+      crt.interrupt ();
+      begin = sysclock.now ();
+      res = mx.timed_lock (pi_timeout);
+      if (!pi_check (name, "mutex timed_lock()", res, begin))
+        {
+          return 1;
+        }
+      th.join ();
+    }
+
+    // Memory pool, no free block.
+    {
+      lw_pool pool{ "mp-pi" };
+      std::uintptr_t* blk = pool.alloc ();
+      crt.interrupt ();
+      begin = sysclock.now ();
+      std::uintptr_t* p = pool.timed_alloc (pi_timeout);
+      res = (p == nullptr) ? static_cast<result_t> (EINTR)
+                           : static_cast<result_t> (result::ok);
+      if (!pi_check (name, "memory pool timed_alloc()", res, begin))
+        {
+          return 1;
+        }
+      pool.free (blk);
+    }
+
+    // Message queue, empty.
+    {
+      lw_queue queue{ "mq-pi" };
+      std::uintptr_t msg;
+      crt.interrupt ();
+      begin = sysclock.now ();
+      res = queue.timed_receive (&msg, pi_timeout);
+      if (!pi_check (name, "message queue timed_receive()", res, begin))
+        {
+          return 1;
+        }
+    }
+
+    // Event flags, not raised.
+    {
+      event_flags ev{ "ev-pi" };
+      crt.interrupt ();
+      begin = sysclock.now ();
+      res = ev.timed_wait (0x1, pi_timeout);
+      if (!pi_check (name, "event flags timed_wait()", res, begin))
+        {
+          return 1;
+        }
+    }
+
+    printf ("%s - pending interrupts ok\n", name);
+    return 0;
+  }
+
+  // --------------------------------------------------------------------------
+
   // Timer callback counter for the timers tests.
   uint32_t volatile tm_count;
 
@@ -2099,6 +2287,11 @@ test_cpp_api (void)
   }
 
   // ==========================================================================
+
+  if (test_pending_interrupt (test_name) != 0)
+    {
+      return 1;
+    }
 
   printf ("\n%s - done\n", test_name);
   // fflush(stdout);

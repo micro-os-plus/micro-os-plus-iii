@@ -19,6 +19,13 @@ and close existing issues and pull requests.
   first and initialised globals. Call `HAL_Init()`,
   `SystemClock_Config()` and `SystemCoreClockUpdate()` from the
   application `os_startup_initialize_hardware()`.
+* **Behaviour change:** a `thread::interrupt()` which arrives while the
+  thread is not yet waiting is no longer lost: the next wait which would
+  block (thread event flags, clock sleeps, semaphores, mutexes, message
+  queues, memory pools, event flags) returns `EINTR` immediately. Before,
+  such a wait blocked until its event, then returned `EINTR`. The flag
+  stays set until cleared with `interrupt (false)`; code that leaves it
+  set and keeps waiting now returns at once instead of blocking.
 
 ## 2025-09-24
 

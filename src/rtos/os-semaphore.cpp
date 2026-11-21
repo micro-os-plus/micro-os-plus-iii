@@ -491,6 +491,15 @@ namespace os
                 return result::ok;
               }
 
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                instrumentation::semaphore::wait_retval (this, EINTR);
+                return EINTR;
+              }
+
             // Add this thread to the semaphore waiting list.
             scheduler::internal_link_node (
                 list_, node,
@@ -703,6 +712,15 @@ namespace os
                 instrumentation::semaphore::timed_wait_retval (this,
                                                                result::ok);
                 return result::ok;
+              }
+
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                instrumentation::semaphore::timed_wait_retval (this, EINTR);
+                return EINTR;
               }
 
             // Add this thread to the semaphore waiting list,

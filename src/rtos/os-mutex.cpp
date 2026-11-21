@@ -1171,6 +1171,17 @@ namespace os
                 return res;
               }
 
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                // Undo the boost given to the owner by internal_try_lock_().
+                internal_leave_wait_ (false);
+                instrumentation::mutex::lock_retval (this, EINTR);
+                return EINTR;
+              }
+
             {
               // ----- Enter critical section -----------------------------
               interrupts::critical_section ics;
@@ -1411,6 +1422,17 @@ namespace os
               {
                 instrumentation::mutex::timed_lock_retval (this, res);
                 return res;
+              }
+
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                // Undo the boost given to the owner by internal_try_lock_().
+                internal_leave_wait_ (false);
+                instrumentation::mutex::timed_lock_retval (this, EINTR);
+                return EINTR;
               }
 
             {

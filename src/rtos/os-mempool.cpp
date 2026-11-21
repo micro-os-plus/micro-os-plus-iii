@@ -575,6 +575,15 @@ namespace os
                 return p;
               }
 
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (this_thread::thread ().interrupted ())
+              {
+                instrumentation::memory_pool::alloc_retval (this, nullptr);
+                return nullptr;
+              }
+
             // Add this thread to the memory pool waiting list.
             scheduler::internal_link_node (
                 list_, node,
@@ -763,6 +772,16 @@ namespace os
 
                 instrumentation::memory_pool::timed_alloc_retval (this, p);
                 return p;
+              }
+
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (this_thread::thread ().interrupted ())
+              {
+                instrumentation::memory_pool::timed_alloc_retval (this,
+                                                                  nullptr);
+                return nullptr;
               }
 
             // Add this thread to the memory pool waiting list,

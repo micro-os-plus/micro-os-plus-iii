@@ -428,6 +428,14 @@ namespace os
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
 
+        // A pending interrupt() ends the wait before blocking, since an
+        // interrupt() which arrived while this thread was not yet
+        // suspended could not wake it. The callers return EINTR.
+        if (crt_thread.interrupted ())
+          {
+            return EINTR;
+          }
+
         // Remove this thread from the ready list, if there.
         port::this_thread::prepare_suspend ();
 

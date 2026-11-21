@@ -1136,6 +1136,15 @@ namespace os
      * After the thread detects the interrupted condition, it
      * must clear the interrupted flag.
      *
+     * If the thread is not waiting when the flag is set, the flag
+     * remains pending: the next wait which would block (thread event
+     * flags, clock sleeps, semaphores, mutexes, message queues, memory
+     * pools, event flags) returns `EINTR` immediately, without
+     * blocking. A wait which can complete without blocking (for
+     * example a semaphore with a token available) still succeeds.
+     * The flag stays set until cleared with `interrupt (false)`.
+     * Condition variable waits and `join()` are not interrupted.
+     *
      * @warning Cannot be invoked from Interrupt Service Routines.
      */
     bool
@@ -1646,6 +1655,19 @@ namespace os
                 return result::ok;
               }
 
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not yet
+            // suspended could not wake it.
+            if (interrupted ())
+              {
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+                trace::printf ("%s(0x%X,%u) EINTR @%p %s\n", __func__, mask,
+                               mode, this, name ());
+#endif
+                instrumentation::thread::flags_wait_retval (this, EINTR);
+                return EINTR;
+              }
+
             // Check and suspend under the same lock. `resume()` does
             // not remember a wake-up for a running thread, so if the
             // state were set in a separate critical section, a
@@ -1793,6 +1815,17 @@ namespace os
                 instrumentation::thread::flags_timed_wait_retval (this,
                                                                   result::ok);
                 return result::ok;
+              }
+
+            // A pending interrupt() ends the wait before blocking.
+            if (interrupted ())
+              {
+#if defined(OS_TRACE_RTOS_THREAD_FLAGS)
+                trace::printf ("%s(0x%X,%u,%u) EINTR @%p %s\n", __func__, mask,
+                               timeout, mode, this, name ());
+#endif
+                instrumentation::thread::flags_timed_wait_retval (this, EINTR);
+                return EINTR;
               }
 
             // Remove this thread from the ready list, if there.

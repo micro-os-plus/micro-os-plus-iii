@@ -1001,6 +1001,15 @@ namespace os
                 return result::ok;
               }
 
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                instrumentation::message_queue::send_retval (this, EINTR);
+                return EINTR;
+              }
+
             // Add this thread to the message queue send waiting list.
             scheduler::internal_link_node (
                 send_list_, node,
@@ -1255,6 +1264,16 @@ namespace os
                 return result::ok;
               }
 
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                instrumentation::message_queue::timed_send_retval (this,
+                                                                   EINTR);
+                return EINTR;
+              }
+
             // Add this thread to the semaphore waiting list,
             // and the clock timeout list.
             scheduler::internal_link_node (
@@ -1417,6 +1436,15 @@ namespace os
                 instrumentation::message_queue::receive_retval (this,
                                                                 result::ok);
                 return result::ok;
+              }
+
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                instrumentation::message_queue::receive_retval (this, EINTR);
+                return EINTR;
               }
 
             // Add this thread to the message queue receive waiting list.
@@ -1684,6 +1712,16 @@ namespace os
                 instrumentation::message_queue::timed_receive_retval (
                     this, result::ok);
                 return result::ok;
+              }
+
+            // A pending interrupt() ends the wait before blocking, since
+            // an interrupt() which arrived while this thread was not
+            // yet suspended could not wake it.
+            if (crt_thread.interrupted ())
+              {
+                instrumentation::message_queue::timed_receive_retval (this,
+                                                                      EINTR);
+                return EINTR;
               }
 
             // Add this thread to the message queue receive waiting list,
