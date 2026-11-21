@@ -829,7 +829,9 @@ namespace os
                           internal::waiting_thread_node& node,
                           unsigned int cause);
 
-      void
+      // Return true if the node was already unlinked, by the object
+      // that resumed the thread (for example post() or unlock()).
+      bool
       internal_unlink_node (internal::waiting_thread_node& node);
 
       void
@@ -839,7 +841,7 @@ namespace os
                           internal::timeout_thread_node& timeout_node,
                           unsigned int cause);
 
-      void
+      bool
       internal_unlink_node (internal::waiting_thread_node& node,
                             internal::timeout_thread_node& timeout_node);
 

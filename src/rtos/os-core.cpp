@@ -410,19 +410,23 @@ namespace os
         instrumentation::thread::suspended (node.thread_, cause);
       }
 
-      void
+      bool
       internal_unlink_node (internal::waiting_thread_node& node)
       {
-        {
-          // ----- Enter critical section -------------------------------------
-          interrupts::critical_section ics;
+        // ----- Enter critical section ---------------------------------------
+        interrupts::critical_section ics;
 
-          // Remove the thread from the node waiting list,
-          // if not already removed.
-          node.thread_->waiting_node_ = nullptr;
-          node.unlink ();
-          // ----- Exit critical section --------------------------------------
-        }
+        // Already removed by the object that resumed the thread
+        // (for example post() or unlock())?
+        bool was_unlinked = node.unlinked ();
+
+        // Remove the thread from the node waiting list,
+        // if not already removed.
+        node.thread_->waiting_node_ = nullptr;
+        node.unlink ();
+
+        return was_unlinked;
+        // ----- Exit critical section ----------------------------------------
       }
 
       void
@@ -439,12 +443,17 @@ namespace os
         timeout_node.thread.clock_node_ = &timeout_node;
       }
 
-      void
+      bool
       internal_unlink_node (internal::waiting_thread_node& node,
                             internal::timeout_thread_node& timeout_node)
       {
         // ----- Enter critical section ---------------------------------------
         interrupts::critical_section ics;
+
+        // Already removed by the object that resumed the thread
+        // (for example post() or unlock())? The timeout node does not
+        // count, the clock removes it.
+        bool was_unlinked = node.unlinked ();
 
         // Remove the thread from the clock timeout list,
         // if not already removed by the timer.
@@ -455,6 +464,8 @@ namespace os
         // if not already removed.
         node.thread_->waiting_node_ = nullptr;
         node.unlink ();
+
+        return was_unlinked;
         // ----- Exit critical section ----------------------------------------
       }
 

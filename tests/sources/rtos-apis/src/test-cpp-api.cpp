@@ -244,6 +244,56 @@ namespace
 
   // --------------------------------------------------------------------------
 
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wpadded"
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Wpadded"
+#endif
+
+  // Shared with the mutex waiters.
+  struct mx_wait_args
+  {
+    mutex* mx;
+    clock::duration_t timeout;
+    result_t res;
+    bool volatile done;
+  };
+
+#pragma GCC diagnostic pop
+
+  void*
+  mx_timed_lock_func (void* args)
+  {
+    mx_wait_args* p = static_cast<mx_wait_args*> (args);
+
+    p->res = p->mx->timed_lock (p->timeout);
+    if (p->res == result::ok)
+      {
+        p->mx->unlock ();
+      }
+    p->done = true;
+
+    return nullptr;
+  }
+
+  void*
+  mx_lock_func (void* args)
+  {
+    mx_wait_args* p = static_cast<mx_wait_args*> (args);
+
+    p->res = p->mx->lock ();
+    if (p->res == result::ok)
+      {
+        p->mx->unlock ();
+      }
+    p->done = true;
+
+    return nullptr;
+  }
+
+  // --------------------------------------------------------------------------
+
   // Threads for the kill() tests.
   void*
   kill_sleeper_func (void* args __attribute__ ((unused)))
@@ -1249,6 +1299,228 @@ test_cpp_api (void)
     mx1.prio_ceiling (prio);
 
     mx1.reset ();
+  }
+
+  {
+    // Priority inheritance after a timed_lock() timeout. The waiters
+    // are above the current thread, so they start at once and block.
+    mutex::attributes mx_attr;
+    mx_attr.mx_protocol = mutex::protocol::inherit;
+    mutex mx{ "mx-pi", mx_attr };
+
+    thread& crt = this_thread::thread ();
+    thread::priority_t prio = crt.priority ();
+    thread::attributes th_attr;
+
+    // The only waiter times out: the boost must be undone.
+    {
+      mx.lock ();
+      mx_wait_args a{ &mx, 5, ENOTRECOVERABLE, false };
+      th_attr.th_priority = thread::priority::high;
+      thread th{ "th-pi0", mx_timed_lock_func, &a, th_attr };
+      if (crt.priority () != thread::priority::high)
+        {
+          printf ("%s - mutex owner not boosted (%u)\n", test_name,
+                  static_cast<unsigned int> (crt.priority ()));
+          return 1;
+        }
+
+      sysclock.sleep_for (2 * a.timeout);
+      if (a.res != ETIMEDOUT || crt.priority () != prio)
+        {
+          printf ("%s - timed_lock() timeout returned %d, owner prio %u\n",
+                  test_name, static_cast<int> (a.res),
+                  static_cast<unsigned int> (crt.priority ()));
+          return 1;
+        }
+      mx.unlock ();
+      th.join ();
+    }
+
+    // One of two waiters times out: the owner inherits the remaining
+    // waiter priority, and its assigned priority is not changed.
+    {
+      mx.lock ();
+      mx_wait_args a1{ &mx, 5, ENOTRECOVERABLE, false };
+      mx_wait_args a2{ &mx, 100, ENOTRECOVERABLE, false };
+      th_attr.th_priority = thread::priority::high;
+      thread th1{ "th-pi1", mx_timed_lock_func, &a1, th_attr };
+      th_attr.th_priority = thread::priority::above_normal;
+      thread th2{ "th-pi2", mx_timed_lock_func, &a2, th_attr };
+      // The owner is boosted above th2; let th2 run and block.
+      sysclock.sleep_for (1);
+
+      sysclock.sleep_for (2 * a1.timeout);
+      if (a1.res != ETIMEDOUT
+          || crt.priority () != thread::priority::above_normal)
+        {
+          printf ("%s - timed_lock() timeout returned %d, owner prio %u\n",
+                  test_name, static_cast<int> (a1.res),
+                  static_cast<unsigned int> (crt.priority ()));
+          return 1;
+        }
+
+      mx.unlock ();
+      th1.join ();
+      th2.join ();
+      if (a2.res != result::ok || crt.priority () != prio)
+        {
+          printf ("%s - after unlock() waiter returned %d, owner prio %u\n",
+                  test_name, static_cast<int> (a2.res),
+                  static_cast<unsigned int> (crt.priority ()));
+          return 1;
+        }
+    }
+
+    printf ("%s - timed_lock() priority inheritance ok\n", test_name);
+  }
+
+  {
+    // unlock() wakes a single waiter; if that waiter times out before
+    // it runs, the wake-up must be passed to the next waiter.
+    mutex mx{ "mx-lw" };
+    thread::attributes th_attr;
+
+    mx.lock ();
+    mx_wait_args a{ &mx, 5, ENOTRECOVERABLE, false };
+    mx_wait_args c{ &mx, 0, ENOTRECOVERABLE, false };
+    th_attr.th_priority = thread::priority::high;
+    thread tha{ "th-lwa", mx_timed_lock_func, &a, th_attr };
+    th_attr.th_priority = thread::priority::above_normal;
+    thread thc{ "th-lwc", mx_lock_func, &c, th_attr };
+    // The owner is boosted above thc; let thc run and block.
+    sysclock.sleep_for (1);
+
+    {
+      // ----- Enter critical section -----------------------------------------
+      scheduler::critical_section scs;
+
+      // Wakes the head of the waiting list, the higher priority one,
+      // which cannot run yet.
+      mx.unlock ();
+
+      // Busy wait past its deadline.
+      clock::timestamp_t begin = sysclock.now ();
+      while (sysclock.now () - begin < 2 * a.timeout)
+        {
+          __asm__ volatile ("" ::: "memory");
+        }
+      // ----- Exit critical section ------------------------------------------
+    }
+
+    // Let both waiters run.
+    sysclock.sleep_for (2);
+
+    bool lost = !c.done;
+    if (lost)
+      {
+        // Release the remaining waiter.
+        mx.lock ();
+        mx.unlock ();
+      }
+    tha.join ();
+    thc.join ();
+
+    if (a.res != ETIMEDOUT || lost || c.res != result::ok)
+      {
+        printf ("%s - timed out waiter returned %d, next waiter %s\n",
+                test_name, static_cast<int> (a.res),
+                lost ? "not woken" : "woken");
+        return 1;
+      }
+
+    printf ("%s - timed_lock() timeout passes the wake-up on ok\n", test_name);
+  }
+
+  {
+    // lock() interrupted: the boost given to the owner must be undone.
+    mutex mx{ "mx-intr" };
+    thread& crt = this_thread::thread ();
+    thread::priority_t prio = crt.priority ();
+    thread::attributes th_attr;
+
+    mx.lock ();
+    mx_wait_args a{ &mx, 0, ENOTRECOVERABLE, false };
+    th_attr.th_priority = thread::priority::high;
+    thread tha{ "th-intr", mx_lock_func, &a, th_attr };
+    // Boosting the owner to the waiter priority yields to it before the
+    // waiter blocks; let the waiter finish blocking, since an interrupt
+    // before it waits would be lost (a separate, known limitation).
+    sysclock.sleep_for (1);
+    if (crt.priority () != thread::priority::high)
+      {
+        printf ("%s - mutex owner not boosted (%u)\n", test_name,
+                static_cast<unsigned int> (crt.priority ()));
+        return 1;
+      }
+
+    tha.interrupt ();
+    // Let the waiter run and leave.
+    sysclock.sleep_for (1);
+
+    if (!a.done || a.res != EINTR || crt.priority () != prio
+        || mx.owner () != &crt)
+      {
+        printf ("%s - interrupted lock() returned %d, owner prio %u\n",
+                test_name, static_cast<int> (a.res),
+                static_cast<unsigned int> (crt.priority ()));
+        return 1;
+      }
+    mx.unlock ();
+    tha.join ();
+
+    printf ("%s - interrupted lock() priority inheritance ok\n", test_name);
+  }
+
+  {
+    // lock() interrupted after unlock() woke it: the wake-up must be
+    // passed to the next waiter.
+    mutex mx{ "mx-intr2" };
+    thread::attributes th_attr;
+
+    mx.lock ();
+    mx_wait_args a{ &mx, 0, ENOTRECOVERABLE, false };
+    mx_wait_args c{ &mx, 0, ENOTRECOVERABLE, false };
+    th_attr.th_priority = thread::priority::high;
+    thread tha{ "th-intra", mx_lock_func, &a, th_attr };
+    th_attr.th_priority = thread::priority::above_normal;
+    thread thc{ "th-intrc", mx_lock_func, &c, th_attr };
+    // The owner is boosted above thc; let thc run and block.
+    sysclock.sleep_for (1);
+
+    {
+      // ----- Enter critical section -----------------------------------------
+      scheduler::critical_section scs;
+
+      // Wake the head of the waiting list, then interrupt it before it
+      // can run.
+      mx.unlock ();
+      tha.interrupt ();
+      // ----- Exit critical section ------------------------------------------
+    }
+
+    // Let both waiters run.
+    sysclock.sleep_for (2);
+
+    bool lost = !c.done;
+    if (lost)
+      {
+        // Release the remaining waiter.
+        mx.lock ();
+        mx.unlock ();
+      }
+    tha.join ();
+    thc.join ();
+
+    if (a.res != EINTR || lost || c.res != result::ok)
+      {
+        printf ("%s - interrupted waiter returned %d, next waiter %s\n",
+                test_name, static_cast<int> (a.res),
+                lost ? "not woken" : "woken");
+        return 1;
+      }
+
+    printf ("%s - interrupted lock() passes the wake-up on ok\n", test_name);
   }
 
   {

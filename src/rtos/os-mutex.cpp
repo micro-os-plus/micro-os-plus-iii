@@ -855,6 +855,82 @@ namespace os
       return EWOULDBLOCK;
     }
 
+    // Must be called in a scheduler critical section.
+    thread::priority_t
+    mutex::internal_owned_boost_ (thread* th)
+    {
+      mutexes_list* thread_mutexes
+          = reinterpret_cast<mutexes_list*> (&th->mutexes_);
+
+      thread::priority_t max_prio = thread::priority::none;
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
+      for (auto&& mx : *thread_mutexes)
+        {
+          if (mx.boosted_prio_ > max_prio)
+            {
+              max_prio = mx.boosted_prio_;
+            }
+        }
+#pragma GCC diagnostic pop
+
+      return max_prio;
+    }
+
+    // Called by a waiter which leaves lock() or timed_lock() without
+    // the mutex (EINTR, ETIMEDOUT), after its nodes were unlinked.
+    void
+    mutex::internal_leave_wait_ (bool woken_by_unlock)
+    {
+      // ----- Enter critical section -----------------------------------------
+      scheduler::critical_section scs;
+
+      // unlock() wakes a single waiter and does not hand the mutex
+      // over. If this thread was that waiter and leaves without the
+      // mutex, pass the wake-up on, otherwise the other waiters would
+      // stay blocked on a free mutex.
+      if (woken_by_unlock && owner_ == nullptr)
+        {
+          list_.resume_one ();
+        }
+
+      // Read the owner once, under the lock; it may have released the
+      // mutex meanwhile.
+      thread* owner = owner_;
+      if (protocol_ == protocol::inherit && owner != nullptr)
+        {
+          // This thread no longer boosts the owner: the mutex boost is
+          // now the highest priority of the remaining waiters, if any.
+          thread::priority_t max_prio = thread::priority::none;
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#endif
+          for (auto&& th : list_)
+            {
+              thread::priority_t prio = th.priority ();
+              if (prio > max_prio)
+                {
+                  max_prio = prio;
+                }
+            }
+#pragma GCC diagnostic pop
+
+          boosted_prio_ = max_prio;
+
+          // The owner inherits the highest boost of all the mutexes it
+          // owns, as in unlock(); its assigned priority is not changed.
+          // Delayed until end of critical section.
+          owner->priority_inherited (internal_owned_boost_ (owner));
+        }
+      // ----- Exit critical section ------------------------------------------
+    }
+
     result_t
     mutex::internal_unlock_ (thread* th)
     {
@@ -904,35 +980,10 @@ namespace os
 
             if (boosted_prio_ != thread::priority::none)
               {
-                mutexes_list* thread_mutexes
-                    = reinterpret_cast<mutexes_list*> (&owner_->mutexes_);
-
-                thread::priority_t inherited_prio = thread::priority::none;
-                if (!thread_mutexes->empty ())
-                  {
-                    // If the owner thread acquired other mutexes too,
-                    // compute the maximum boosted priority.
-                    thread::priority_t max_prio = 0;
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Waggregate-return"
-#endif
-                    for (auto&& mx : *thread_mutexes)
-                      {
-                        if (mx.boosted_prio_ > max_prio)
-                          {
-                            max_prio = mx.boosted_prio_;
-                          }
-                      }
-#pragma GCC diagnostic pop
-                    if (max_prio > 0)
-                      {
-                        inherited_prio = max_prio;
-                      }
-                  }
+                // If the owner thread acquired other mutexes too,
+                // inherit the maximum boosted priority.
                 // Delayed until end of critical section.
-                owner_->priority_inherited (inherited_prio);
+                owner_->priority_inherited (internal_owned_boost_ (owner_));
                 boosted_prio_ = thread::priority::none;
               }
 
@@ -1135,15 +1186,18 @@ namespace os
 
           port::scheduler::reschedule ();
 
-          // Remove the thread from the semaphore waiting list,
-          // if not already removed by unlock().
-          scheduler::internal_unlink_node (node);
+          // Remove the thread from the mutex waiting list,
+          // if not already removed by unlock(), which wakes a single
+          // waiter by removing it.
+          bool woken_by_unlock = scheduler::internal_unlink_node (node);
 
           if (crt_thread.interrupted ())
             {
 #if defined(OS_TRACE_RTOS_MUTEX)
               trace::printf ("%s() EINTR @%p %s\n", __func__, this, name ());
 #endif
+              internal_leave_wait_ (woken_by_unlock);
+
               instrumentation::mutex::lock_retval (this, EINTR);
               return EINTR;
             }
@@ -1376,10 +1430,12 @@ namespace os
 
           port::scheduler::reschedule ();
 
-          // Remove the thread from the semaphore waiting list,
-          // if not already removed by unlock() and from the clock
-          // timeout list, if not already removed by the timer.
-          scheduler::internal_unlink_node (node, timeout_node);
+          // Remove the thread from the mutex waiting list,
+          // if not already removed by unlock() (which wakes a single
+          // waiter by removing it), and from the clock timeout list,
+          // if not already removed by the timer.
+          bool woken_by_unlock
+              = scheduler::internal_unlink_node (node, timeout_node);
 
           res = result::ok;
 
@@ -1400,34 +1456,8 @@ namespace os
             }
           if (res != result::ok)
             {
-              if (boosted_prio_ != thread::priority::none)
-                {
-                  // If the priority was boosted, it must be restored
-                  // to the highest priority of the waiting threads, if any.
+              internal_leave_wait_ (woken_by_unlock);
 
-                  thread::priority_t max_prio = thread::priority::none;
-
-#pragma GCC diagnostic push
-#if defined(__clang__)
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Waggregate-return"
-#endif
-                  for (auto&& th : list_)
-                    {
-                      thread::priority_t prio = th.priority ();
-                      if (prio > max_prio)
-                        {
-                          max_prio = prio;
-                        }
-                    }
-#pragma GCC diagnostic pop
-
-                  if (max_prio != thread::priority::none)
-                    {
-                      boosted_prio_ = max_prio;
-                      owner_->priority (boosted_prio_);
-                    }
-                }
               instrumentation::mutex::timed_lock_retval (this, res);
               return res;
             }

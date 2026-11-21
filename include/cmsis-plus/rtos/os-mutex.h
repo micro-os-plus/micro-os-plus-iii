@@ -624,6 +624,24 @@ namespace os
       result_t
       internal_unlock_ (thread* th);
 
+      /**
+       * @brief Internal function used to compute the inherited priority.
+       * @param th Pointer to the owner thread.
+       * @return The highest boosted priority of the mutexes owned by
+       *  the thread, or `thread::priority::none`.
+       */
+      static thread::priority_t
+      internal_owned_boost_ (thread* th);
+
+      /**
+       * @brief Internal function used when a waiter leaves without the mutex.
+       * @param woken_by_unlock The waiter was woken by `unlock()`.
+       * @par Returns
+       *  Nothing.
+       */
+      void
+      internal_leave_wait_ (bool woken_by_unlock);
+
       void
       internal_mark_owner_dead_ (void);
 

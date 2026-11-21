@@ -1389,7 +1389,7 @@ namespace os
                                      internal::waiting_thread_node& node,
                                      unsigned int cause);
 
-      friend void
+      friend bool
       scheduler::internal_unlink_node (internal::waiting_thread_node& node);
 
       friend void
@@ -1399,7 +1399,7 @@ namespace os
           internal::clock_timestamps_list& timeout_list,
           internal::timeout_thread_node& timeout_node, unsigned int cause);
 
-      friend void
+      friend bool
       scheduler::internal_unlink_node (
           internal::waiting_thread_node& node,
           internal::timeout_thread_node& timeout_node);
