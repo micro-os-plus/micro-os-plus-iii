@@ -1189,6 +1189,33 @@ namespace os
       port::scheduler::reschedule ();
     }
 
+    /**
+     * @details
+     * Used when a wait marked the current thread `suspended` (for
+     * example with `scheduler::internal_link_node()`) but then fails
+     * before blocking, so the thread continues to run. Must be called
+     * by the current thread, in an interrupts critical section, after
+     * the waiting and timeout nodes were unlinked.
+     *
+     * Between the suspend and this call, a timeout (or, on SMP, a
+     * `signal()` from another CPU) may already have resumed the
+     * thread, linking it into the ready list; since it is running,
+     * it is taken out of the list again.
+     */
+    void
+    thread::internal_cancel_suspend_ (void)
+    {
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
+      // Remove this thread from the ready list, if a resume() put it
+      // there; ineffective if not linked.
+      ready_node_.unlink ();
+#endif
+
+      state_ = state::running;
+
+      instrumentation::thread::active (this);
+    }
+
     void
     thread::internal_exit_ (void* exit_ptr)
     {

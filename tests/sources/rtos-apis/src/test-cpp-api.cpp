@@ -975,6 +975,45 @@ test_cpp_api (void)
     cv2->signal ();
   }
 
+  {
+    // A wait with a mutex not owned by the caller fails in unlock(),
+    // after the thread was linked to the condition variable and marked
+    // suspended. It must return the error with the thread running;
+    // a thread left `suspended` would be lost at the next context
+    // switch, so the state is checked before yielding.
+    mutex::attributes attr;
+    attr.mx_type = mutex::type::errorcheck;
+    mutex mx{ "mx-ec", attr };
+    condition_variable cv{ "cv-ec" };
+
+    result_t res = cv.wait (mx);
+    if (res != EPERM
+        || this_thread::thread ().state () != thread::state::running)
+      {
+        printf ("%s - wait() with a mutex not owned returned %d, state %u\n",
+                test_name, static_cast<int> (res),
+                static_cast<unsigned int> (this_thread::thread ().state ()));
+        return 1;
+      }
+
+    res = cv.timed_wait (mx, 10);
+    if (res != EPERM
+        || this_thread::thread ().state () != thread::state::running)
+      {
+        printf (
+            "%s - timed_wait() with a mutex not owned returned %d, state %u\n",
+            test_name, static_cast<int> (res),
+            static_cast<unsigned int> (this_thread::thread ().state ()));
+        return 1;
+      }
+
+    // Still scheduled.
+    this_thread::yield ();
+    sysclock.sleep_for (1);
+
+    printf ("%s - wait() with a mutex not owned ok\n", test_name);
+  }
+
   // ==========================================================================
 
   printf ("\n%s - Event flags\n", test_name);

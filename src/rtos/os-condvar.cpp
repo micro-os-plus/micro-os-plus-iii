@@ -620,7 +620,19 @@ namespace os
 
         if (res != result::ok)
           {
-            scheduler::internal_unlink_node (node);
+            {
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
+
+              // The thread did not block; undo internal_link_node(),
+              // otherwise it would continue to run as `suspended` and
+              // be lost at the next context switch.
+              crt_thread.waiting_node_ = nullptr;
+              node.unlink ();
+
+              crt_thread.internal_cancel_suspend_ ();
+              // ----- Exit critical section ----------------------------------
+            }
             instrumentation::condition_variable::wait_retval (this, res);
             return res;
           }
@@ -813,7 +825,22 @@ namespace os
 
         if (res != result::ok)
           {
-            scheduler::internal_unlink_node (node, timeout_node);
+            {
+              // ----- Enter critical section ---------------------------------
+              interrupts::critical_section ics;
+
+              // The thread did not block; undo internal_link_node(),
+              // as in wait(). The timeout may have already expired and
+              // resumed the thread; internal_cancel_suspend_() handles it.
+              timeout_node.thread.clock_node_ = nullptr;
+              timeout_node.unlink ();
+
+              crt_thread.waiting_node_ = nullptr;
+              node.unlink ();
+
+              crt_thread.internal_cancel_suspend_ ();
+              // ----- Exit critical section ----------------------------------
+            }
             instrumentation::condition_variable::timed_wait_retval (this, res);
             return res;
           }

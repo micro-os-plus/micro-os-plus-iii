@@ -1470,6 +1470,16 @@ namespace os
       internal_suspend_ (unsigned int cause);
 
       /**
+       * @brief Undo a suspend of the current thread that did not block.
+       * @par Parameters
+       *  None.
+       * @par Returns
+       *  Nothing.
+       */
+      void
+      internal_cancel_suspend_ (void);
+
+      /**
        * @brief Terminate thread by itself.
        * @param [in] exit_ptr Pointer to object to return (optional).
        * @par Returns
