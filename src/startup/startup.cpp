@@ -355,7 +355,7 @@ _start (void)
   instrumentation::configure ();
 
 #if !defined(OS_DISABLE_INSTRUMENTATION_AUTOSTART)
-  // Start recording to catch system initialization.
+  // Start recording to catch system initialisation.
   instrumentation::start ();
 #endif
 
