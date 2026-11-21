@@ -311,7 +311,7 @@ static my_block mb{ "mb", mx1, 512u, 512u, 2u + 3u };
 template class posix::block_device_partition_implementable<>;
 using my_partition1 = posix::block_device_partition_implementable<>;
 
-// /dev/mb1
+// /dev/mb-p1
 static my_partition1 p1{ "mb-p1", mb };
 
 // Explicit template instantiation.
@@ -322,7 +322,7 @@ using my_partition2 = posix::block_device_partition_lockable<
 
 static rtos::mutex mx2{ "mx2" };
 
-// /dev/mb2
+// /dev/mb-p2
 // The mutex is not really needed, but it is used to test the template.
 static my_partition2 p2{ "mb-p2", mb, mx2 };
 
@@ -456,7 +456,8 @@ test_posix_io_api (bool extra __attribute__ ((unused)))
 
   printf ("\n%s - Block device - C API\n", test_name);
   {
-    int fd = open ("/dev/mb2", 0);
+    int fd = open ("/dev/mb-p2", 0);
+    assert (fd >= 0);
 
     buff[0] = 0xFF;
     res = read (fd, buff, bsz);
