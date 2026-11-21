@@ -259,6 +259,24 @@ unrelated code.
   functions.
 - Guard new optional features with `OS_INCLUDE_*`/`OS_USE_*` macros and
   give them sensible defaults in the headers.
+- Portability: the code must remain portable to Cortex-M, AArch32,
+  AArch64, RISC-V and POSIX native. Guard code by what it needs, never
+  by toolchain or ABI macros such as `__ARM_EABI__`, which silently
+  exclude it on other architectures:
+  - portable bare-metal code: `OS_IS_CROSS_BUILD` (from `os-versions.h`);
+  - optional features: their `OS_USE_*`/`OS_INCLUDE_*` macro;
+  - Cortex-M only:
+    `defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')`; tell
+    Mainline (v7-M, v7E-M, v8-M Main, v8.1-M) from Baseline (v6-M,
+    v8-M Base) with `__ARM_ARCH_ISA_THUMB == 2`/`== 1`, not with lists
+    of `__ARM_ARCH_7M__`-style macros (clang names Armv8.1-M
+    `__ARM_ARCH_8_1M_MAIN__`), and put a comment listing the matched
+    architectures before such tests;
+  - keep architecture-specific lines small and isolated. The AArch32,
+    AArch64 and RISC-V ports are not implemented yet; where code needs
+    an architecture-specific implementation, use an explicit
+    `#error "... not yet implemented for this architecture"` instead of
+    untested code.
 - Document public APIs with Doxygen comments, consistent with the
   existing ones.
 - Each file starts with the standard µOS++ MIT licence header.
