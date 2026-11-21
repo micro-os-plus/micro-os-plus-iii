@@ -6,6 +6,13 @@ Please check
 [GitHub](https://github.com/micro-os-plus/micro-os-plus-iii/issues)
 and close existing issues and pull requests.
 
+## 2026-11-21
+
+* **Behaviour change:** 445513d3 C API `os_timer_construct()` and
+  `os_timer_new()` with `NULL` attributes create one-shot timers, as the
+  C++ API does; up to 7.1.0 they created periodic timers. Applications
+  that relied on it must pass `os_timer_attr_get_periodic()`.
+
 ## 2025-09-24
 
 * v7.1.0 prepared

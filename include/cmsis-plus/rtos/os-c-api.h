@@ -1075,9 +1075,13 @@ extern "C"
    * @param [in] name Pointer to name (may be NULL).
    * @param [in] function Pointer to timer function.
    * @param [in] args Pointer to timer function arguments (may be NULL).
-   * @param [in] attr Pointer to attributes (may be NULL).
+   * @param [in] attr Pointer to attributes (may be NULL, which creates
+   *  a one-shot timer, as in C++).
    * @par Returns
    *  Nothing.
+   *
+   * @note Versions up to 7.1.0 created a periodic timer when _attr_ was
+   *  `NULL`; use `os_timer_attr_get_periodic()` for periodic timers.
    */
   void
   os_timer_construct (os_timer_t* timer, const char* name,
@@ -1098,8 +1102,12 @@ extern "C"
    * @param [in] name Pointer to name (may be NULL).
    * @param [in] function Pointer to timer function.
    * @param [in] args Pointer to timer function arguments (may be NULL).
-   * @param [in] attr Pointer to attributes (may be NULL).
+   * @param [in] attr Pointer to attributes (may be NULL, which creates
+   *  a one-shot timer, as in C++).
    * @return Pointer to new timer object instance.
+   *
+   * @note Versions up to 7.1.0 created a periodic timer when _attr_ was
+   *  `NULL`; use `os_timer_attr_get_periodic()` for periodic timers.
    */
   os_timer_t*
   os_timer_new (const char* name, os_timer_func_t function,

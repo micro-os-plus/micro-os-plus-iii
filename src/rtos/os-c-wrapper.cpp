@@ -1504,6 +1504,14 @@ os_timer_attr_get_periodic (void)
 }
 
 /**
+ * @details
+ * If _attr_ is `NULL`, a one-shot timer is created, as with the C++
+ * constructor without attributes. To create a periodic timer, pass
+ * `os_timer_attr_get_periodic()`.
+ *
+ * @note Versions up to 7.1.0 created a periodic timer when _attr_ was
+ *  `NULL`; applications that relied on it must now pass
+ *  `os_timer_attr_get_periodic()`.
  * @note Must be paired with `os_timer_destruct()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1519,8 +1527,9 @@ os_timer_construct (os_timer_t* timer, const char* name,
   assert (timer != nullptr);
   if (attr == nullptr)
     {
-      // The C++ and CMSIS defaults are one-shot timers; only an explicit
-      // periodic attribute (os_timer_attr_get_periodic()) should repeat.
+      // Same default as the C++ API (one-shot). Releases up to 7.1.0
+      // created periodic timers here, which was wrong; use
+      // os_timer_attr_get_periodic() for periodic timers.
       attr = (const os_timer_attr_t*)&timer::once_initializer;
     }
   new (timer)
@@ -1548,7 +1557,14 @@ os_timer_destruct (os_timer_t* timer)
  * Dynamically allocate the timer object instance using the RTOS
  * system allocator and construct it.
  *
+ * If _attr_ is `NULL`, a one-shot timer is created, as with the C++
+ * constructor without attributes. To create a periodic timer, pass
+ * `os_timer_attr_get_periodic()`.
+ *
  * @note Equivalent of C++ `new timer(...)`.
+ * @note Versions up to 7.1.0 created a periodic timer when _attr_ was
+ *  `NULL`; applications that relied on it must now pass
+ *  `os_timer_attr_get_periodic()`.
  * @note Must be paired with `os_timer_delete()`.
  *
  * @warning Cannot be invoked from Interrupt Service Routines.
@@ -1562,8 +1578,9 @@ os_timer_new (const char* name, os_timer_func_t function,
 {
   if (attr == nullptr)
     {
-      // The C++ and CMSIS defaults are one-shot timers; only an explicit
-      // periodic attribute (os_timer_attr_get_periodic()) should repeat.
+      // Same default as the C++ API (one-shot). Releases up to 7.1.0
+      // created periodic timers here, which was wrong; use
+      // os_timer_attr_get_periodic() for periodic timers.
       attr = (const os_timer_attr_t*)&timer::once_initializer;
     }
   return reinterpret_cast<os_timer_t*> (

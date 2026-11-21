@@ -78,6 +78,15 @@ tmfunc (void* args __attribute__ ((unused)))
   // fflush(stdout);
 }
 
+// Counts the timer callbacks, to check one-shot and periodic timers.
+static volatile unsigned int tm_count;
+
+static void
+tmfunc_count (void* args __attribute__ ((unused)))
+{
+  ++tm_count;
+}
+
 // ----------------------------------------------------------------------------
 
 void
@@ -406,6 +415,53 @@ test_c_api (void)
 
     os_timer_delete (tm3);
   }
+
+  {
+    // NULL attributes create a one-shot timer, as in C++.
+    os_timer_t tm4;
+    os_timer_construct (&tm4, "tm4", tmfunc_count, NULL, NULL);
+
+    tm_count = 0;
+    os_sysclock_sleep_for (1); // Sync
+    os_timer_start (&tm4, 1);
+
+    os_sysclock_sleep_for (5);
+
+    os_timer_stop (&tm4); // EAGAIN if already expired.
+    os_timer_destruct (&tm4);
+
+    if (tm_count != 1)
+      {
+        printf ("%s - default timer fired %u times, expected 1\n", test_name,
+                tm_count);
+        return 1;
+      }
+  }
+
+  {
+    // An explicit periodic attribute repeats.
+    os_timer_t tm5;
+    os_timer_construct (&tm5, "tm5", tmfunc_count, NULL,
+                        os_timer_attr_get_periodic ());
+
+    tm_count = 0;
+    os_sysclock_sleep_for (1); // Sync
+    os_timer_start (&tm5, 1);
+
+    os_sysclock_sleep_for (5);
+
+    os_timer_stop (&tm5);
+    os_timer_destruct (&tm5);
+
+    if (tm_count < 2)
+      {
+        printf ("%s - periodic timer fired %u times, expected at least 2\n",
+                test_name, tm_count);
+        return 1;
+      }
+  }
+
+  printf ("%s - default one-shot and periodic timers ok\n", test_name);
 
   // ==========================================================================
 
