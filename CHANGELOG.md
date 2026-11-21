@@ -12,6 +12,13 @@ and close existing issues and pull requests.
   `os_timer_new()` with `NULL` attributes create one-shot timers, as the
   C++ API does; up to 7.1.0 they created periodic timers. Applications
   that relied on it must pass `os_timer_attr_get_periodic()`.
+* **Behaviour change:** `OS_HAS_SYSTEMCLOCK_CONFIG` is no longer used and
+  is now an error. The default `os_startup_initialize_hardware_early()`
+  no longer calls `SystemClock_Config()` (added in 7.1.0 by 017e4745),
+  since the STM32CubeMX code uses the HAL, which requires `HAL_Init()`
+  first and initialised globals. Call `HAL_Init()`,
+  `SystemClock_Config()` and `SystemCoreClockUpdate()` from the
+  application `os_startup_initialize_hardware()`.
 
 ## 2025-09-24
 

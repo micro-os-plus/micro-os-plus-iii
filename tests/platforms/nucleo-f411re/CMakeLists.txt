@@ -87,8 +87,7 @@ if (ENABLE_RTOS_APIS_TEST)
 
     target_compile_definitions (
       rtos-apis-instrumentation-test
-      PRIVATE OS_HAS_SYSTEMCLOCK_CONFIG
-              # OS_USE_TRACE_SEGGER_RTT
+      PRIVATE # OS_USE_TRACE_SEGGER_RTT
               OS_USE_TRACE_SEMIHOSTING_STDOUT
               # OS_USE_TRACE_SEMIHOSTING_STDERR
               # OS_USE_TRACE_SEMIHOSTING_ITM
@@ -229,8 +228,7 @@ if (ENABLE_INSTRUMENTATION_TEST)
 
   target_compile_definitions (
     instrumentation-test
-    PRIVATE OS_HAS_SYSTEMCLOCK_CONFIG
-            # OS_USE_TRACE_SEGGER_RTT
+    PRIVATE # OS_USE_TRACE_SEGGER_RTT
             OS_USE_TRACE_SEMIHOSTING_STDOUT
             # OS_USE_TRACE_SEMIHOSTING_STDERR
             # OS_USE_TRACE_SEMIHOSTING_ITM

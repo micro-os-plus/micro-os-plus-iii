@@ -35,8 +35,12 @@ extern unsigned int __vectors_start;
 // ----------------------------------------------------------------------------
 
 #if defined(OS_HAS_SYSTEMCLOCK_CONFIG)
-extern void
-SystemClock_Config (void);
+// Up to 7.1.0, the default os_startup_initialize_hardware_early() called
+// SystemClock_Config() when this was defined. STM32CubeMX clock code uses
+// the HAL, which requires HAL_Init() first and initialised globals, so it
+// cannot run before DATA & BSS init; it was removed.
+#error \
+    "OS_HAS_SYSTEMCLOCK_CONFIG is no longer used; call HAL_Init(), SystemClock_Config() and SystemCoreClockUpdate() from os_startup_initialize_hardware()."
 #endif
 
 /**
@@ -54,18 +58,18 @@ SystemClock_Config (void);
  *
  * Also useful on platform with external RAM, that need to be
  * initialised before filling the BSS section.
+ *
+ * @warning This function runs before the DATA section is copied and
+ *  the BSS section is cleared, so it must only access registers; it
+ *  must not use initialised global variables, and must not call
+ *  vendor HAL functions (like the STM32CubeMX `SystemClock_Config()`),
+ *  which use them. Such calls belong in `os_startup_initialize_hardware()`.
  */
 void __attribute__ ((weak))
 os_startup_initialize_hardware_early (void)
 {
   // Call the CSMSIS system initialisation routine.
   SystemInit ();
-
-#if defined(OS_HAS_SYSTEMCLOCK_CONFIG)
-  // Call the CMSIS system clock configuration routine, if available.
-  // (STM32CubeMX generates it in `main.c`)
-  SystemClock_Config ();
-#endif
 
 #if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 
