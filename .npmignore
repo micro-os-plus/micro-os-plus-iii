@@ -21,6 +21,10 @@ Thumbs.db
 # Visual Studio Code
 .vscode/
 
+# Claude Code (project instructions, skills and settings)
+.claude/
+CLAUDE.md
+
 # Eclipse
 .settings/
 Debug*/
