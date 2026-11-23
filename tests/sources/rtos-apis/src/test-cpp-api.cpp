@@ -923,6 +923,18 @@ test_cpp_api (void)
   }
 
   {
+    // A thread with a small stack, above the port minimum (twice the
+    // minimum: 512 bytes on Cortex-M, where debug builds used to reject
+    // any stack up to 548 bytes).
+    thread::attributes attr;
+    attr.th_stack_size_bytes = thread::stack::min_size () * 2;
+    thread th{ "th-small-stack", kill_quick_func, nullptr, attr };
+    th.join ();
+    printf ("%s - thread with a %u bytes stack ok\n", test_name,
+            static_cast<unsigned int> (attr.th_stack_size_bytes));
+  }
+
+  {
     // Static threads with allocated stacks.
     thread th1{ func, nullptr };
     thread th2{ "th2", func, nullptr };
