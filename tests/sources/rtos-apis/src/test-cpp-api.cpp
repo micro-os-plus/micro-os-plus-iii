@@ -956,6 +956,18 @@ test_cpp_api (void)
     // any stack up to 548 bytes).
     thread::attributes attr;
     attr.th_stack_size_bytes = thread::stack::min_size () * 2;
+#if defined(TRACE) \
+    && (defined(OS_TRACE_RTOS_THREAD) \
+        || defined(OS_TRACE_RTOS_THREAD_CONTEXT) \
+        || defined(OS_TRACE_RTOS_THREAD_FLAGS) \
+        || defined(OS_TRACE_RTOS_SCHEDULER) || defined(OS_TRACE_RTOS_LISTS))
+    // The minimum does not include the RTOS trace: with these options
+    // the thread calls trace::printf() on its own stack while starting
+    // and exiting (about 800 bytes in debug builds, for the buffer and
+    // vsnprintf()); allow 1 KB more (the 548 bytes check is then not
+    // exercised).
+    attr.th_stack_size_bytes += 1024;
+#endif
     thread th{ "th-small-stack", kill_quick_func, nullptr, attr };
     th.join ();
     printf ("%s - thread with a %u bytes stack ok\n", test_name,
