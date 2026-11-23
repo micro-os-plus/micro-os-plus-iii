@@ -1223,6 +1223,19 @@ runtime memory is initialised, and the RTOS tick is protected instead:
 - `nucleo-f411re-cmake-gcc-debug` and `-release` build without
   warnings. Not run on the board.
 
+### Follow-up: context switch requested by a static constructor
+
+Found later, while fixing the Cortex-M port review
+(`micro-os-plus-iii-cortexm/maintenance/docs/CODE-REVIEW-1.md`, #13):
+with interrupts enabled during the static constructors, a constructor
+that requests a context switch outside a scheduler critical section (for
+example `flags_raise()` or `resume()` on a thread) took PendSV before the
+scheduler existed (HardFault on Cortex-M, hang on POSIX). Fixed in the
+ports, `reschedule()` does nothing until the scheduler is started:
+micro-os-plus/micro-os-plus-iii-cortexm#3 (Cortex-M 32662b5f, POSIX
+92205987); test in 6a11d028 (a global thread woken by a static
+constructor must run after the start). Noted in issue #142.
+
 ---
 
 ## #9 - HLT trap switches to `.arm` and never back to Thumb
@@ -2119,7 +2132,7 @@ pass without the change; the real check is the SMP stress tests on the
 
 **File:** `src/startup/startup.cpp:358`
 
-**Status:** fixed (not committed).
+**Status:** fixed in 2ee9d0ce (no issue).
 
 ### Problem
 
