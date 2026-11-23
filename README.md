@@ -167,8 +167,9 @@ repository to be split into multiple separate source code libraries.
 The project is written in C/C++ and it is expected
 to be used in C and C++ projects.
 
-The source code was compiled with GCC 11/12, clang 12/13/14/15,
-arm-none-eabi-gcc 12, and should be warning free.
+The source code was compiled with GCC 11-14 and clang 13-19 (native
+builds on macOS and GNU/Linux) and with arm-none-eabi-gcc 14
+(Cortex-M), and should be warning free.
 
 To ease the integration of this package into user projects, there
 are already made CMake configuration files (see below).
