@@ -975,6 +975,41 @@ test_cpp_api (void)
   }
 
   {
+    // A thread created inside an interrupts critical section must run
+    // with the interrupts (the clock) enabled, once the critical section
+    // is left. On POSIX the context used to inherit the blocked clock
+    // signal from its creator (checks
+    // micro-os-plus/micro-os-plus-iii-posix-arch#4); the thread
+    // busy-waits for 5 ticks, at most 1 second.
+    static clock::timestamp_t ticks_seen;
+    ticks_seen = 0;
+    thread* pth;
+    {
+      interrupts::critical_section ics;
+      pth = new thread{ "th-created-in-ics", [] (void*) -> void*
+        {
+          clock::timestamp_t t0 = sysclock.now ();
+          clock::timestamp_t h0 = hrclock.now ();
+          clock::timestamp_t limit = hrclock.input_clock_frequency_hz ();
+          while ((sysclock.now () - t0) < 5 && (hrclock.now () - h0) < limit)
+            {
+            }
+          ticks_seen = sysclock.now () - t0;
+          return nullptr;
+        }, nullptr };
+    }
+    pth->join ();
+    delete pth;
+    if (ticks_seen < 5)
+      {
+        printf ("%s - thread created in a critical section saw %u ticks\n",
+                test_name, static_cast<unsigned int> (ticks_seen));
+        return 1;
+      }
+    printf ("%s - thread created in a critical section ok\n", test_name);
+  }
+
+  {
     // Static threads with allocated stacks.
     thread th1{ func, nullptr };
     thread th2{ "th2", func, nullptr };
