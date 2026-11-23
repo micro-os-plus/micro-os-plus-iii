@@ -2357,6 +2357,63 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  printf ("\n%s - Scheduler lock\n", test_name);
+
+  {
+    // A higher priority thread woken while the scheduler is locked must
+    // run as soon as the scheduler is unlocked, not at the next tick.
+    // mutex::unlock() wakes the waiter in a scheduler critical section.
+    mutex::attributes mx_attr;
+    mx_attr.mx_protocol = mutex::protocol::none;
+    mutex mx{ "mx-sl", mx_attr };
+    mx.lock ();
+    mx_wait_args a{ &mx, 0, ENOTRECOVERABLE, false };
+    thread::attributes th_attr;
+    th_attr.th_priority = thread::priority::high;
+    // Above the current thread, so it starts at once and blocks.
+    thread th{ "th-sl", mx_lock_func, &a, th_attr };
+
+    mx.unlock ();
+    bool at_once = a.done;
+    th.join ();
+    if (!at_once)
+      {
+        printf ("%s - waiter woken by unlock() did not run at once\n",
+                test_name);
+        return 1;
+      }
+  }
+
+  {
+    // The same with an explicit scheduler critical section.
+    semaphore sem{ "sem-sl" };
+    lw_args a{ &sem, nullptr, nullptr, 0, ENOTRECOVERABLE, nullptr, 0, false };
+    thread::attributes th_attr;
+    th_attr.th_priority = thread::priority::high;
+    thread th{ "th-sl2", lw_sem_func, &a, th_attr };
+
+    {
+      // ----- Enter critical section -----------------------------------------
+      scheduler::critical_section scs;
+
+      sem.post ();
+      // ----- Exit critical section ------------------------------------------
+    }
+    bool at_once = a.done;
+    th.join ();
+    if (!at_once)
+      {
+        printf ("%s - thread woken in a scheduler critical section did not "
+                "run at once\n",
+                test_name);
+        return 1;
+      }
+
+    printf ("%s - deferred context switch at unlock ok\n", test_name);
+  }
+
+  // ==========================================================================
+
   if (test_pending_interrupt (test_name) != 0)
     {
       return 1;

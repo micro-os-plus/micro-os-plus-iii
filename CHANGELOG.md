@@ -6,6 +6,14 @@ Please check
 [GitHub](https://github.com/micro-os-plus/micro-os-plus-iii/issues)
 and close existing issues and pull requests.
 
+## 2026-11-23
+
+* A context switch requested while the scheduler is locked (for example
+  to a higher priority thread woken by `mutex::unlock()`) is performed
+  when the scheduler is unlocked, instead of at the next tick. It needs
+  the ports to record the request in `scheduler::is_reschedule_pending`
+  (the Cortex-M and the POSIX ports do).
+
 ## 2026-11-21
 
 * **Behaviour change:** 445513d3 C API `os_timer_construct()` and

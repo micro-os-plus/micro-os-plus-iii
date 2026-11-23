@@ -60,6 +60,12 @@ namespace os
        */
       bool is_started_ = false;
 
+      /**
+       * @details
+       * Set by the port when a context switch is requested while the
+       * scheduler is locked (and, on Cortex-M, while PendSV is pending);
+       * the switch is then performed when the scheduler is unlocked.
+       */
       bool is_reschedule_pending = false;
 
 #if 0
@@ -222,6 +228,10 @@ namespace os
         is_preemptive_ = OS_BOOL_RTOS_SCHEDULER_PREEMPTIVE;
 #endif /* defined(OS_USE_RTOS_PORT_SCHEDULER) */
 
+        // Requests made before the start are meaningless; the port
+        // start performs the first context switch.
+        is_reschedule_pending = false;
+
         is_started_ = true;
 
         port::scheduler::start ();
@@ -341,6 +351,28 @@ namespace os
        *
        * @warning Cannot be invoked from Interrupt Service Routines.
        */
+      namespace
+      {
+        // A context switch requested while the scheduler was locked was
+        // deferred by the port (see `port::scheduler::reschedule()`);
+        // perform it now, if the scheduler is started and no longer
+        // locked.
+        // Read the flag after the new lock state was stored: a request
+        // made just before is seen here, one made just after finds the
+        // scheduler unlocked and is performed by the port at once.
+        inline void
+        internal_reschedule_if_pending_ (void)
+        {
+#if !defined(OS_USE_RTOS_PORT_SCHEDULER)
+          if (is_started_ && !port::scheduler::locked ()
+              && is_reschedule_pending)
+            {
+              port::scheduler::reschedule ();
+            }
+#endif
+        }
+      } // namespace
+
       state_t
       lock (void)
       {
@@ -361,6 +393,7 @@ namespace os
       {
         state_t state = port::scheduler::unlock ();
         instrumentation::scheduler::unlock (locked ());
+        internal_reschedule_if_pending_ ();
         return state;
       }
 
@@ -380,6 +413,7 @@ namespace os
       {
         state_t out_state = port::scheduler::locked (state);
         instrumentation::scheduler::locked_set (locked ());
+        internal_reschedule_if_pending_ ();
         return out_state;
       }
 

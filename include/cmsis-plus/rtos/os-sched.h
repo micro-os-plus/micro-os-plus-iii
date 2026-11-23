@@ -51,6 +51,8 @@ namespace os
        */
       extern bool is_started_;
 
+      // A context switch was requested while the scheduler was locked;
+      // performed when it is unlocked.
       extern bool is_reschedule_pending;
 
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
