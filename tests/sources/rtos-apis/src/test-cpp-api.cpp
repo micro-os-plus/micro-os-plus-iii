@@ -2288,6 +2288,75 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  printf ("\n%s - Clocks\n", test_name);
+
+  {
+    // The high resolution clock must be monotonic, also when read in a
+    // critical section while the tick interrupt is held pending (the
+    // counter wrapped, but the tick was not yet accounted). Only one
+    // wrap can be detected by the hardware, so each round keeps the
+    // critical section for less than one tick: a tick already pending
+    // when the round starts (delayed by the interrupt latency) has just
+    // wrapped, so no second wrap can follow within the round.
+    const clock::timestamp_t cycles_per_tick
+        = hrclock.input_clock_frequency_hz ()
+          / OS_INTEGER_SYSTICK_FREQUENCY_HZ;
+    uint32_t backwards = 0;
+    uint32_t crossed = 0;
+    for (int round = 0; round < 20; ++round)
+      {
+        clock::timestamp_t ticks_before = sysclock.now ();
+        {
+          // ----- Enter critical section -------------------------------------
+          interrupts::critical_section ics;
+
+          clock::timestamp_t begin = hrclock.now ();
+          clock::timestamp_t prev = begin;
+          // The iterations limit ends the round if the clock is broken.
+          for (uint32_t i = 0; i < 2000000; ++i)
+            {
+              clock::timestamp_t now = hrclock.now ();
+              if (now < prev)
+                {
+                  ++backwards;
+                  break;
+                }
+              prev = now;
+              if (now - begin >= (cycles_per_tick * 3) / 4)
+                {
+                  break;
+                }
+            }
+          // ----- Exit critical section --------------------------------------
+        }
+        // The pending tick is processed here; a round exercises the
+        // case only if a tick occurred while it was masked.
+        if (sysclock.now () != ticks_before)
+          {
+            ++crossed;
+          }
+      }
+
+    if (backwards != 0)
+      {
+        printf ("%s - hrclock went backwards %u times\n", test_name,
+                static_cast<unsigned int> (backwards));
+        return 1;
+      }
+    if (crossed == 0)
+      {
+        printf ("%s - hrclock monotonic, but no tick was held pending\n",
+                test_name);
+      }
+    else
+      {
+        printf ("%s - hrclock monotonic ok (%u rounds over a tick)\n",
+                test_name, static_cast<unsigned int> (crossed));
+      }
+  }
+
+  // ==========================================================================
+
   if (test_pending_interrupt (test_name) != 0)
     {
       return 1;
