@@ -31,13 +31,15 @@ extern "C"
     /******  Cortex-M4 Processor Exceptions Numbers
      ****************************************************************/
     NonMaskableInt_IRQn = -14, /*!< 2 Non Maskable Interrupt */
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, ...).
+#if (__ARM_ARCH_ISA_THUMB == 2)
     MemoryManagement_IRQn = -12, /*!< 4 Memory Management Interrupt */
     BusFault_IRQn = -11, /*!< 5 Bus Fault Interrupt */
     UsageFault_IRQn = -10, /*!< 6 Usage Fault Interrupt */
 #endif
     SVCall_IRQn = -5, /*!< 11 SV Call Interrupt */
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, ...).
+#if (__ARM_ARCH_ISA_THUMB == 2)
     DebugMonitor_IRQn = -4, /*!< 12 Debug Monitor Interrupt */
 #endif
     PendSV_IRQn = -2, /*!< 14 Pend SV Interrupt */

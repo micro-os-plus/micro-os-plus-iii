@@ -18,14 +18,16 @@
 
 #define OS_INTEGER_SYSTICK_FREQUENCY_HZ (1000)
 
-#if defined(__ARM_EABI__)
+// Cortex-M.
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
 
 // With 4 bits NVIC, there are 16 levels, 0 = highest, 15 = lowest
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Mainline (v7-M, v7E-M, v8-M Main, v8.1-M) has BASEPRI.
+#if (__ARM_ARCH_ISA_THUMB == 2)
 // Disable all interrupts from 15 to 4, keep 3-2-1 enabled
 #define OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY (4)
-#endif // defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+#endif // (__ARM_ARCH_ISA_THUMB == 2)
 
 #define OS_INTEGER_RTOS_MAIN_STACK_SIZE_BYTES (4000)
 
@@ -81,7 +83,9 @@
 // #define OS_TRACE_LIBCPP_OPERATOR_NEW
 // #define OS_TRACE_LIBCPP_MEMORY_RESOURCE
 
-#if !defined(__ARM_EABI__) || defined(OS_USE_TRACE_SEGGER_RTT)
+// Too verbose for semihosting; on Cortex-M only with the RTT trace.
+#if !(defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')) \
+    || defined(OS_USE_TRACE_SEGGER_RTT)
 // #define OS_TRACE_RTOS_LISTS
 // #define OS_TRACE_RTOS_LISTS_CLOCKS
 // #define OS_TRACE_RTOS_THREAD_CONTEXT

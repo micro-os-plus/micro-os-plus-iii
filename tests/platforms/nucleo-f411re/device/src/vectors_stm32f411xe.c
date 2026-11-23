@@ -181,7 +181,8 @@ handler_ptr_t _interrupt_vectors[] =
     NMI_Handler,                       // The NMI handler
     HardFault_Handler,                 // The hard fault handler
 
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, ...).
+#if (__ARM_ARCH_ISA_THUMB == 2)
     MemManage_Handler,                 // The MPU fault handler
     BusFault_Handler,                  // The bus fault handler
     UsageFault_Handler,                // The usage fault handler
@@ -195,7 +196,8 @@ handler_ptr_t _interrupt_vectors[] =
     0,                                 // Reserved
     0,                                 // Reserved
     SVC_Handler,                       // SVCall handler
-#if defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
+// Mainline: v7-M, v7E-M, v8-M Main, v8.1-M (M3, M4, M7, M33, ...).
+#if (__ARM_ARCH_ISA_THUMB == 2)
     DebugMon_Handler,                  // Debug monitor handler
 #else
     0,                                 // Reserved

@@ -26,7 +26,8 @@
 using namespace os;
 using namespace os::rtos;
 
-#if defined(__ARM_EABI__)
+// Bare-metal: the RTOS high resolution clock; native: the host time.
+#if defined(OS_IS_CROSS_BUILD)
 
 void
 busy_wait (unsigned int micros)
