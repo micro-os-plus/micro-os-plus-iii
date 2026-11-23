@@ -581,6 +581,23 @@
 #define OS_DISABLE_CORTEXM_SET_MSP_VIA_VTOR
 
 /**
+ * @brief Disable the Cortex-M7 r0p1 erratum 837070 workaround.
+ *
+ * @details
+ * On Cortex-M7 r0p1, a write that raises BASEPRI may not take effect
+ * immediately, so an interrupt that should be masked can still be taken
+ * right after it (Arm erratum 837070). When the critical sections use
+ * BASEPRI (`OS_INTEGER_RTOS_CRITICAL_SECTION_INTERRUPT_PRIORITY`),
+ * the Cortex-M port raises BASEPRI with interrupts disabled, as
+ * recommended by Arm, on all Cortex-M7 builds.
+ *
+ * Devices with a Cortex-M7 r1p0 or later (for example STM32F76x/F77x
+ * and STM32H7) are not affected and may define this macro to avoid the
+ * few extra instructions in each critical section.
+ */
+#define OS_DISABLE_CORTEXM7_ERRATUM_837070_WORKAROUND
+
+/**
  * @}
  */
 
