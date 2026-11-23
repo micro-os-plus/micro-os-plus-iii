@@ -271,7 +271,9 @@ unrelated code.
     v8-M Base) with `__ARM_ARCH_ISA_THUMB == 2`/`== 1`, not with lists
     of `__ARM_ARCH_7M__`-style macros (clang names Armv8.1-M
     `__ARM_ARCH_8_1M_MAIN__`), and put a comment listing the matched
-    architectures before such tests;
+    architectures before such tests; use the ACLE version
+    `__ARM_ARCH` (6, 7, 8) only to exclude versions not yet supported,
+    in one central check (as the Cortex-M port does for Armv8-M);
   - keep architecture-specific lines small and isolated. The AArch32,
     AArch64 and RISC-V ports are not implemented yet; where code needs
     an architecture-specific implementation, use an explicit
