@@ -569,13 +569,14 @@
  * @brief Disable setting MSP during startup.
  *
  * @details
- * On Cortex-M, during startup, the MSP register is set to the stack
- * pointer available in the first word pointed by VTOR.
- * Some platforms run custom firmware (like Nordic's soft radio)
- * that take control of VTOR and set it to a location which does
- * point to the valid interrupt stack. It is perfectly acceptable
- * to not reset MSP, and leave it to the location where it reached
- * before switching to PSP, just that some stack space is wasted.
+ * On Cortex-M, when the scheduler starts, the MSP register is reset
+ * to `__stack`, the top of the interrupt stack defined by the linker
+ * script (the value also stored in the first word of the vector table).
+ * Previously it was read from the first word pointed by VTOR (or from
+ * address 0 on Armv6-M), hence the name.
+ * If the platform requires a different interrupt stack, it is perfectly
+ * acceptable to not reset MSP, and leave it to the location where it
+ * reached before switching to PSP, just that some stack space is wasted.
  */
 #define OS_DISABLE_CORTEXM_SET_MSP_VIA_VTOR
 

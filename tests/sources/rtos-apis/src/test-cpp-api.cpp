@@ -61,6 +61,9 @@ namespace
   bool volatile nmi_priority_valid;
 } // namespace
 
+// The top of the interrupt stack, from the linker script.
+extern "C" unsigned int __stack;
+
 extern "C" void
 NMI_Handler (void);
 
@@ -2529,6 +2532,23 @@ test_cpp_api (void)
       }
     printf ("%s - system calls not valid from NMI ok\n", test_name);
   }
+
+#if !defined(OS_DISABLE_CORTEXM_SET_MSP_VIA_VTOR)
+  {
+    // In Thread mode no handler is active, so MSP is at the base of
+    // the interrupt stack, set by the scheduler start.
+    uint32_t msp = __get_MSP ();
+    if (msp != reinterpret_cast<uint32_t> (&__stack))
+      {
+        printf (
+            "%s - MSP %08X, __stack %08X\n", test_name,
+            static_cast<unsigned int> (msp),
+            static_cast<unsigned int> (reinterpret_cast<uint32_t> (&__stack)));
+        return 1;
+      }
+    printf ("%s - interrupt stack at __stack ok\n", test_name);
+  }
+#endif
 
 #endif
 
