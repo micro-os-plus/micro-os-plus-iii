@@ -49,6 +49,49 @@ using namespace os::rtos;
 
 static const char* test_name = "Test C++ API";
 
+// ----------------------------------------------------------------------------
+
+namespace
+{
+  // A thread created by a static constructor, before the scheduler is
+  // started (with interrupts already enabled by the startup code); it
+  // must only become ready, and run after the scheduler is started.
+  // Its stack is inside the object, so it does not use the heap for the
+  // whole program.
+  bool volatile static_thread_ran;
+  bool volatile static_thread_ran_started;
+
+  void*
+  static_thread_func (void* args __attribute__ ((unused)))
+  {
+    static_thread_ran_started = scheduler::started ();
+    static_thread_ran = true;
+    return nullptr;
+  }
+
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wexit-time-destructors"
+#pragma clang diagnostic ignored "-Wglobal-constructors"
+#endif
+  thread_inclusive<OS_INTEGER_RTOS_DEFAULT_STACK_SIZE_BYTES> static_thread{
+    "th-static", static_thread_func, nullptr
+  };
+
+  // A static constructor which, like many others could, wakes the thread
+  // (resume() requests a context switch outside a scheduler critical
+  // section), still before the scheduler is started.
+  struct static_thread_waker
+  {
+    static_thread_waker ()
+    {
+      static_thread.flags_raise (0x1);
+    }
+  };
+  static_thread_waker static_waker;
+#pragma GCC diagnostic pop
+} // namespace
+
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wpadded"
@@ -864,6 +907,20 @@ test_cpp_api (void)
 
   printf ("\n%s - Threads\n", test_name);
   // fflush(stdout);
+
+  {
+    // The thread created by a static constructor.
+    static_thread.join ();
+    if (!static_thread_ran || !static_thread_ran_started)
+      {
+        printf ("%s - thread created by a static constructor ran %s the "
+                "scheduler was started\n",
+                test_name,
+                static_thread_ran ? "before" : "neither before nor after");
+        return 1;
+      }
+    printf ("%s - thread created by a static constructor ok\n", test_name);
+  }
 
   {
     // Static threads with allocated stacks.
