@@ -51,6 +51,31 @@ static const char* test_name = "Test C++ API";
 
 // ----------------------------------------------------------------------------
 
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
+
+// Cortex-M only: system calls are never valid from NMI (fixed priority,
+// not masked by the RTOS critical sections); record what the port says.
+namespace
+{
+  bool volatile nmi_taken;
+  bool volatile nmi_priority_valid;
+} // namespace
+
+extern "C" void
+NMI_Handler (void);
+
+// Overrides the weak default.
+extern "C" void
+NMI_Handler (void)
+{
+  nmi_priority_valid = port::interrupts::is_priority_valid ();
+  nmi_taken = true;
+}
+
+#endif
+
+// ----------------------------------------------------------------------------
+
 namespace
 {
   // A thread created by a static constructor, before the scheduler is
@@ -2480,6 +2505,32 @@ test_cpp_api (void)
 
     printf ("%s - deferred context switch at unlock ok\n", test_name);
   }
+
+  // ==========================================================================
+
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')
+
+  printf ("\n%s - Interrupt priorities\n", test_name);
+
+  {
+    // Pend NMI (ICSR.NMIPENDSET, bit 31); the handler records whether
+    // the port considers system calls valid from it.
+    volatile uint32_t* const icsr
+        = reinterpret_cast<volatile uint32_t*> (0xE000ED04);
+    *icsr = (1UL << 31);
+    __asm__ volatile ("dsb\n isb" ::: "memory");
+
+    if (!nmi_taken || nmi_priority_valid)
+      {
+        printf ("%s - NMI %s, is_priority_valid() %s\n", test_name,
+                nmi_taken ? "taken" : "not taken",
+                nmi_priority_valid ? "true" : "false");
+        return 1;
+      }
+    printf ("%s - system calls not valid from NMI ok\n", test_name);
+  }
+
+#endif
 
   // ==========================================================================
 
