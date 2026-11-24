@@ -10,14 +10,16 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "del-cli": "^5.0.0"
+    "del-cli": "^8.0.1"
   },
   "scripts": {
+    "npm-ci": "npm ci",
     "npm-install": "npm install",
+    "npm-outdated": "npm outdated",
     "deep-clean": "del-cli build node_modules xpacks package-json.json"
   },
   "xpack": {
-    "minimumXpmRequired": "0.20.8",
+    "minimumXpmRequired": "0.23.2",
     "dependencies": {},
     "$devDependenciesUrls": [
       "https://github.com/micro-os-plus",
@@ -27,21 +29,9 @@
     "devDependencies": {
       "@xpack-dev-tools/cmake": "3.26.5-1.1",
       "@xpack-dev-tools/ninja-build": "1.11.1-3.1",
-      "@micro-os-plus/build-helper": {
-        "specifier": "^2.17.0",
-        "local": "link",
-        "platforms": "all"
-      },
-      "@xpacks/arm-cmsis-rtos-validator": {
-        "specifier": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-4",
-        "local": "link",
-        "platforms": "all"
-      },
-      "@xpacks/chan-fatfs": {
-        "specifier": "github:xpacks/chan-fatfs#v0.13.1-5",
-        "local": "link",
-        "platforms": "all"
-      }
+      "@micro-os-plus/build-helper":  "^2.17.0",
+      "@xpacks/arm-cmsis-rtos-validator": "github:xpacks/arm-cmsis-rtos-validator#v1.0.0-4",
+      "@xpacks/chan-fatfs": "github:xpacks/chan-fatfs#v0.13.1-5"
     },
     "properties": {
       "buildFolderRelativePath": "{{ 'build' | path_join: configuration.name | to_filename | downcase }}",
@@ -55,7 +45,6 @@
       "commandCMakePerformTests": "cd {{ properties.buildFolderRelativePath }} && ctest -V"
     },
     "actions": {
-      "deep-clean": "del-cli build node_modules xpacks package-lock.json",
       "git-clone-deps": [
         "rm -rf ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "git clone --branch xpack-development https://github.com/micro-os-plus/build-helper-xpack.git ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
@@ -102,7 +91,7 @@
         "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git pull",
         "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git pull"
       ],
-      "xpm-link-deps": [
+      "xpm-link-dependencies": [
         "xpm link -C ${HOME}/Work/micro-os-plus/build-helper-xpack.git",
         "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-posix-arch.git",
         "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
@@ -112,7 +101,7 @@
         "xpm link -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
         "xpm link -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git"
       ],
-      "xpm-link-deps-ilg": [
+      "xpm-link-dependencies-ilg": [
         "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/xPacks/build-helper-xpack.git",
         "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii-posix-arch.git",
         "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii-cortexm.git",
@@ -122,31 +111,47 @@
       ],
       "install": [
         "xpm install",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm install --config native-cmake-sys-debug",
+        "xpm install --config native-cmake-sys-release"
       ],
       "link-helper": [
         "xpm link @micro-os-plus/build-helper"
       ],
-      "link-deps": [
+      "link-dependencies": [
         "xpm link @xpacks/arm-cmsis-rtos-validator",
-        "xpm link @xpacks/chan-fatfs"
+        "xpm link @xpacks/chan-fatfs",
+        "xpm run link-dependencies --config native-cmake-sys-debug",
+        "xpm run link-dependencies --config native-cmake-sys-release"
       ],
       "test": [
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run test-native-cmake-sys"
       ],
+
       "install-ci": [
         "xpm install",
         "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-debug{% endif %}",
         "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-release{% endif %}",
         "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-debug{% endif %}",
-        "{% if os.platform == 'linux' or os.platform == 'darwin'%}xpm install --config native-cmake-clang-release{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-release{% endif %}",
         "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m0-cmake-gcc-release",
         "xpm install --config qemu-cortex-m3-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m3-cmake-gcc-release",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+     "link-dependencies-ci": [
+        "xpm run link-dependencies",
+        "{% if os.platform == 'linux' %}xpm run link-dependencies --config native-cmake-gcc-debug{% endif %}",
+        "{% if os.platform == 'linux' %}xpm run link-dependencies --config native-cmake-gcc-release{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run link-dependencies --config native-cmake-clang-debug{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run link-dependencies --config native-cmake-clang-release{% endif %}",
+        "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release"
       ],
       "test-ci": [
         "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
@@ -155,6 +160,71 @@
         "xpm run test-qemu-cortex-m3-cmake",
         "xpm run test-qemu-cortex-m7f-cmake"
       ],
+
+      "install-selected": [
+        "xpm install",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-debug{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-release{% endif %}",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+     "link-dependencies-selected": [
+        "xpm run link-dependencies",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run link-dependencies --config native-cmake-clang-debug{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run link-dependencies --config native-cmake-clang-release{% endif %}",
+        "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+      "test-selected": [
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
+        "xpm run test-qemu-cortex-m0-cmake",
+        "xpm run test-qemu-cortex-m7f-cmake"
+      ],
+
+      "install-latest": [
+        "xpm install",
+        "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-debug{% endif %}",
+        "{% if os.platform == 'linux' %}xpm install --config native-cmake-gcc-release{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-debug{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm install --config native-cmake-clang-release{% endif %}",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+     "link-dependencies-latest": [
+        "xpm run link-dependencies",
+        "{% if os.platform == 'linux' %}xpm run link-dependencies --config native-cmake-gcc-debug{% endif %}",
+        "{% if os.platform == 'linux' %}xpm run link-dependencies --config native-cmake-gcc-release{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run link-dependencies --config native-cmake-clang-debug{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run link-dependencies --config native-cmake-clang-release{% endif %}",
+        "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+      "test-latest": [
+        "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
+        "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
+        "xpm run test-qemu-cortex-m0-cmake",
+        "xpm run test-qemu-cortex-m3-cmake",
+        "xpm run test-qemu-cortex-m4f-cmake",
+        "xpm run test-qemu-cortex-m7f-cmake"
+      ],
+
+
       "install-qemu-cortex-latest": [
         "xpm install",
         "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
@@ -172,65 +242,24 @@
         "xpm run test-qemu-cortex-m4f-cmake",
         "xpm run test-qemu-cortex-m7f-cmake"
       ],
+
       "install-all": [
         "npm install",
         "xpm install --all-configs"
       ],
-      "link-deps-all": [
-        "xpm run link-deps",
-        "xpm run link-deps --config native-cmake-sys-debug",
-        "xpm run link-deps --config native-cmake-sys-release",
-        "xpm run link-deps --config native-cmake-gcc-debug",
-        "xpm run link-deps --config native-cmake-gcc-release",
-        "xpm run link-deps --config native-cmake-gcc11-debug",
-        "xpm run link-deps --config native-cmake-gcc11-release",
-        "xpm run link-deps --config native-cmake-gcc12-debug",
-        "xpm run link-deps --config native-cmake-gcc12-release",
-        "xpm run link-deps --config native-cmake-gcc13-debug",
-        "xpm run link-deps --config native-cmake-gcc13-release",
-        "xpm run link-deps --config native-cmake-gcc14-debug",
-        "xpm run link-deps --config native-cmake-gcc14-release",
-        "xpm run link-deps --config native-cmake-clang-debug",
-        "xpm run link-deps --config native-cmake-clang-release",
-        "xpm run link-deps --config native-cmake-clang13-debug",
-        "xpm run link-deps --config native-cmake-clang13-release",
-        "xpm run link-deps --config native-cmake-clang14-debug",
-        "xpm run link-deps --config native-cmake-clang14-release",
-        "xpm run link-deps --config native-cmake-clang15-debug",
-        "xpm run link-deps --config native-cmake-clang15-release",
-        "xpm run link-deps --config native-cmake-clang16-debug",
-        "xpm run link-deps --config native-cmake-clang16-release",
-        "xpm run link-deps --config native-cmake-clang17-debug",
-        "xpm run link-deps --config native-cmake-clang17-release",
-        "xpm run link-deps --config native-cmake-clang18-debug",
-        "xpm run link-deps --config native-cmake-clang18-release",
-        "xpm run link-deps --config native-cmake-clang19-debug",
-        "xpm run link-deps --config native-cmake-clang19-release",
-        "xpm run link-deps --config qemu-cortex-m0-cmake-gcc-debug",
-        "xpm run link-deps --config qemu-cortex-m0-cmake-gcc-release",
-        "xpm run link-deps --config qemu-cortex-m3-cmake-gcc-debug",
-        "xpm run link-deps --config qemu-cortex-m3-cmake-gcc-release",
-        "xpm run link-deps --config qemu-cortex-m4f-cmake-gcc-debug",
-        "xpm run link-deps --config qemu-cortex-m4f-cmake-gcc-release",
-        "xpm run link-deps --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm run link-deps --config qemu-cortex-m7f-cmake-gcc-release",
-        "xpm run link-deps --config raspberrypi-pico-cmake-gcc-debug",
-        "xpm run link-deps --config raspberrypi-pico-cmake-gcc-release",
-        "xpm run link-deps --config nucleo-f411re-cmake-gcc-debug",
-        "xpm run link-deps --config nucleo-f411re-cmake-gcc-release",
-        "xpm run link-deps --config nucleo-f767zi-cmake-gcc-debug",
-        "xpm run link-deps --config nucleo-f767zi-cmake-gcc-release",
-        "xpm run link-deps --config nucleo-h743zi-cmake-gcc-debug",
-        "xpm run link-deps --config nucleo-h743zi-cmake-gcc-release"
+      "link-dependencies-all": [
+        "xpm run link-dependencies",
+        "xpm run link-dependencies --all-configs --ignore-errors"
       ],
       "test-all": [
-        "{% if os.platform != 'win32' %}xpm run test-native-cmake{% endif %}",
+        "{% if os.platform != 'win32' %}xpm run test-native-cmake-all{% endif %}",
         "xpm run test-cortex-cmake"
       ],
       "clean-all": [
         "xpm run clean --all-configs --ignore-errors"
       ],
-      "test-native-cmake": [
+
+      "test-native-cmake-all": [
         "{% if os.platform == 'darwin' %}xpm run test-native-cmake-sys{% endif %}",
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc11{% endif %}",
         "{% if os.platform != 'darwin' %}xpm run test-native-cmake-gcc12{% endif %}",
@@ -248,9 +277,9 @@
         "xpm install --config native-cmake-sys-debug",
         "xpm install --config native-cmake-sys-release"
       ],
-      "link-deps-native-cmake-sys": [
-        "xpm run link-deps --config native-cmake-sys-debug",
-        "xpm run link-deps --config native-cmake-sys-release"
+      "link-dependencies-native-cmake-sys": [
+        "xpm run link-dependencies --config native-cmake-sys-debug",
+        "xpm run link-dependencies --config native-cmake-sys-release"
       ],
       "test-native-cmake-sys": [
         "xpm run prepare --config native-cmake-sys-debug",
@@ -498,7 +527,7 @@
           "install": [
             "xpm install --config {{ configuration.name }}"
           ],
-          "link-deps": [
+          "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
             "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}"
           ]
@@ -510,7 +539,7 @@
           "install": [
             "xpm install --config {{ configuration.name }}"
           ],
-          "link-deps": [
+          "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
             "xpm link @xpacks/arm-cmsis --config {{ configuration.name }}"
           ]
@@ -1102,7 +1131,7 @@
           }
         },
         "actions": {
-          "link-deps": [
+          "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
             "xpm link @xpack-3rd-party/raspberrypi-pico-sdk --config {{ configuration.name }}"
           ]
@@ -1133,7 +1162,7 @@
           "shortConfigurationName": "nf4d"
         },
         "actions": {
-          "link-deps": [
+          "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm @xpack-segger/rtt @xpack-segger/system-view --config {{ configuration.name }}"
           ]
         },
@@ -1175,7 +1204,7 @@
           "shortConfigurationName": "nf7d"
         },
         "actions": {
-          "link-deps": [
+          "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
           ]
         }
@@ -1205,7 +1234,7 @@
           "shortConfigurationName": "nh7d"
         },
         "actions": {
-          "link-deps": [
+          "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
           ]
         }
