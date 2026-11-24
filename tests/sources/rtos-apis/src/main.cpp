@@ -104,7 +104,7 @@ os_main (int argc __attribute__ ((unused)),
     }
 #endif
 
-  printf ("done\n");
+  printf ("done %d\n", ret);
   // fflush(stdout);
   return ret;
 }

@@ -54,7 +54,7 @@ os_main (int argc __attribute__ ((unused)),
       errno = 0;
     }
 
-  printf ("done\n");
+  printf ("done %d\n", ret);
   return ret;
 }
 
