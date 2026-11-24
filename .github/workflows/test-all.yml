@@ -1,7 +1,9 @@
 # -----------------------------------------------------------------------------
+# DO NOT EDIT! Automatically generated from template file:
+# npm-packages-helper/templates/common/.github/workflows/_micro-os-plus/test-all-liquid.yml
 #
 # This file is part of the µOS++ project (http://micro-os-plus.github.io).
-# Copyright (c) 2021-2025 Liviu Ionescu. All rights reserved.
+# Copyright (c) 2021-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -11,28 +13,29 @@
 #
 # -----------------------------------------------------------------------------
 
-# https://help.github.com/en/actions
-# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-# https://github.com/actions
+# https://micro-os-plus.github.io/micro-os-plus-iii/
+# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-ci.yml
 
-# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-all.yml
-name: Test All (manual)
+# Workflow for running all tests.
+name: Run all tests
+
+# https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
 
 on:
-  # Run only when manually triggered from the Actions tab.
-  # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_dispatch
+  # Runs on manual triggering.
   workflow_dispatch:
 
-# Allow one concurrent deployment.
+# Allow one concurrent run.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
-  group: "tests-all-${{ github.ref_name }}"
+  group: 'test-all'
   # A new manual trigger cancels the older run.
   cancel-in-progress: true
 
 jobs:
   ci-test:
-    name: "All µOS++ IIIe tests"
+    name: 'All µOS++ IIIe tests'
 
     runs-on: ${{ matrix.os }}
 
@@ -40,38 +43,42 @@ jobs:
       # Run all platforms to completion, even if one fails.
       fail-fast: false
       matrix:
-        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-        # macos-13 is x64, macos-15 is arm64.
+        # https://github.com/actions/runner-images
         os:
           [
-            "ubuntu-24.04",
-            "ubuntu-22.04",
-            "ubuntu-24.04-arm",
-            "ubuntu-22.04-arm",
-            "macos-15-intel",
-            "macos-15",
-            "windows-2025",
-            "windows-2022",
+            'ubuntu-26.04',
+            'ubuntu-24.04',
+            'ubuntu-22.04',
+            'ubuntu-26.04-arm',
+            'ubuntu-24.04-arm',
+            'ubuntu-22.04-arm',
+            'macos-26-intel',
+            'macos-15-intel',
+            'macos-26',
+            'macos-15',
+            'windows-2025',
+            'windows-2022'
           ]
+        # https://nodejs.org/en - use LTS
+        node-version: ['24']
+        # https://www.npmjs.com/package/xpm
+        xpm-version: ['0.23.2']
 
     steps:
       - name: Checkout
         # https://github.com/actions/checkout/
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 3
 
-      - name: Setup Node.js on ${{ matrix.os }}
-        # https://github.com/actions/setup-node/
-        uses: actions/setup-node@v7.0.0
+      - name: Setup Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+        # https://github.com/actions/setup-node
+        uses: actions/setup-node@v7.1.0
         with:
-          # https://nodejs.org/en - use LTS
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
 
-      - name: Install xpm on ${{ matrix.os }}
-        run: |
-          # https://www.npmjs.com/package/xpm
-          npm install -g xpm@0.20.8
+      - name: Install xpm@${{ matrix.xpm-version }} on ${{ matrix.os }}
+        run: npm install -g xpm@${{ matrix.xpm-version }}
 
       - name: Show environment
         run: |
@@ -82,12 +89,36 @@ jobs:
           xpm --version
           env | sort
 
+      - name: Clean xPack cache Linux
+        if: runner.os == 'Linux'
+        run: |
+          rm -rf "${HOME}/.cache/xPacks"
+
+      - name: Clean xPack cache macOS
+        if: runner.os == 'macOS'
+        run: |
+          rm -rf "${HOME}/Library/Caches/xPacks"
+
+      - name: Clean xPack cache Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $cachePath = "$env:LOCALAPPDATA\Caches\xPacks"
+          if (Test-Path -LiteralPath $cachePath) {
+            Remove-Item -LiteralPath $cachePath -Force -Recurse -ErrorAction SilentlyContinue
+          }
+
       - name: Satisfy project dependencies on ${{ matrix.os }}
         run: |
+          npm ci
           npm --prefix tests ci
+          xpm install -C tests
+
+      - name: Satisfy platforms dependencies on ${{ matrix.os }}
+        run: |
           xpm run install-all -C tests
 
-      - name: Run tests on ${{ matrix.os }}
+      - name: Run platforms tests on ${{ matrix.os }}
         run: xpm run test-all -C tests
         env:
           CI: true

@@ -1,0 +1,20 @@
+{
+  "descriptiveName": "µOS++ IIIe",
+  "permalinkName": "micro-os-plus",
+  "preferredName": "µOS++ IIIe",
+  "githubActionsNodeVersions": [
+    "24"
+  ],
+  "githubActionsOses": [
+    "ubuntu-26.04",
+    "ubuntu-26.04-arm",
+    "macos-26-intel",
+    "macos-26",
+    "windows-2025"
+  ],
+  "githubActionsXpmVersions": [
+    "0.23.2"
+  ],
+  "hasTestAll": true,
+  "useSelfHostedRunners": false
+}

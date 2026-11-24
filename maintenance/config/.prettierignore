@@ -1,12 +1,11 @@
-# DO NOT EDIT!
-# Automatically generated from npm-packages-helper/templates/*.
+# DO NOT EDIT! Automatically generated from template file:
+# npm-packages-helper/templates/common/maintenance/config/.prettierignore-liquid
 
 # Ignore artifacts:
 build
 coverage
 dist
 bin
-maintenance-scripts
 templates
 
 # Ignore Liquid template files.

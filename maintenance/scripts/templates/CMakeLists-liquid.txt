@@ -1,0 +1,528 @@
+{%- assign packageScope = package.name | remove_first: '@' | split: '/' | first %}
+{%- assign packageName = package.name | remove_first: '@' | split: '/' | last -%}
+# -----------------------------------------------------------------------------
+# DO NOT EDIT! Automatically generated from template file:
+# {{libraryFilePath}}
+#
+# This file is part of the µOS++ project (https://micro-os-plus.github.io/).
+# Copyright (c) 2021-{{currentYear}} Liviu Ionescu. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose is hereby granted, under the terms of the MIT license.
+#
+# If a copy of the license was not distributed with this file, it can be
+# obtained from https://opensource.org/licenses/mit.
+#
+# -----------------------------------------------------------------------------
+
+# This file is intended to be used by applications via:
+#
+# `add_subdirectory("xpacks/@{{packageScope}}/{{packageName}}")`
+#
+# This creates libraries that can be linked to a target with:
+#
+# ~~~
+{%- for component in xcdl.cdlComponents %}
+{%- assign nameDash = component.id | replace: '.', '-' %}
+{%- assign nameDoubleColon = component.id | replace_first: '.', '::' | replace: '.', '-' %}
+{%- assign staticArtefacts = component.cdlArtefacts | where: 'type', 'staticLibrary' %}
+{%- assign staticArtefact = staticArtefacts | first %}
+{%- assign staticSuffix = staticArtefact.id %}
+{%- assign objectsArtefacts = component.cdlArtefacts | where: 'type', 'objectFiles' %}
+{%- assign objectsArtefact = objectsArtefacts | first %}
+{%- assign objectsSuffix = objectsArtefact.id %}
+# target_link_libraries(your-target PUBLIC {{nameDoubleColon}})
+{%- if staticArtefact %}
+# target_link_libraries(your-target PUBLIC {{nameDoubleColon}}-{{staticSuffix}})
+{%- endif %}
+{%- if objectsArtefact %}
+# target_link_libraries(your-target PUBLIC {{nameDoubleColon}}-{{objectsSuffix}})
+{%- endif %}
+{%- endfor %}
+# ~~~
+
+# -----------------------------------------------------------------------------
+
+# https://cmake.org/cmake/help/v3.20/
+cmake_minimum_required (VERSION 3.20)
+project (
+  {{packageScope}}-{{packageName}}
+  DESCRIPTION "{{package.description}}"
+  LANGUAGES C CXX ASM
+)
+
+# To access the optional functions, include the
+# `cmake/micro-os-plus-build-helper.cmake` file from the
+# `@micro-os-plus/build-helper` package.
+
+if (COMMAND xpack_get_package_name_and_version)
+  xpack_get_package_name_and_version (
+    "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
+  )
+  message (VERBOSE
+           "Processing xpm package ${PACKAGE_JSON_NAME}@${PACKAGE_JSON_VERSION}..."
+  )
+endif ()
+
+# -----------------------------------------------------------------------------
+
+# Interface libraries are the main targets, which consumers (like embedded
+# applications) link against. It defines the public API and properties of the
+# library; sources are propagated to and compiled by each consumer.
+
+# They are aliased using namespaced syntax (Project::Target). This is the
+# canonical pattern for consumption via target_link_libraries(), whether the
+# dependency is added via add_subdirectory(), FetchContent, or an installed
+# package via find_package(). Using "::" lets CMake detect an invalid or
+# misspelled target name at configure time, rather than silently passing it
+# through to the linker as a plain string or flag. Note: alias targets are
+# read-only; properties must be set on the underlying target, not on the alias
+# itself.
+
+{% for component in xcdl.cdlComponents %}
+{%- assign nameDash = component.id | replace: '.', '-' %}
+{%- assign nameDoubleColon = component.id | replace_first: '.', '::' | replace: '.', '-' %}
+{%- assign aliasDoubleColon = component.alias | replace_first: '.', '::' | replace: '.', '-' %}
+{%- assign staticArtefacts = component.cdlArtefacts | where: 'type', 'staticLibrary' %}
+{%- assign staticArtefact = staticArtefacts | first %}
+{%- assign staticSuffix = staticArtefact.id %}
+{%- assign objectsArtefacts = component.cdlArtefacts | where: 'type', 'objectFiles' %}
+{%- assign objectsArtefact = objectsArtefacts | first %}
+{%- assign objectsSuffix = objectsArtefact.id %}
+{%- comment %}
+  The compiler options are maps of categories, each with an array of strings.
+  Flatten them in a fixed category order. The `remove` category is not
+  additive. The `linker` category is collected separately, since it goes to
+  the link options.
+{%- endcomment %}
+{%- assign optionCategories = "target,optimisations,warnings,debugging,miscellaneous" | split: "," %}
+{%- assign publicOptions = "" | split: "" %}
+{%- assign privateOptions = "" | split: "" %}
+{%- assign publicLinkerOptions = "" | split: "" %}
+{%- assign privateLinkerOptions = "" | split: "" %}
+{%- if component.publicCompilerOptions.linker and component.publicCompilerOptions.linker.size > 0 %}
+  {%- assign publicLinkerOptions = component.publicCompilerOptions.linker %}
+{%- endif %}
+{%- if component.privateCompilerOptions.linker and component.privateCompilerOptions.linker.size > 0 %}
+  {%- assign privateLinkerOptions = component.privateCompilerOptions.linker %}
+{%- endif %}
+{%- for category in optionCategories %}
+  {%- assign categoryOptions = component.publicCompilerOptions[category] %}
+  {%- if categoryOptions and categoryOptions.size > 0 %}
+    {%- assign publicOptions = publicOptions | concat: categoryOptions %}
+  {%- endif %}
+  {%- assign categoryOptions = component.privateCompilerOptions[category] %}
+  {%- if categoryOptions and categoryOptions.size > 0 %}
+    {%- assign privateOptions = privateOptions | concat: categoryOptions %}
+  {%- endif %}
+{%- endfor %}
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#interface-libraries
+# Visibility keywords: PRIVATE applies to the target itself; INTERFACE passes
+# properties up to targets that link against it; PUBLIC does both.
+add_library ({{nameDash}}-interface INTERFACE EXCLUDE_FROM_ALL)
+{%- if component.publicIncludeFolders and component.publicIncludeFolders.size > 0 %}
+
+target_include_directories (
+  {{nameDash}}-interface 
+  INTERFACE{% for folder in component.publicIncludeFolders %}{% if forloop.first %} {% else %}
+            {% endif %}"{{folder}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.sourceFiles and component.sourceFiles.size > 0 %}
+
+target_sources (
+  {{nameDash}}-interface
+  INTERFACE{% for file in component.sourceFiles %}{% if forloop.first %} {% else %}
+            {% endif %}"{{file}}"{% endfor %}
+)
+{%- endif %}
+{%- assign defines = "" | split: "" %}
+{%- if component.publicDefines and component.publicDefines.size > 0 %}
+  {%- assign defines = defines | concat: component.publicDefines %}
+{%- endif %}
+{%- if component.privateDefines and component.privateDefines.size > 0 %}
+  {%- assign defines = defines | concat: component.privateDefines %}
+{%- endif %}
+{%- if defines.size > 0 %}
+
+target_compile_definitions (
+  {{nameDash}}-interface 
+  INTERFACE{% for define in defines %}{% if forloop.first %} {% else %}
+            {% endif %}"{{define}}"{% endfor %}
+)
+{%- endif %}
+{%- assign compilerOptions = publicOptions | concat: privateOptions %}
+{%- if compilerOptions.size > 0 %}
+
+target_compile_options (
+  {{nameDash}}-interface 
+  INTERFACE{% for option in compilerOptions %}{% if forloop.first %} {% else %}
+            {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- assign linkerOptions = publicLinkerOptions | concat: privateLinkerOptions %}
+{%- if linkerOptions.size > 0 %}
+
+target_link_options (
+  {{nameDash}}-interface 
+  INTERFACE{% for option in linkerOptions %}{% if forloop.first %} {% else %}
+            {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.dependencies and component.dependencies.size > 0 %}
+
+target_link_libraries (
+  {{nameDash}}-interface 
+  INTERFACE{% for dependency in component.dependencies %}{% assign dependencyDoubleColon = dependency | replace_first: '.', '::' | replace: '.', '-' %}{% if forloop.first %} {% else %}
+            {% endif %}"{{dependencyDoubleColon}}"{% endfor %}
+)
+{%- endif %}
+
+if (COMMAND xpack_display_target_lists)
+  xpack_display_target_lists ({{nameDash}}-interface)
+endif ()
+
+# -----------------------------------------------------------------------------
+# Alias.
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
+add_library (
+  {{nameDoubleColon}} ALIAS {{nameDash}}-interface
+)
+message (
+  VERBOSE
+  "> {{nameDoubleColon}} -> {{nameDash}}-interface"
+)
+
+{%- if component.alias %}
+
+add_library (
+  {{aliasDoubleColon}} ALIAS {{nameDash}}-interface
+)
+message (
+  VERBOSE
+  "> {{aliasDoubleColon}} -> {{nameDash}}-interface"
+)
+{%- endif %}
+
+{%- if component.cdlArtefacts and component.cdlArtefacts.size > 0 %}
+{%- if component.dependencies and component.dependencies.size > 0 %}
+
+# -----------------------------------------------------------------------------
+
+{%- for dependency in component.dependencies %}
+{%- assign dependencyDash = dependency | replace: '.', '-' %}
+{%- assign dependencyDoubleColon = dependency | replace_first: '.', '::' | replace: '.', '-' %}
+
+get_property (
+  {{dependencyDash}}-includes
+  TARGET {{dependencyDoubleColon}}
+  PROPERTY INTERFACE_INCLUDE_DIRECTORIES
+)
+{%- endfor %}
+{%- endif %}
+
+{%- if objectsArtefact %}
+
+# -----------------------------------------------------------------------------
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#object-libraries
+# Optional OBJECT library: compiles the library sources once and shares the
+# resulting object files across all test executables, rather than recompiling
+# them per consumer.
+#
+# Include directories are managed explicitly instead of using PRIVATE linkage to
+# the interface library. PRIVATE linkage would cause dependency sources to be
+# compiled into this OBJECT library via transitive propagation, which conflicts
+# with the separate dependency compilation in each executable. Consumers of this
+# OBJECT library are expected to link separately to all dependencies and to the
+# platform-specific library.
+add_library ({{nameDash}}-{{objectsSuffix}} OBJECT EXCLUDE_FROM_ALL)
+{%- if component.publicIncludeFolders and component.publicIncludeFolders.size > 0 %}
+
+# Use PUBLIC so that the include directories are available both for the OBJECT
+# library's own sources and for consumers of the library.
+target_include_directories (
+  {{nameDash}}-{{objectsSuffix}}
+  PUBLIC{% for folder in component.publicIncludeFolders %}{% if forloop.first %} {% else %}
+         {% endif %}"{{folder}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.sourceFiles and component.sourceFiles.size > 0 %}
+
+# Use PRIVATE to avoid propagating the sources to consumers of the OBJECT
+# library, which would cause duplicate symbol errors at link time.
+target_sources (
+  {{nameDash}}-{{objectsSuffix}}
+  PRIVATE{% for file in component.sourceFiles %}{% if forloop.first %} {% else %}
+          {% endif %}"{{file}}"{% endfor %}
+)
+
+# Propagate the compiled object files to consumers via INTERFACE_SOURCES so that
+# CMake includes them in the final link even when this OBJECT library is
+# referenced only transitively through an INTERFACE library chain. Without this,
+# CMake does not automatically inject $<TARGET_OBJECTS:...> for indirect OBJECT
+# library dependencies reached via INTERFACE libraries.
+target_sources (
+  {{nameDash}}-{{objectsSuffix}}
+  INTERFACE "$<TARGET_OBJECTS:{{nameDash}}-{{objectsSuffix}}>"
+)
+{%- endif %}
+{%- if component.publicDefines and component.publicDefines.size > 0 %}
+
+# Use PUBLIC to allow propagating compile definitions to consumers of the
+# OBJECT library.
+target_compile_definitions (
+  {{nameDash}}-{{objectsSuffix}}
+  PUBLIC{% for define in component.publicDefines %}{% if forloop.first %} {% else %}
+          {% endif %}"{{define}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.privateDefines and component.privateDefines.size > 0 %}
+
+# Use PRIVATE to avoid propagating compile definitions to consumers of the
+# OBJECT library.
+target_compile_definitions (
+  {{nameDash}}-{{objectsSuffix}}
+  PRIVATE{% for define in component.privateDefines %}{% if forloop.first %} {% else %}
+          {% endif %}"{{define}}"{% endfor %}
+)
+{%- endif %}
+{%- if publicOptions.size > 0 %}
+
+# Use PUBLIC to allow propagating the compile options to consumers of the
+# OBJECT library, which may cause conflicts with consumer-specific compile
+# options.
+target_compile_options (
+  {{nameDash}}-{{objectsSuffix}}
+  PUBLIC{% for option in publicOptions %}{% if forloop.first %} {% else %}
+          {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if privateOptions.size > 0 %}
+
+# Use PRIVATE to avoid propagating the compile options to consumers of the
+# OBJECT library, which may cause conflicts with consumer-specific compile
+# options.
+target_compile_options (
+  {{nameDash}}-{{objectsSuffix}}
+  PRIVATE{% for option in privateOptions %}{% if forloop.first %} {% else %}
+          {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if publicLinkerOptions.size > 0 %}
+
+# Use PUBLIC to allow propagating the link options to consumers of the
+# OBJECT library. The private link options have no effect on it, since
+# it is not linked.
+target_link_options (
+  {{nameDash}}-{{objectsSuffix}}
+  PUBLIC{% for option in publicLinkerOptions %}{% if forloop.first %} {% else %}
+         {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.dependencies and component.dependencies.size > 0 %}
+
+# Add the dependency include paths without linking the code; linking it would
+# add dependency sources as INTERFACE_SOURCES and compile them into the OBJECT
+# library, causing duplicate symbols at link time.
+{%- for dependency in component.dependencies %}
+{%- assign dependencyDash = dependency | replace: '.', '-' %}
+target_include_directories (
+  {{nameDash}}-{{objectsSuffix}}
+  PRIVATE {% raw %}${{% endraw %}{{dependencyDash}}-includes}
+)
+{%- endfor %}
+
+# Use INTERFACE (not PUBLIC) to propagate the dependency to consumers without
+# pulling its INTERFACE_SOURCES into the OBJECT library compilation; the include
+# paths above already provide the headers needed to compile this library's own
+# sources.
+target_link_libraries (
+  {{nameDash}}-{{objectsSuffix}} 
+  INTERFACE{% for dependency in component.dependencies %}{% assign dependencyDoubleColon = dependency | replace_first: '.', '::' | replace: '.', '-' %}{% if forloop.first %} {% else %}
+            {% endif %}"{{dependencyDoubleColon}}"{% endfor %}
+)
+{%- endif %}
+
+if (COMMAND xpack_display_target_lists)
+  xpack_display_target_lists ({{nameDash}}-{{objectsSuffix}})
+endif ()
+
+# -----------------------------------------------------------------------------
+# Alias.
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
+add_library (
+  {{nameDoubleColon}}-{{objectsSuffix}} ALIAS
+  {{nameDash}}-{{objectsSuffix}}
+)
+message (
+  VERBOSE
+  "> {{nameDoubleColon}}-{{objectsSuffix}} -> {{nameDash}}-{{objectsSuffix}}"
+)
+
+{%- if component.alias %}
+
+add_library (
+  {{aliasDoubleColon}}-{{objectsSuffix}} ALIAS
+  {{nameDash}}-{{objectsSuffix}}
+)
+message (
+  VERBOSE
+  "> {{aliasDoubleColon}}-{{objectsSuffix}} -> {{nameDash}}-{{objectsSuffix}}"
+)
+{%- endif %}
+
+{%- endif %}
+{%- if staticArtefact %}
+
+# -----------------------------------------------------------------------------
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#normal-libraries
+# Optional STATIC library: compiles the library sources into an archive that is
+# linked into each consumer executable, rather than sharing object files.
+#
+# Include directories are managed explicitly instead of using PRIVATE linkage to
+# the interface library. PRIVATE linkage would cause dependency sources to be
+# compiled into this STATIC library via transitive propagation, which conflicts
+# with the separate dependency compilation in each executable. Consumers of this
+# STATIC library are expected to link separately to all dependencies and to the
+# platform-specific library.
+add_library ({{nameDash}}-{{staticSuffix}} STATIC EXCLUDE_FROM_ALL)
+
+set_target_properties (
+  {{nameDash}}-{{staticSuffix}}
+  PROPERTIES OUTPUT_NAME {{staticArtefact.fileName}}
+)
+{%- if component.publicIncludeFolders and component.publicIncludeFolders.size > 0 %}
+
+# Use PUBLIC so that the include directories are available both for the STATIC
+# library's own sources and for consumers of the library.
+target_include_directories (
+  {{nameDash}}-{{staticSuffix}}
+  PUBLIC{% for folder in component.publicIncludeFolders %}{% if forloop.first %} {% else %}
+         {% endif %}"{{folder}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.sourceFiles and component.sourceFiles.size > 0 %}
+
+# Use PRIVATE to avoid propagating the sources to consumers of the STATIC
+# library, which would cause duplicate symbol errors at link time.
+target_sources (
+  {{nameDash}}-{{staticSuffix}}
+  PRIVATE{% for file in component.sourceFiles %}{% if forloop.first %} {% else %}
+           {% endif %}"{{file}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.publicDefines and component.publicDefines.size > 0 %}
+
+# Use PUBLIC to allow propagating compile definitions to consumers of the
+# STATIC library.
+target_compile_definitions (
+  {{nameDash}}-{{staticSuffix}}
+  PUBLIC{% for define in component.publicDefines %}{% if forloop.first %} {% else %}
+          {% endif %}"{{define}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.privateDefines and component.privateDefines.size > 0 %}
+
+# Use PRIVATE to avoid propagating compile definitions to consumers of the
+# STATIC library.
+target_compile_definitions (
+  {{nameDash}}-{{staticSuffix}}
+  PRIVATE{% for define in component.privateDefines %}{% if forloop.first %} {% else %}
+          {% endif %}"{{define}}"{% endfor %}
+)
+{%- endif %}
+{%- if publicOptions.size > 0 %}
+
+# Use PUBLIC to allow propagating the compile options to consumers of the
+# STATIC library, which may cause conflicts with consumer-specific compile
+# options.
+target_compile_options (
+  {{nameDash}}-{{staticSuffix}}
+  PUBLIC{% for option in publicOptions %}{% if forloop.first %} {% else %}
+          {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if privateOptions.size > 0 %}
+
+# Use PRIVATE to avoid propagating the compile options to consumers of the
+# STATIC library, which may cause conflicts with consumer-specific compile
+# options.
+target_compile_options (
+  {{nameDash}}-{{staticSuffix}}
+  PRIVATE{% for option in privateOptions %}{% if forloop.first %} {% else %}
+          {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if publicLinkerOptions.size > 0 %}
+
+# Use PUBLIC to allow propagating the link options to consumers of the
+# STATIC library. The private link options have no effect on it, since
+# it is not linked.
+target_link_options (
+  {{nameDash}}-{{staticSuffix}}
+  PUBLIC{% for option in publicLinkerOptions %}{% if forloop.first %} {% else %}
+         {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.dependencies and component.dependencies.size > 0 %}
+
+# Add the dependency include paths without linking the dependency target:
+# linking it would add dependency sources as INTERFACE_SOURCES and compile them
+# into the STATIC library, causing duplicate symbols at link time.
+{%- for dependency in component.dependencies %}
+{%- assign dependencyDash = dependency | replace: '.', '-' %}
+target_include_directories (
+  {{nameDash}}-{{staticSuffix}}
+  PRIVATE {% raw %}${{% endraw %}{{dependencyDash}}-includes}
+)
+{%- endfor %}
+
+# Use INTERFACE (not PUBLIC) to propagate the dependency to consumers without
+# pulling its INTERFACE_SOURCES into the STATIC library compilation; the include
+# paths above already provide the headers needed to compile this library's own
+# sources.
+target_link_libraries (
+  {{nameDash}}-{{staticSuffix}} 
+  INTERFACE{% for dependency in component.dependencies %}{% assign dependencyDoubleColon = dependency | replace_first: '.', '::' | replace: '.', '-' %}{% if forloop.first %} {% else %}
+            {% endif %}"{{dependencyDoubleColon}}"{% endfor %}
+)
+{%- endif %}
+
+if (COMMAND xpack_display_target_lists)
+  xpack_display_target_lists ({{nameDash}}-{{staticSuffix}})
+endif ()
+
+# -----------------------------------------------------------------------------
+# Alias.
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
+add_library (
+  {{nameDoubleColon}}-{{staticSuffix}} ALIAS
+  {{nameDash}}-{{staticSuffix}}
+)
+message (
+  VERBOSE
+  "> {{nameDoubleColon}}-{{staticSuffix}} -> {{nameDash}}-{{staticSuffix}}"
+)
+
+{%- if component.alias %}
+
+add_library (
+  {{aliasDoubleColon}}-{{staticSuffix}} ALIAS
+  {{nameDash}}-{{staticSuffix}}
+)
+message (
+  VERBOSE
+  "> {{aliasDoubleColon}}-{{staticSuffix}} -> {{nameDash}}-{{staticSuffix}}"
+)
+{%- endif %}
+{%- endif %}
+{%- endif %}
+
+# -----------------------------------------------------------------------------
+{% endfor %}

@@ -1,7 +1,9 @@
 # -----------------------------------------------------------------------------
+# DO NOT EDIT! Automatically generated from template file:
+# npm-packages-helper/templates/common/.github/workflows/_micro-os-plus/test-pr-liquid.yml
 #
 # This file is part of the µOS++ project (http://micro-os-plus.github.io).
-# Copyright (c) 2021-2025 Liviu Ionescu. All rights reserved.
+# Copyright (c) 2021-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -11,13 +13,10 @@
 #
 # -----------------------------------------------------------------------------
 
-# https://help.github.com/en/actions
-# https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions
-# https://github.com/actions
+# https://micro-os-plus.github.io/micro-os-plus-iii/
+# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-ci.yml
 
-# https://github.com/micro-os-plus/micro-os-plus-iii/actions/workflows/test-pr.yml
-
-# Workflow for running some tests on each Pull Request.
+# Workflow for running some tests on each Push.
 name: Test on Pull Request
 
 # https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions
@@ -26,40 +25,45 @@ name: Test on Pull Request
 on:
   # Runs on pull requests, if all conditions are met:
   pull_request:
+    # ... on the active branches ...
+    branches:
+      - 'xpack-development'
+      - 'xpack'
+    # ... skip tags only ...
+    tags-ignore:
+      - '**'
+    # ... include everything except ...
     paths-ignore:
-      - ".claude/**"
-      - ".github/skills/**"
-      - ".github/copilot-instructions.md"
-      - ".github/FUNDING.yml"
-      - ".settings/**"
-      - ".vscode/**"
-      - "config/**"
-      - "docs/**"
-      - "doxygen/**"
-      - "inspiration/**"
-      - "scripts/**"
-      - "templates/**"
-      - "tests/scripts/**"
-      - "LICENSE*"
-      - "**.md"
-      - ".gitignore"
-      - ".npmignore"
-      - "**/README**"
+      - '.claude/**'
+      - '.github/skills'
+      - '.github/skills/**'
+      - '.github/workflows/publish-github-pages.yml'
+      - '.github/workflows/test-all.yml'
+      - '.github/copilot-instructions.md'
+      - '.github/FUNDING.yml'
+      - '.settings/**'
+      - '.vscode/**'
+      - 'maintenance/**'
+      - 'doxygen/**'
+      - 'tests/scripts/**'
+      - 'website/**'
+      - 'docs/**'
+      - 'LICENSE*'
+      - '**.md'
+      - '.gitignore'
+      - '.npmignore'
+      - '**/README**'
 
-# Allow one concurrent run per pull request; new pushes cancel older runs.
+# Allow one concurrent run per push; new pushes cancel older runs.
 # https://docs.github.com/en/actions/using-jobs/using-concurrency
 concurrency:
-  group: "tests-pr-${{ github.event.pull_request.number }}"
-  # A new pull request update to the same pull request cancels the older run.
+  group: 'tests-pr-${{ github.event.pull_request.number }}'
+  # A new pull request to the same branch cancels the older run.
   cancel-in-progress: true
-
-# Pull requests from forks must not get write access.
-permissions:
-  contents: read
 
 jobs:
   ci-test:
-    name: "µOS++ IIIe PR tests"
+    name: 'µOS++ IIIe PR tests'
 
     runs-on: ${{ matrix.os }}
 
@@ -67,35 +71,36 @@ jobs:
       # Run all platforms to completion, even if one fails.
       fail-fast: false
       matrix:
-        # https://docs.github.com/en/actions/using-github-hosted-runners/about-github-hosted-runners
-        # macos-13 is x64, macos-15 is arm64.
+        # https://github.com/actions/runner-images
         os:
           [
-            "ubuntu-24.04",
-            "ubuntu-24.04-arm",
-            "macos-15-intel",
-            "macos-15",
-            "windows-2025",
+            'ubuntu-26.04',
+            'ubuntu-26.04-arm',
+            'macos-26-intel',
+            'macos-26',
+            'windows-2025'
           ]
+        # https://nodejs.org/en - use LTS
+        node-version: ['24']
+        # https://www.npmjs.com/package/xpm
+        xpm-version: ['0.23.2']
 
     steps:
       - name: Checkout
         # https://github.com/actions/checkout/
-        uses: actions/checkout@v7.0.0
+        uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 3
 
-      - name: Setup Node.js on ${{ matrix.os }}
-        # https://github.com/actions/setup-node/
-        uses: actions/setup-node@v7.0.0
+      - name: Setup Node.js ${{ matrix.node-version }} on ${{ matrix.os }}
+        # https://github.com/actions/setup-node
+        uses: actions/setup-node@v7.1.0
         with:
-          # https://nodejs.org/en - use LTS
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
 
-      - name: Install xpm on ${{ matrix.os }}
-        run: |
-          # https://www.npmjs.com/package/xpm
-          npm install -g xpm@0.20.8
+      - name: Install xpm@${{ matrix.xpm-version }} on ${{ matrix.os }}
+        run: npm install -g xpm@${{ matrix.xpm-version }}
 
       - name: Show environment
         run: |
@@ -106,12 +111,36 @@ jobs:
           xpm --version
           env | sort
 
+      - name: Clean xPack cache Linux
+        if: runner.os == 'Linux'
+        run: |
+          rm -rf "${HOME}/.cache/xPacks"
+
+      - name: Clean xPack cache macOS
+        if: runner.os == 'macOS'
+        run: |
+          rm -rf "${HOME}/Library/Caches/xPacks"
+
+      - name: Clean xPack cache Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $cachePath = "$env:LOCALAPPDATA\Caches\xPacks"
+          if (Test-Path -LiteralPath $cachePath) {
+            Remove-Item -LiteralPath $cachePath -Force -Recurse -ErrorAction SilentlyContinue
+          }
+
       - name: Satisfy project dependencies on ${{ matrix.os }}
         run: |
+          npm ci
           npm --prefix tests ci
-          xpm run install-ci -C tests
+          xpm install -C tests
 
-      - name: Run tests on ${{ matrix.os }}
-        run: xpm run test-ci -C tests
+      - name: Satisfy platforms dependencies on ${{ matrix.os }}
+        run: |
+          xpm run install-all -C tests
+
+      - name: Run platforms tests on ${{ matrix.os }}
+        run: xpm run test-all -C tests
         env:
           CI: true

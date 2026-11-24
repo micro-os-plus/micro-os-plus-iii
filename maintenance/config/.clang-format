@@ -12,6 +12,7 @@ DerivePointerAlignment: false
 FixNamespaceComments: true
 NamespaceIndentation: All
 PointerAlignment: Left
+ReflowComments: false
 SortIncludes: false
 Standard: c++20
 LambdaBodyIndentation: OuterScope
