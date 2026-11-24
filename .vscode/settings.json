@@ -102,5 +102,7 @@
   "cortex-debug.variableUseNaturalFormat": false,
   "python.analysis.exclude": [
     "**"
-  ]
+  ],
+  //
+  "chat.useClaudeMdFile": true
 }
