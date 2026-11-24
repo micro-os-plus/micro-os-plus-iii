@@ -5,8 +5,8 @@ argument-hint: 'Optional: the GitHub issue number (#N), and whether the commit c
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/github-commit/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/github-commit/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/github-commit/project.md (this skill only);
 see .github/skills/README.md.

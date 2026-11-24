@@ -5,8 +5,8 @@ argument-hint: 'What the script must do, and where it goes, e.g. maintenance/scr
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/create-javascript-mjs/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/create-javascript-mjs/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/create-javascript-mjs/project.md (this skill only);
 see .github/skills/README.md.

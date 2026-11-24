@@ -1,306 +1,201 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working
-with code in this repository.
+This file provides guidance to Claude Code (claude.ai/code)
+when working with code in this repository.
+It includes the rules common to all projects; the project-specific
+rules are in `.claude/project.md`:
 
-@.github/copilot-instructions.md
+@.claude/project.md
 
-## Project overview
+<!--
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/CLAUDE-liquid.md.
+-->
 
-**µOS++ IIIe** (`@micro-os-plus/micro-os-plus-iii`) is a POSIX-like,
-portable, real-time framework for 32/64-bit embedded applications,
-written in C++20 (C11 for the C sources). It provides the startup code,
-a multi-threaded RTOS scheduler and its synchronisation objects, memory
-allocators, a POSIX I/O layer (files, file systems, devices, sockets),
-ISO C++ threading wrappers, a legacy CMSIS RTOS API, and trace/diagnostics
-support.
+## Project Overview
 
-The project is distributed as an xpm/npm source package and
-is consumed by applications as a CMake **interface library**
-(`micro-os-plus::iii`). It is a monolithic repository; most components
-are compiled conditionally and are enabled by preprocessor definitions
-supplied by the application.
+This is the **µOS++ IIIe** project, part of
+µOS++.
 
-Note: the IVe edition (split into separate libraries) is a different
-project; this repository is IIIe only.
+## General
 
-## Portable core and architecture ports
+- Avoid sycophantic behaviour; for all conversation, never soften criticism
+  to protect the person's ego.
+- If something has a flaw, say so directly.
+- When the meaning of a question is uncertain, say so and ask questions
+  rather than guess.
+- When multiple valid answers are possible, say so and ask questions to
+  identify the most appropriate one, rather than assuming a single
+  correct answer.
+- This applies to every response.
 
-This repository contains **only the portable part**. It never builds on
-its own: every application must also link exactly one architecture port.
-The ports are separate repositories, checked out as sibling folders of
-this one:
+## Language and Tone
 
-```text
-micro-os-plus-iii/
-├── micro-os-plus-iii.git               ← this project (portable core)
-├── micro-os-plus-iii-cortexm.git       ← Arm Cortex-M port
-├── micro-os-plus-iii-posix-arch.git    ← synthetic POSIX port (macOS/Linux)
-├── micro-os-plus-iii-aarch32.git       ← other ports (experimental)
-├── micro-os-plus-iii-aarch64.git
-├── micro-os-plus-iii-riscv.git
-├── arm-cmsis.git, arm-cmsis-rtos-validator.git, chan-fatfs.git, ...
+- Use British English spelling and grammar (e.g., "behaviour", "colour",
+  "organise", "analyse", "favour", "initialise", etc.)
+- Maintain a professional and formal tone in all generated content
+- Avoid colloquialisms, slang, or informal expressions
+- Avoid humour, jokes, or casual remarks
+- Use clear, precise, and professional language appropriate for technical
+  documentation
+- Avoid contractions (e.g., use "do not" instead of "don't")
+- Use the Oxford comma in lists for clarity
+- Maintain consistency in terminology throughout the codebase
+- Prefer "folder" to "directory"
+
+## Code Style
+
+- Follow the existing C++ code style defined in the .clang-format file.
+- Use consistent formatting and naming conventions based on prettier and
+  clang-format configurations.
+- For C/C++, the naming convention is snake_case.
+- For C++, write multiple level namespaces on the same line.
+
+## Includes order
+
+- Project-specific headers.
+- µOS++ headers
+- Third-party library headers.
+- Standard library headers.
+- Use alphabetical order within each group.
+- Separate each group with a blank line.
+- Brace the whole group of includes by separator lines
+
+## Compiler pragmas
+
+When needed to silence warnings, use separate groups of pragmas for each compiler.
+
+Always use `__GNUC__` guards, and, if necessary, `__clang__` guards to apply
+compiler-specific pragmas.
+
+```c++
+#if defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wc++98-compat-pedantic"
+#endif // defined(__clang__)
+#pragma GCC diagnostic ignored "-Wredundant-tags"
+#endif // defined(__GNUC__)
 ```
 
-| Port repository | npm package | CMake target |
-| --- | --- | --- |
-| `micro-os-plus-iii-cortexm.git` | `@micro-os-plus/micro-os-plus-iii-cortexm` | `micro-os-plus::iii-cortexm` |
-| `micro-os-plus-iii-posix-arch.git` | `@micro-os-plus/micro-os-plus-iii-posix-arch` | `micro-os-plus::iii-posix-arch` |
+Brace the whole group of pragmas by separator lines.
 
-### The port contract
+## Documentation
 
-Each port provides the same small set of files, which the core includes
-by fixed paths:
+- Add comprehensive documentation comments accepted by Doxygen
+- Document all classes, methods, properties, parameters, and return types.
+- The declarations should be in the headers, the definitions in the `src`
+  folder, and the inline definitions in the `inlines` folder.
+- Add @details sections to all declarations and definitions.
+- The @brief and @details sections are displayed sequentially, so ensure the
+  @details section expands on the @brief without repeating it. The @brief
+  should be a concise summary of the member's purpose, whilst the @details
+  should provide a more in-depth explanation, including any relevant
+  information about the implementation, usage, or edge cases.
+- Document private and protected members as well
+- Keep the line length below 80 characters
+- If the code already includes documentation, review and possibly improve it.
 
-- `include/cmsis-plus/rtos/port/os-decls.h` - port types and declarations
-  (stack element type, interrupt state, scheduler/thread context types);
-  included from `rtos/os-decls.h` and `rtos/os-c-decls.h`
-- `include/cmsis-plus/rtos/port/os-c-decls.h` - the C-API equivalents
-- `include/cmsis-plus/rtos/port/os-inlines.h` - inline implementations of
-  the `os::rtos::port` functions (critical sections, context switch
-  requests, clock helpers, etc.); included at the end of `rtos/os.h`
-- `src/rtos/os-core.cpp` - non-inline port code (scheduler start,
-  context creation/switching, SysTick/timer handling)
-- the POSIX port also provides `src/diag/trace-posix.cpp`
+## Folder Structure
 
-The interface the core expects from a port is declared in the
-`os::rtos::port` namespace in
-[include/cmsis-plus/rtos/os-decls.h](include/cmsis-plus/rtos/os-decls.h)
-(sub-namespaces such as `port::clock`, `port::interrupts`,
-`port::scheduler`, `port::thread`).
+- `/src`: Contains the C++ source code
+- `/include`: Contains the C++ header files
+- `/tests`: Contains the test suites and test cases
+- `/maintenance`: Contains the project maintenance resources, which are
+  not published with the package: `/maintenance/config` (the formatter
+  configuration files), `/maintenance/scripts` (the maintenance scripts
+  and their templates), and `/maintenance/docs` (the developer notes)
 
-When changing anything in `namespace port`, in the `port/*.h` includes,
-or in the semantics of scheduler/thread/clock internals, **check and
-update all ports** (at least Cortex-M and POSIX), since they are
-compiled together with the core and are not covered by this repository's
-own sources.
+When adding new source files, place them in the appropriate `src` or `include`
+folder, and add them to `xcdl-package.jsonc`, from which the top CMake and Meson
+configurations are generated with `xpm run xcdl-export` (see the xcdl section
+below); do not edit the generated files.
 
-Some synchronisation objects can be delegated to the port, controlled by
-`OS_USE_RTOS_PORT_SCHEDULER`, `OS_USE_RTOS_PORT_TIMER`,
-`OS_USE_RTOS_PORT_MUTEX`, `OS_USE_RTOS_PORT_SEMAPHORE`,
-`OS_USE_RTOS_PORT_MESSAGE_QUEUE`, `OS_USE_RTOS_PORT_EVENT_FLAGS`,
-`OS_USE_RTOS_PORT_CLOCK_SYSTICK_WAIT_FOR`. The portable implementation
-must keep working when these are not defined.
+Avoid running `find /` commands that search the entire filesystem, as this
+always times out.
 
-### Headers supplied by the application
+## Tool Binaries
 
-The core includes headers that are **not** in this repository; the
-application (or the test platform) must provide them on the include path:
+The compiler and the other binary tools are installed in the
+`build/<configuration>/xpacks/.bin` folder of each build configuration,
+or in the `<project>/xpacks/.bin` folder of the project root; the
+JavaScript tools are in the `node_modules/.bin` folders.
 
-- `<cmsis-plus/os-app-config.h>` - application configuration
-  (`OS_INTEGER_*`, `OS_INCLUDE_*`, `OS_USE_*`, `OS_BOOL_*` definitions);
-  see `tests/sources/*/include/cmsis-plus/os-app-config.h` for examples
-- `<cmsis-plus/platform.h>` - platform selection
-  (see `tests/platforms/*/include/cmsis-plus/platform.h`)
-- `<cmsis_device.h>` - on Cortex-M, the vendor CMSIS device header
+## Testing
 
-## Repository layout
+After making major changes, run in a terminal:
 
-- `include/cmsis-plus/` - public headers (the include root is `include`;
-  `include/cmsis-plus/legacy` is also added for `cmsis_os.h`)
-  - `rtos/` - RTOS C++ API (`os.h` is the umbrella header), C API
-    (`os-c-api.h`, `os-c-decls.h`), hooks, inlines, `internal/` lists
-    and flags
-  - `estd/` - ISO C++ threading headers implemented on top of the RTOS
-    (`thread`, `mutex`, `condition_variable`, `chrono`,
-    `memory_resource`, ...), in namespace `os::estd`
-  - `memory/` - allocators (`first-fit-top`, `lifo`, `block-pool`,
-    `null`, `malloc`)
-  - `posix-io/` - POSIX I/O class hierarchy (`io`, `file`, `directory`,
-    `file-system`, `block-device`, `char-device`, `tty`, `socket`,
-    `net-stack`, file descriptors manager) and the syscall aliases
-  - `posix/` - POSIX headers missing from newlib (`dirent.h`,
-    `sys/socket.h`, `termios.h`, ...)
-  - `diag/` - `trace.h` and `instrumentation.h`
-  - `driver/`, `posix-driver/` - **work in progress**, mostly not built
-  - `arm/semihosting.h`, `cortexm/exception-handlers.h`
-  - `os-versions.h` - version macros (update on release)
-- `src/` - implementations, mirroring `include/`, plus:
-  - `startup/` - reset/startup code, free store initialisation,
-    exception handlers
-  - `libc/`, `libcpp/` - newlib reentrancy, `_sbrk`, `malloc`,
-    `atexit`/`exit`, `new`/`delete`, C++ runtime support
-  - `semihosting/` - semihosting syscalls
-- `CMakeLists.txt` - defines the `micro-os-plus-iii-interface` INTERFACE
-  library (alias `micro-os-plus::iii`); **every new source file must be
-  added to `target_sources()` here**, otherwise it is not built
-- `tests/` - a separate xpm project with the test suite (see below)
-- `doxygen/` - reference documentation (Doxygen) sources
-- `maintenance/` - **maintainer-only material; not part of the library.**
-  Applications using this library must not use, include or depend on
-  anything in this folder, and code reviews must ignore it (do not
-  review, flag or suggest changes to its contents). It holds:
-  - `config/` - `.clang-format`, `.cmake-format.py`, prettier configs
-  - `scripts/` - formatting scripts (generated from templates, do not edit)
-  - `docs/` - maintainer notes (`README-DEVELOPER.md`,
-    `README-MAINTAINER.md`, `TODO.md`, `HISTORY.md`, POSIX I/O notes)
-  - `inspiration/` - third-party reference code (libstdc++, libc++,
-    newlib); not compiled, do not modify
-  - `templates/` - project templates and work-in-progress headers;
-    not compiled
+- `xpm run test-selected -C tests` -- to execute a minimal selection of tests
 
-## Build and test
+After minor changes, take a shortcut and run only:
 
-There is no standalone build at the top level; everything is driven
-from the `tests` folder with xpm (Node.js >= 20, xpm >= 0.20.8).
-Build folders are `tests/build/<configuration>`.
+- `xpm run test -C tests` -- to execute the test with the system compiler.
 
-```sh
-# Top dependencies and default tests (QEMU Cortex-M7F)
-xpm run install -C tests
-xpm run test -C tests
+When using linked writable projects, it is necessary to run the linking step to ensure all dependencies are correctly resolved.
 
-# Native (synthetic POSIX) tests with the system compiler
-xpm run install-native-cmake-sys -C tests
-xpm run test-native-cmake-sys -C tests
+- `xpm run link-dependencies --config <name>`
 
-# QEMU Cortex-M tests with the latest toolchain
-xpm run install-qemu-cortex-latest -C tests
-xpm run test-qemu-cortex-latest -C tests
+When using non-native platforms, run one by one specific actions for the given configuration.
 
-# Everything (all GCC/clang versions, all platforms)
-xpm run install-all -C tests
-xpm run test-all -C tests
+- `xpm run setup --config <name>`
+- `xpm run build --config <name>`
 
-# Same set as the GitHub Actions CI
-xpm run install-ci -C tests
-xpm run test-ci -C tests
+For non-qemu platforms, running the tests can be done only after confirming that the board is
+powered up, with the command:
 
-# Clean
-xpm run deep-clean -C tests
-```
+- `xpm run test --config <name>`
 
-A single configuration can be driven step by step:
+QEMU tests can be done directly, without confirmation that the board is
+powered up.
 
-```sh
-xpm run prepare --config native-cmake-gcc-debug -C tests
-xpm run build   --config native-cmake-gcc-debug -C tests
-xpm run test    --config native-cmake-gcc-debug -C tests
-```
+## Reviews
 
-Configuration names follow `<platform>-cmake-<toolchain>-<debug|release>`,
-for example `native-cmake-clang17-release` or
-`qemu-cortex-m3-cmake-gcc-debug`.
+When asked for one of the following reviews, follow the separate
+instructions of the corresponding skill:
 
-### Test platforms (`tests/platforms/`)
+- a design review, or an API review:
+  `.github/skills/design-review/SKILL.md`;
+- a code review: `.github/skills/code-review/SKILL.md`;
+- a review of the Doxygen comments:
+  `.github/skills/doxygen-review/SKILL.md`;
+- a consistency check: `.github/skills/consistency-check/SKILL.md`.
 
-- `native` - runs on the host using the POSIX port and `libucontext`
-- `qemu-cortex-m0`, `qemu-cortex-m3`, `qemu-cortex-m4f`,
-  `qemu-cortex-m7f` - Cortex-M port on QEMU (MPS2 boards, see
-  `tests/device-qemu-cortexm/`)
-- `nucleo-f411re`, `nucleo-f767zi`, `nucleo-h743zi`,
-  `raspberrypi-pico` - physical boards (manual)
+The review skills share the rules in `.github/skills/review-common.md`,
+and all the skills read the facts of this project in
+`.github/skills/project.md`. Most skills are generated from the
+`npm-packages-helper` templates (`npm run generate-top-commons`), so
+the project-specific rules go in `.github/skills/project.md`, or in a
+`project.md` file in the folder of the skill, never in a generated
+`SKILL.md` (see `.github/skills/README.md`).
 
-(the raspberrypi-pico is not yet functional)
+## Git Commits
 
-Each platform's `cmake/dependencies-folders.cmake` lists the folders
-added to the build, including the port, which is resolved from
-`build/<config>/xpacks/@micro-os-plus/micro-os-plus-iii-<port>`.
+- When asked to commit, or to write a commit message, follow the separate
+  instructions in `.github/skills/github-commit/SKILL.md`, which cover the
+  commit message format, the GitHub issue references, and the closing
+  comment of the GitHub issue.
+- Do not commit without user review and approval.
 
-### Test applications (`tests/sources/`)
+## Issues
 
-- `rtos-apis` - exercises the RTOS C++ API, the C API and the ISO C++ API
-  (the presence of the API calls, simple cases)
-- `unit` - functional tests of the RTOS (scenarios, races, wake-ups,
-  priority inheritance, interrupts, clocks) and the regression tests of
-  fixed bugs; new behaviour tests go here, not in `rtos-apis`
-- `mutex-stress` - several threads competing for one mutex
-- `cmsis-os-validator` - the Arm CMSIS RTOS validator
-- `blinky`, `instrumentation` - board/instrumentation demos
+- When asked to open an issue, follow the separate instructions in
+  `.github/skills/create-github-issue/SKILL.md`.
+- After committing a fix for a GitHub issue, add the closing comment to
+  that issue, as described in `.github/skills/github-commit/SKILL.md`
+  ("Issue Comment").
 
-`tests/deprecated/` is old material and is not built.
+## xcdl
 
-### Working with local (writable) port repositories
+When working with `xcdl-package.jsonc`, or when adding, removing, or
+renaming a source file, an include folder, a compiler or linker option,
+or a dependency, follow the separate instructions in
+`.github/skills/xcdl/SKILL.md`.
 
-By default xpm installs the ports as read-only packages from the
-central xPacks store. To develop the core and a port together, link the
-sibling repositories:
+## Verbal Questions
 
-```sh
-# Register the sibling repos as linkable packages (once)
-xpm link -C ../micro-os-plus-iii-posix-arch.git
-xpm link -C ../micro-os-plus-iii-cortexm.git
-
-# Link them into the per-configuration xpacks folders
-xpm run link-deps-all -C tests
-# or, for one configuration
-xpm run link-deps --config native-cmake-sys-debug -C tests
-```
-
-`xpm run git-clone-deps -C tests` does the same, but clones fresh
-copies under `~/Work/...`; prefer the existing siblings when they are
-already present.
-
-## Formatting
-
-```sh
-xpm run clang-format    # src, include, tests/sources|includes|platforms
-xpm run cmake-format    # all CMakeLists.txt and *.cmake files
-```
-
-The clang-format style is in `maintenance/config/.clang-format` (GNU-like style:
-return type on its own line, a space before parentheses, two-space
-indentation). Format only the files you touch; avoid reformatting
-unrelated code.
-
-## Coding conventions
-
-- C++20. RTOS functions report errors via `result_t` return codes
-  (POSIX `errno` values, `result::ok` on success); the code must also
-  build with `-fno-exceptions`/`-fno-rtti`. Use `os_assert_err()`
-  (asserts in debug, returns the error with `NDEBUG`) and
-  `os_assert_throw()` (asserts in debug, throws a system error with
-  `NDEBUG`, or aborts if exceptions are disabled).
-- Naming: lower-case `snake_case` for types, functions and members; the
-  public API lives in `os::rtos`, `os::posix`, `os::memory`, `os::estd`,
-  `os::trace`; internal helpers in `internal` namespaces.
-- C API wrappers (`os_*` functions in `os-c-api.h`/`os-c-wrapper.cpp`)
-  must be kept in sync with the C++ API, including the opaque storage
-  structures in `os-c-decls.h` (their sizes must match the C++ objects).
-- Functions that may block must check that they are not called from
-  interrupt handlers (`interrupts::in_handler_mode()`) and return
-  `EPERM`; preserve these checks.
-- Keep the trace/instrumentation calls (`trace::printf`,
-  `#if defined(OS_TRACE_RTOS_*)` blocks) when adding or changing RTOS
-  functions.
-- Guard new optional features with `OS_INCLUDE_*`/`OS_USE_*` macros and
-  give them sensible defaults in the headers.
-- Portability: the code must remain portable to Cortex-M, AArch32,
-  AArch64, RISC-V and POSIX native. Guard code by what it needs, never
-  by toolchain or ABI macros such as `__ARM_EABI__`, which silently
-  exclude it on other architectures:
-  - portable bare-metal code: `OS_IS_CROSS_BUILD` (from `os-versions.h`);
-  - optional features: their `OS_USE_*`/`OS_INCLUDE_*` macro;
-  - Cortex-M only:
-    `defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M')`; tell
-    Mainline (v7-M, v7E-M, v8-M Main, v8.1-M) from Baseline (v6-M,
-    v8-M Base) with `__ARM_ARCH_ISA_THUMB == 2`/`== 1`, not with lists
-    of `__ARM_ARCH_7M__`-style macros (clang names Armv8.1-M
-    `__ARM_ARCH_8_1M_MAIN__`), and put a comment listing the matched
-    architectures before such tests; use the ACLE version
-    `__ARM_ARCH` (6, 7, 8) only to exclude versions not yet supported,
-    in one central check (as the Cortex-M port does for Armv8-M);
-  - keep architecture-specific lines small and isolated. The AArch32,
-    AArch64 and RISC-V ports are not implemented yet; where code needs
-    an architecture-specific implementation, use an explicit
-    `#error "... not yet implemented for this architecture"` instead of
-    untested code.
-- Document public APIs with Doxygen comments, consistent with the
-  existing ones.
-- Each file starts with the standard µOS++ MIT licence header.
-- Compiler warnings are treated seriously; the code must stay warning
-  free with GCC 11-14, clang 13-19 and arm-none-eabi-gcc.
-- Use British English in comments and documentation, and "folder"
-  rather than "directory".
-
-## Branches and releases
-
-- `xpack-development` - all development and pull requests
-- `xpack` - latest stable release; `xpack-development` is merged into it
-  on release
-- Releases: bump `package.json`, update `include/cmsis-plus/os-versions.h`,
-  `README.md`, `maintenance/docs/README-MAINTAINER.md` and `CHANGELOG.md`, run all tests,
-  then `npm version X.Y.Z` (the `postversion` script pushes branches and
-  tags). Details in [README-MAINTAINER.md](maintenance/docs/README-MAINTAINER.md).
-- The npm package only ships the files allowed by `.npmignore`; check
-  with `npm pack` before publishing.
+When more input from the user is required, first ask a short version
+of the question aloud, with the macOS `say` program, and only then show
+the full question in the chat window (in the text of the reply, or in a
+question dialog), so that the spoken question draws the attention of
+the user before the text appears.

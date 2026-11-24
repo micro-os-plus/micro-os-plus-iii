@@ -5,8 +5,8 @@ argument-hint: 'Optional: the change to make to xcdl-package.jsonc, or the prope
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/_micro-os-plus/xcdl/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/_micro-os-plus/xcdl/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/xcdl/project.md (this skill only);
 see .github/skills/README.md.

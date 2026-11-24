@@ -1,8 +1,8 @@
 # Defaults of the Project Facts — µOS++ IIIe
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/project-defaults-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/project-defaults-liquid.md;
 put the project rules in .github/skills/project.md; see
 .github/skills/README.md.
 -->

@@ -5,8 +5,8 @@ argument-hint: 'Optional: header, file, or folder to review; defaults to include
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/_micro-os-plus/design-review/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/_micro-os-plus/design-review/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/design-review/project.md (this skill only);
 see .github/skills/README.md.

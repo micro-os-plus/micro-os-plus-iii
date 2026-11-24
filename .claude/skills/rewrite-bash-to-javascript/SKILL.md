@@ -5,8 +5,8 @@ argument-hint: 'Path to the .sh script to convert, e.g. maintenance/scripts/<nam
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/rewrite-bash-to-javascript/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/rewrite-bash-to-javascript/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/rewrite-bash-to-javascript/project.md (this skill only);
 see .github/skills/README.md.

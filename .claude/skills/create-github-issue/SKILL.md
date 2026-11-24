@@ -5,8 +5,8 @@ argument-hint: 'Short description of the problem or improvement, or a list of fi
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/create-github-issue/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/create-github-issue/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/create-github-issue/project.md (this skill only);
 see .github/skills/README.md.

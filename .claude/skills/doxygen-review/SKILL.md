@@ -5,8 +5,8 @@ argument-hint: 'Optional: file or folder to review; defaults to include/ and src
 ---
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/_micro-os-plus/doxygen-review/SKILL-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/_micro-os-plus/doxygen-review/SKILL-liquid.md;
 put the project rules in .github/skills/project.md (all the skills) or
 in .github/skills/doxygen-review/project.md (this skill only);
 see .github/skills/README.md.

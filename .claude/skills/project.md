@@ -137,15 +137,14 @@ node .github/skills/review-and-fix/scripts/build-probe.mjs \
 
 This overrides the default:
 
-- The project has no `xcdl-package.jsonc`, no `xcdl-test.jsonc`, and
-  no `meson.build`. The top-level `CMakeLists.txt` (the
-  `micro-os-plus-iii-interface` INTERFACE library) and the
+- The top-level `CMakeLists.txt` (the `micro-os-plus-iii-interface`
+  INTERFACE library) and `meson.build` are generated from
+  `xcdl-package.jsonc` with `xpm run xcdl-export`, as in the default;
+  they are never edited by hand, and every new source file is added to
+  `xcdl-package.jsonc` (see the `xcdl` skill). The project has no
+  `xcdl-test.jsonc` and no `meson.build` in the tests: the
   `CMakeLists.txt` of the test applications in `tests/sources/` are
-  written by hand; every new source file is added to
-  `target_sources()` in the top-level `CMakeLists.txt`. The
-  `xcdl-export` action of `package.json`, and
-  `maintenance/scripts/xcdl-export.mjs` with its `templates/`, come
-  from the template and have nothing to export here.
+  written by hand.
 - In `tests/`, only `tests/cmake/common-options.cmake`,
   `tests/cmake/tests-main.cmake`, and the
   `tests/platforms/*/cmake/platform-library.cmake` files carry a

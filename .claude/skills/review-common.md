@@ -1,8 +1,8 @@
 # Rules Shared by the Review Skills — µOS++ IIIe
 
 <!--
-DO NOT EDIT!
-Automatically generated from template file: npm-packages-helper/templates/common/.github/skills/review-common-liquid.md;
+DO NOT EDIT! Automatically generated from template file:
+npm-packages-helper/templates/common/.github/skills/review-common-liquid.md;
 put the project rules in .github/skills/project.md;
 see .github/skills/README.md.
 -->
