@@ -14,6 +14,7 @@
 # Global definitions.
 
 set (ENABLE_RTOS_APIS_TEST true)
+set (ENABLE_UNIT_TEST true)
 set (ENABLE_MUTEX_STRESS_TEST true)
 set (ENABLE_CMSIS_OS_VALIDATOR_TEST true)
 

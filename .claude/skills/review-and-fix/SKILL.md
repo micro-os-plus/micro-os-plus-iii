@@ -70,7 +70,9 @@ Do not just repeat the review's suggestion; re-derive it.
 1. Implement the fix. Keep trace and instrumentation calls, the
    `in_handler_mode()` checks, British English, "folder" not "directory",
    the µOS++ licence header in new files, and the portability rule.
-2. Add the tests (usually in `tests/sources/rtos-apis/src/test-cpp-api.cpp`).
+2. Add the tests in the `unit` test (`tests/sources/unit/src/test-rtos.cpp`,
+   `test-c-api.c`, `test-memory.cpp`); `rtos-apis` only checks that the
+   API calls are present, so functional checks do not go there.
 3. **Negative check**: show the new test fails without the fix. Save the
    fixed file to the scratchpad, restore the original from `HEAD` (or
    from the previous fix), make test failures non-fatal if one failure

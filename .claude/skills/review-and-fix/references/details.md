@@ -78,7 +78,7 @@ Change:
 - <bullet per change; say what is not changed>
 - No port, C API or data layout changes.
 
-Test: `tests/sources/rtos-apis/src/test-cpp-api.cpp`, <what the test does>.
+Test: `tests/sources/unit/src/test-rtos.cpp`, <what the test does>.
 
 Without the fix <what the test reports>. With the fix,
 `test-native-cmake-clang`, `test-qemu-cortex-m7f-cmake` and
@@ -98,7 +98,7 @@ Fixed on <YYYY-MM-DD> in <full sha> (`xpack-development`).
 <file or area>: <short summary> (#<issue>)
 
 - <what changed, one bullet per logical change>
-- rtos-apis: <what the new test checks>
+- unit: <what the new test checks>
 
 <attribution trailer from the system prompt>
 ```
@@ -148,7 +148,7 @@ scheduler lock; prefer that to timing.
   lock); state that they pass with the old code too.
 
 Helper threads and their argument structs go in the anonymous namespace
-at the top of `test-cpp-api.cpp` (wrap padded structs in
+at the top of `test-rtos.cpp` (wrap padded structs in
 `#pragma GCC diagnostic ignored "-Wpadded"`).
 
 ## 6. Negative checks and binary comparisons
@@ -160,7 +160,7 @@ S=<scratchpad>
 cp src/rtos/<file>.cpp $S/<file>.cpp.fixed
 git show HEAD:src/rtos/<file>.cpp > src/rtos/<file>.cpp   # or the previous fix
 xpm run build --config native-cmake-clang-debug -C tests
-./tests/build/native-cmake-clang-debug/platform-bin/rtos-apis-test | grep <marker>
+./tests/build/native-cmake-clang-debug/platform-bin/unit-test | grep <marker>
 cp $S/<file>.cpp.fixed src/rtos/<file>.cpp
 ```
 

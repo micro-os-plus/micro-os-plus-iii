@@ -76,6 +76,33 @@ if (ENABLE_RTOS_APIS_TEST)
 endif ()
 
 # -----------------------------------------------------------------------------
+if (ENABLE_UNIT_TEST)
+  add_test_executable (unit-test)
+
+  target_compile_definitions (
+    unit-test
+    PRIVATE # Use buffered write with caution, it occasionally hangs.
+            # OS_USE_TRACE_POSIX_FWRITE_STDOUT
+            OS_USE_TRACE_POSIX_STDOUT
+  )
+
+  target_link_libraries (
+    unit-test
+    PRIVATE micro-os-plus::common-options
+            # Current test library.
+            test::unit
+            # Tested library.
+            micro-os-plus::iii
+            # Platform specific dependencies.
+            micro-os-plus::platform
+  )
+
+  message (VERBOSE "A> unit-test")
+
+  add_test (NAME "unit-test" COMMAND unit-test)
+endif ()
+
+# -----------------------------------------------------------------------------
 if (ENABLE_MUTEX_STRESS_TEST)
   add_test_executable (mutex-stress-test)
 

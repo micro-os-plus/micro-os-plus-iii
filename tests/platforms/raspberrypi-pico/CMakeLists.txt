@@ -83,6 +83,36 @@ if (ENABLE_RTOS_APIS_TEST)
 endif ()
 
 # -----------------------------------------------------------------------------
+if (ENABLE_UNIT_TEST)
+  add_test_executable (unit-test)
+
+  target_link_libraries (
+    unit-test
+    PRIVATE micro-os-plus::common-options
+            # Current test library.
+            test::unit
+            # Tested library.
+            micro-os-plus::iii
+            # Platform specific dependencies.
+            micro-os-plus::platform
+  )
+
+  message (VERBOSE "A> unit-test")
+
+  add_test (
+    NAME "unit-test"
+    COMMAND
+      ${pico_openocd}${extension}
+      # -d3
+      -c "gdb port disabled" -c "tcl port disabled" -c "telnet port disabled"
+      -f interface/cmsis-dap.cfg -f target/rp2040.cfg -c "adapter speed 5000"
+      -c "program unit-test.elf verify" -c "arm semihosting enable" -c
+      "arm semihosting_cmdline unit-test" -c "reset halt" -c
+      "rp2040.core0 arp_reset assert 0"
+  )
+endif ()
+
+# -----------------------------------------------------------------------------
 if (ENABLE_MUTEX_STRESS_TEST)
   add_test_executable (mutex-stress-test)
 

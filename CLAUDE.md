@@ -198,6 +198,10 @@ added to the build, including the port, which is resolved from
 ### Test applications (`tests/sources/`)
 
 - `rtos-apis` - exercises the RTOS C++ API, the C API and the ISO C++ API
+  (the presence of the API calls, simple cases)
+- `unit` - functional tests of the RTOS (scenarios, races, wake-ups,
+  priority inheritance, interrupts, clocks) and the regression tests of
+  fixed bugs; new behaviour tests go here, not in `rtos-apis`
 - `mutex-stress` - several threads competing for one mutex
 - `cmsis-os-validator` - the Arm CMSIS RTOS validator
 - `blinky`, `instrumentation` - board/instrumentation demos

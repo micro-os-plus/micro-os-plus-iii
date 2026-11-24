@@ -44,7 +44,7 @@ os_main (int argc __attribute__ ((unused)),
   int ret = 0;
   errno = 0;
 
-#if 1
+#if 0
   if (ret == 0)
     {
       ret = test_cpp_mem ();

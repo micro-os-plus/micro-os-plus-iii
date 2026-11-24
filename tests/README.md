@@ -76,7 +76,15 @@ the tests occasionally fail, as shown below.
 
 ### rtos-apis
 
-A simple test to exercise most of the RTOS APIs, both C and C++.
+A simple test to exercise most of the RTOS APIs, both C and C++; it
+checks that the API calls are present and work in simple cases.
+
+### unit
+
+Functional tests of the RTOS: the behaviour of threads, the
+synchronisation objects, timers and clocks in specific scenarios
+(races, wake-ups, priority inheritance, interrupts), including the
+regression tests of the fixed bugs.
 
 ### mutex-stress
 

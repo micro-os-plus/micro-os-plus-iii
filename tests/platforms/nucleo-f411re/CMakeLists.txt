@@ -132,6 +132,35 @@ if (ENABLE_RTOS_APIS_TEST)
 endif ()
 
 # -----------------------------------------------------------------------------
+if (ENABLE_UNIT_TEST)
+  add_test_executable (unit-test)
+
+  target_link_libraries (
+    unit-test
+    PRIVATE micro-os-plus::common-options
+            # Current test library.
+            test::unit
+            # Tested library.
+            micro-os-plus::iii
+            # Platform specific dependencies.
+            micro-os-plus::platform
+  )
+
+  message (VERBOSE "A> unit-test")
+
+  add_test (
+    NAME "unit-test"
+    COMMAND
+      openocd${extension}
+      # -d3
+      -c "gdb port disabled" -c "tcl port disabled" -c "telnet port disabled"
+      -f interface/stlink-dap.cfg -f target/stm32f4x.cfg -c
+      "program unit-test.elf verify" -c "arm semihosting enable" -c
+      "arm semihosting_cmdline unit-test" -c "reset"
+  )
+endif ()
+
+# -----------------------------------------------------------------------------
 if (ENABLE_MUTEX_STRESS_TEST)
   add_test_executable (mutex-stress-test)
 

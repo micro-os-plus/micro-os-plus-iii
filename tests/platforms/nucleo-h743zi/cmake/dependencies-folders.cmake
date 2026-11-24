@@ -24,6 +24,7 @@ message (
 set (
   xpack_dependencies_folders
   "${CMAKE_SOURCE_DIR}/sources/rtos-apis"
+  "${CMAKE_SOURCE_DIR}/sources/unit"
   "${CMAKE_SOURCE_DIR}/sources/mutex-stress"
   "${CMAKE_SOURCE_DIR}/sources/cmsis-os-validator"
   # Project dependencies.

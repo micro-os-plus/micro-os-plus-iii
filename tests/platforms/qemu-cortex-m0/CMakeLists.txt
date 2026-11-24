@@ -74,6 +74,33 @@ if (ENABLE_RTOS_APIS_TEST)
 endif ()
 
 # -----------------------------------------------------------------------------
+if (ENABLE_UNIT_TEST)
+  add_test_executable (unit-test)
+
+  target_link_libraries (
+    unit-test
+    PRIVATE micro-os-plus::common-options
+            # Current test library.
+            test::unit
+            # Tested library.
+            micro-os-plus::iii
+            # Platform specific dependencies.
+            micro-os-plus::platform
+  )
+
+  message (VERBOSE "A> unit-test")
+
+  add_test (
+    NAME "unit-test"
+    COMMAND
+      qemu-system-arm${extension} --machine mps2-an385 --cpu cortex-m3 --kernel
+      unit-test.elf --nographic -d unimp,guest_errors --semihosting-config
+      enable=on,target=native,arg=unit-test
+    # --semihosting-config arg=--verbose
+  )
+endif ()
+
+# -----------------------------------------------------------------------------
 if (ENABLE_MUTEX_STRESS_TEST)
   add_test_executable (mutex-stress-test)
 

@@ -241,6 +241,8 @@ target_link_libraries(your-target PRIVATE
 
 - `tests/rtos-apis` - simple test to exercise the µOS++ RTOS C++ API,
 the C API and the ISO C++ API
+- `tests/unit` - functional tests of the RTOS (behaviour in specific
+scenarios, regression tests of the fixed bugs)
 - `tests/mutex-stress` - a stress test with 10 threads fighting for a mutex
 - `tests/cmsis-os-validator` - the Arm CMSIS OS validator
 
