@@ -15,7 +15,7 @@ allocators, a POSIX I/O layer (files, file systems, devices, sockets),
 ISO C++ threading wrappers, a legacy CMSIS RTOS API, and trace/diagnostics
 support.
 
-The project is distributed as an xPack (an xpm/npm source package) and
+The project is distributed as an xpm/npm source package and
 is consumed by applications as a CMake **interface library**
 (`micro-os-plus::iii`). It is a monolithic repository; most components
 are compiled conditionally and are enabled by preprocessor definitions
@@ -190,6 +190,8 @@ for example `native-cmake-clang17-release` or
   `tests/device-qemu-cortexm/`)
 - `nucleo-f411re`, `nucleo-f767zi`, `nucleo-h743zi`,
   `raspberrypi-pico` - physical boards (manual)
+
+(the raspberrypi-pico is not yet functional)
 
 Each platform's `cmake/dependencies-folders.cmake` lists the folders
 added to the build, including the port, which is resolved from

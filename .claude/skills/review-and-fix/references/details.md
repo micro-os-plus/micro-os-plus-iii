@@ -2,112 +2,18 @@
 
 Contents:
 
-1. Review document skeleton
-2. Sections added while fixing
-3. GitHub issue body template
-4. Commit messages
-5. Test patterns (deterministic tests on the RTOS)
-6. Negative checks and binary comparisons
-7. Pitfalls
+1. Test patterns (deterministic tests on the RTOS)
+2. Negative checks and binary comparisons
+3. Pitfalls
 
-## 1. Review document skeleton
+The format of the reports, of the GitHub issues, and of the commit
+messages is no longer described here: it is in
+`.github/skills/review-common.md` and in the `code-review`,
+`create-github-issue`, and `github-commit` skills, and the format of
+the older `CODE-REVIEW-1.md` is under "Review Documents" in
+`.github/skills/project.md`.
 
-```markdown
-# Code review N - <scope>
-
-<Scope, method, what was not reviewed (maintenance/), port versions used.>
-
-## Summary
-
-| # | Severity | File | Issue |
-| --- | --- | --- | --- |
-| #1 | important | `src/rtos/os-thread.cpp:684` | <one line> |
-
-Severity values: important (added or made worse by the change),
-pre-existing, SMP only, minor, narrow, decision, docs, nit.
-
-## Suggested fix order
-
-Phase 1, small and contained: ...
-Phase 2, decide first, then fix: ...
-Phase 3, scheduler and synchronisation core, one at a time, with tests
-between them: ...
-Separately, not tied to this change: ...
-
----
-
-## #1 - <title>
-
-**File:** `path:line`
-
-**Status:** open
-
-### Problem
-### Scenario
-### Documentation and tests
-### Port behaviour
-### Suggested fix
-```
-
-## 2. Sections added while fixing
-
-Under each finding, as it progresses:
-
-- **Status:** `fixed (not committed), with ...` → after the commit
-  `fixed in <short sha> (issue #<n>), with ...`. Decisions:
-  `decided: <what>`.
-- `### Analysis before fixing` - what re-reading the code showed (wider,
-  narrower, wrong); include it whenever the review was not exactly right.
-- `### Fix applied` - files and what changed, what did not change
-  (ports, C API, data layout), behaviour changes.
-- `### Verification` - the tests, the negative check result (for
-  example "with the old file the test returns ETIMEDOUT"), the suites
-  run, what could not be verified.
-- Problems found while fixing that are elsewhere get their own new
-  finding number (#17, #18...) with the same structure, added to the
-  summary table and the fix order.
-
-## 3. GitHub issue body template
-
-```markdown
-Problem: <what is wrong, where (file, function), since which commit or
-"already present in <version>"; a short scenario>.
-
-Change:
-
-- <bullet per change; say what is not changed>
-- No port, C API or data layout changes.
-
-Test: `tests/sources/unit/src/test-rtos.cpp`, <what the test does>.
-
-Without the fix <what the test reports>. With the fix,
-`test-native-cmake-clang`, `test-qemu-cortex-m7f-cmake` and
-`test-qemu-cortex-m0-cmake` pass (debug and release).
-```
-
-Title: `fix(<area>): <summary>` (areas used: rtos, arm, startup, estd).
-After the commit, append (keep two blank lines before it):
-
-```
-Fixed on <YYYY-MM-DD> in <full sha> (`xpack-development`).
-```
-
-## 4. Commit messages
-
-```
-<file or area>: <short summary> (#<issue>)
-
-- <what changed, one bullet per logical change>
-- unit: <what the new test checks>
-
-<attribution trailer from the system prompt>
-```
-
-Examples of subjects used: `os-condvar.cpp: timed_wait() result from what
-woke the thread (#146)`, `rtos: no kill() livelock while idle destroys
-the thread (#147)`, `portable guards instead of __ARM_EABI__ (#152)`.
-
-## 5. Test patterns (deterministic tests on the RTOS)
+## 1. Test patterns (deterministic tests on the RTOS)
 
 Most races can be forced deterministically with priorities and the
 scheduler lock; prefer that to timing.
@@ -151,7 +57,7 @@ Helper threads and their argument structs go in the anonymous namespace
 at the top of `test-rtos.cpp` (wrap padded structs in
 `#pragma GCC diagnostic ignored "-Wpadded"`).
 
-## 6. Negative checks and binary comparisons
+## 2. Negative checks and binary comparisons
 
 Negative check:
 
@@ -178,7 +84,7 @@ macOS) of every test binary in the release configurations.
 `cmsis-os-validator` embeds `__TIME__`; compare its images with
 `cmp -l` and expect only 2-4 differing bytes.
 
-## 7. Pitfalls
+## 3. Pitfalls
 
 - zsh does not split unquoted variables: loop over explicit words or
   use `${=VAR}`; `$B:s...` is a zsh modifier, write `${B}`; set
@@ -199,3 +105,7 @@ macOS) of every test binary in the release configurations.
   matches before writing, so a mismatch stops instead of half-applying.
 - The user may be editing files (for example `tests/package.json`)
   while you work; never include them in commits or stashes.
+- `scripts/build-probe.mjs` links the probe with the objects of the
+  test build folder as they are: after changing a source, rebuild that
+  folder (`xpm run build --config <name> -C tests`) first, or the probe
+  runs the old code.
