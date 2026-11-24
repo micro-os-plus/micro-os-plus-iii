@@ -18,6 +18,10 @@
 
 #define OS_USE_SEMIHOSTING_SYSCALLS
 
+// QEMU raises the SysTick pending flag after the counter reloaded, so the
+// high resolution clock may step back by a few cycles (see test-rtos.cpp).
+#define OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES 1000
+
 // ----------------------------------------------------------------------------
 
 #endif /* PLATFORM_QEMU_CORTEX_M3_PLATFORM_H_ */

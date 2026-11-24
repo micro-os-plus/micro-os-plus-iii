@@ -23,10 +23,22 @@
 #include <cmsis-plus/rtos/os.h>
 
 #include <algorithm>
+#include <cinttypes>
 #include <cstdint>
 #include <cstdio>
 
 #include <test-unit.h>
+
+// ----------------------------------------------------------------------------
+
+// The largest backwards step of the high resolution clock, in cycles,
+// accepted by the clock monotonicity test. It is 0 (strict) by default.
+// QEMU raises the SysTick pending flag some time after the counter
+// reloaded, so a read in between cannot detect the wrap; the platforms
+// running on QEMU define a small tolerance, far below one tick.
+#if !defined(OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES)
+#define OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES 0
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -1321,6 +1333,11 @@ test_unit_rtos (void)
           / OS_INTEGER_SYSTICK_FREQUENCY_HZ;
     uint32_t backwards = 0;
     uint32_t crossed = 0;
+    uint32_t tolerated = 0;
+    // The values of the last failure, to be printed for diagnostics.
+    int fail_round = 0;
+    clock::timestamp_t fail_prev = 0;
+    clock::timestamp_t fail_now = 0;
     for (int round = 0; round < 20; ++round)
       {
         clock::timestamp_t ticks_before = sysclock.now ();
@@ -1336,11 +1353,23 @@ test_unit_rtos (void)
               clock::timestamp_t now = hrclock.now ();
               if (now < prev)
                 {
-                  ++backwards;
-                  break;
+                  if (prev - now > OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES)
+                    {
+                      ++backwards;
+                      fail_round = round;
+                      fail_prev = prev;
+                      fail_now = now;
+                      break;
+                    }
+                  // A small step back, within the tolerance; keep the
+                  // largest value seen, so that the steps do not add up.
+                  ++tolerated;
                 }
-              prev = now;
-              if (now - begin >= (cycles_per_tick * 3) / 4)
+              else
+                {
+                  prev = now;
+                }
+              if (prev - begin >= (cycles_per_tick * 3) / 4)
                 {
                   break;
                 }
@@ -1359,6 +1388,11 @@ test_unit_rtos (void)
       {
         printf ("%s - hrclock went backwards %u times\n", test_name,
                 static_cast<unsigned int> (backwards));
+        printf ("%s - round %d, previous %" PRIu64 ", now %" PRIu64
+                ", cycles per tick %" PRIu64 "\n",
+                test_name, fail_round, static_cast<uint64_t> (fail_prev),
+                static_cast<uint64_t> (fail_now),
+                static_cast<uint64_t> (cycles_per_tick));
         return 1;
       }
     if (crossed == 0)
@@ -1370,6 +1404,13 @@ test_unit_rtos (void)
       {
         printf ("%s - hrclock monotonic ok (%u rounds over a tick)\n",
                 test_name, static_cast<unsigned int> (crossed));
+      }
+    if (tolerated != 0)
+      {
+        printf ("%s - %u small backwards steps tolerated (<= %u cycles)\n",
+                test_name, static_cast<unsigned int> (tolerated),
+                static_cast<unsigned int> (
+                    OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES));
       }
   }
 
