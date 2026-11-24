@@ -91,6 +91,17 @@ tmfunc (void* args __attribute__ ((unused)))
   // fflush(stdout);
 }
 
+// Thread function which sleeps, to be interrupted or killed.
+void*
+sleeper_func (void* args);
+
+void*
+sleeper_func (void* args __attribute__ ((unused)))
+{
+  sysclock.sleep_for (10);
+  return nullptr;
+}
+
 #if !defined(OS_USE_RTOS_PORT_SCHEDULER)
 
 void
@@ -247,6 +258,11 @@ test_cpp_api (void)
         assert (b3 == nullptr);
       }
 
+    // The size of a block.
+    std::size_t sz = bp2.usable_size (b1);
+    assert (sz == sizeof (my_blk_t));
+    (void)sz;
+
     bp2.deallocate (b1, 0, 1);
     bp2.deallocate (b2, 0, 1);
   }
@@ -383,6 +399,32 @@ test_cpp_api (void)
 
     sth1.join ();
     sth2.join ();
+  }
+
+  // --------------------------------------------------------------------------
+
+  {
+    // Thread with attributes.
+    thread::attributes attr;
+    attr.th_priority = thread::priority::below_normal;
+    attr.th_stack_size_bytes = thread::stack::default_size ();
+    thread th{ "th-attr", func, nullptr, attr };
+
+    th.join ();
+  }
+
+  {
+    // Interrupt a thread, which ends its sleep.
+    thread th{ "th-intr", sleeper_func, nullptr };
+    th.interrupt ();
+
+    th.join ();
+  }
+
+  {
+    // Kill a thread.
+    thread th{ "th-kill", sleeper_func, nullptr };
+    th.kill ();
   }
 
   // ==========================================================================
@@ -900,6 +942,17 @@ test_cpp_api (void)
   // fflush(stdout);
 
   {
+    // Mutex with attributes.
+    mutex::attributes attr;
+    attr.mx_type = mutex::type::errorcheck;
+    attr.mx_protocol = mutex::protocol::inherit;
+    mutex mx{ "mx-attr", attr };
+
+    mx.lock ();
+    mx.unlock ();
+  }
+
+  {
     // Unnamed mutex.
     mutex mx1;
     mx1.lock ();
@@ -1205,6 +1258,30 @@ test_cpp_api (void)
   {
     scheduler::preemptive (false);
     scheduler::preemptive (true);
+  }
+
+  // ==========================================================================
+
+  printf ("\n%s - Clocks\n", test_name);
+
+  {
+    uint32_t freq = hrclock.input_clock_frequency_hz ();
+    printf ("%s - hrclock %u Hz\n", test_name,
+            static_cast<unsigned int> (freq));
+  }
+
+  // ==========================================================================
+
+  printf ("\n%s - Critical sections\n", test_name);
+
+  {
+    // Interrupts critical section.
+    interrupts::critical_section ics;
+  }
+
+  {
+    // Scheduler critical section.
+    scheduler::critical_section scs;
   }
 
   // ==========================================================================
