@@ -47,14 +47,13 @@ INPUT = \
 # _INPUT = \
 #	"pages" \
 #	"../include/cmsis-plus/rtos/os.h" \
-#	"../src/cmsis-plus/rtos/" \
+#	"../src/rtos/" \
 
 EXCLUDE = \
-	"../src/cmsis-plus/rtos/os-impl.cpp" \
-	"../src/cmsis-plus/libcpp/chrono.cpp" \
-	"../src/cmsis-plus/libcpp/condition-variable.cpp" \
-	"../src/cmsis-plus/libcpp/mutex.cpp" \
-	"../src/cmsis-plus/libcpp/thread.cpp" \
+	"../src/libcpp/chrono.cpp" \
+	"../src/libcpp/condition-variable.cpp" \
+	"../src/libcpp/mutex.cpp" \
+	"../src/libcpp/thread.cpp" \
 
 # INLINE_INHERITED_MEMB = NO
 INLINE_INHERITED_MEMB = YES
