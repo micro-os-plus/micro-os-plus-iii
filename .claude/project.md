@@ -30,8 +30,12 @@ project; this repository is IIIe only.
 
 ## Portable core and architecture ports
 
-This repository contains **only the portable part**. It never builds on
-its own: every application must also link exactly one architecture port.
+This repository is meant to contain **only the portable part**; a known
+exception is the Cortex-M startup, fault handler, and trace code, which
+is still in the core (see "Cortex-M code in the portable core" in
+`maintenance/docs/TODO.md`; moving it is a deferred breaking change).
+The repository never builds on its own: every application must also link
+exactly one architecture port.
 The ports are separate repositories, checked out as sibling folders of
 this one:
 
