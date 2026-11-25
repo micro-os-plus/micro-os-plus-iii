@@ -30,7 +30,7 @@ set (
   # Project dependencies.
   # The BINARY_DIR is the `build/<config>` folder.
   "${CMAKE_BINARY_DIR}/xpacks/@micro-os-plus/micro-os-plus-iii-cortexm"
-  "${CMAKE_BINARY_DIR}/xpacks/@xpacks/arm-cmsis"
+  "${CMAKE_BINARY_DIR}/xpacks/@xpack-3rd-party/arm-cmsis-core"
   # The SOURCE_DIR is the `tests` folder.
   "${CMAKE_SOURCE_DIR}/device-qemu-cortexm"
   "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/arm-cmsis-rtos-validator"

@@ -56,7 +56,7 @@ target_link_options (
 )
 
 target_link_libraries (
-  device-qemu-cortexm-interface INTERFACE xpacks::arm-cmsis
+  device-qemu-cortexm-interface INTERFACE xpack-3rd-party::arm-cmsis-core
 )
 
 if (COMMAND xpack_display_target_lists)

@@ -61,9 +61,9 @@
         "rm -rf ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
         "git clone --branch xpack-development https://github.com/xpacks/chan-fatfs.git ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
         "xpm link -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
-        "rm -rf ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
-        "git clone --branch xpack-development https://github.com/xpacks/arm-cmsis.git ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
-        "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
+        "rm -rf ${HOME}/Work/xpack-3rd-party/arm-cmsis-core-xpack.git",
+        "git clone --branch xpack-development https://github.com/xpack-3rd-party/arm-cmsis-core-xpack.git ${HOME}/Work/xpack-3rd-party/arm-cmsis-core-xpack.git",
+        "xpm link -C ${HOME}/Work/xpack-3rd-party/arm-cmsis-core-xpack.git",
         "rm -rf ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
         "git clone --branch xpack-development https://github.com/xpack-3rd-party/libucontext-xpack.git ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
         "xpm link -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
@@ -77,7 +77,7 @@
         "git -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git status",
         "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git status",
         "git -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git status",
-        "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git status",
+        "git -C ${HOME}/Work/xpack-3rd-party/arm-cmsis-core-xpack.git status",
         "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git status",
         "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git status"
       ],
@@ -87,7 +87,7 @@
         "git -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git pull",
         "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git pull",
         "git -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git pull",
-        "git -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git pull",
+        "git -C ${HOME}/Work/xpack-3rd-party/arm-cmsis-core-xpack.git pull",
         "git -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git pull",
         "git -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git pull"
       ],
@@ -97,7 +97,7 @@
         "xpm link -C ${HOME}/Work/micro-os-plus/micro-os-plus-iii-cortexm.git",
         "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
         "xpm link -C ${HOME}/Work/micro-os-plus-iii/chan-fatfs.git",
-        "xpm link -C ${HOME}/Work/micro-os-plus-iii/arm-cmsis.git",
+        "xpm link -C ${HOME}/Work/xpack-3rd-party/arm-cmsis-core-xpack.git",
         "xpm link -C ${HOME}/Work/xpack-3rd-party/libucontext-xpack.git",
         "xpm link -C ${HOME}/Work/xpack-3rd-party/raspberrypi-pico-sdk-xpack.git"
       ],
@@ -107,7 +107,7 @@
         "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/micro-os-plus-iii-cortexm.git",
         "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/arm-cmsis-rtos-validator.git",
         "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/chan-fatfs.git",
-        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/micro-os-plus-iii/arm-cmsis.git"
+        "xpm link -C ${HOME}/MyProjects/micro-os-plus.github/xPacks/xPacks-3rd-party/arm-cmsis-core-xpack.git"
       ],
       "install": [
         "xpm install",
@@ -138,7 +138,9 @@
         "xpm install --config qemu-cortex-m3-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m3-cmake-gcc-release",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-release"
       ],
      "link-dependencies-ci": [
         "xpm run link-dependencies",
@@ -151,14 +153,17 @@
         "xpm run link-dependencies --config qemu-cortex-m3-cmake-gcc-debug",
         "xpm run link-dependencies --config qemu-cortex-m3-cmake-gcc-release",
         "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m33-cmake-gcc-release"
       ],
       "test-ci": [
         "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
         "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
         "xpm run test-qemu-cortex-m0-cmake",
         "xpm run test-qemu-cortex-m3-cmake",
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run test-qemu-cortex-m7f-cmake",
+        "xpm run test-qemu-cortex-m33-cmake"
       ],
 
       "install-selected": [
@@ -168,7 +173,9 @@
         "xpm install --config qemu-cortex-m0-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m0-cmake-gcc-release",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-release"
       ],
      "link-dependencies-selected": [
         "xpm run link-dependencies",
@@ -177,12 +184,15 @@
         "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-debug",
         "xpm run link-dependencies --config qemu-cortex-m0-cmake-gcc-release",
         "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m33-cmake-gcc-release"
       ],
       "test-selected": [
         "{% if os.platform == 'linux' or os.platform == 'darwin' %}xpm run test-native-cmake-clang{% endif %}",
         "xpm run test-qemu-cortex-m0-cmake",
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run test-qemu-cortex-m7f-cmake",
+        "xpm run test-qemu-cortex-m33-cmake"
       ],
 
       "install-latest": [
@@ -198,7 +208,9 @@
         "xpm install --config qemu-cortex-m4f-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m4f-cmake-gcc-release",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-release"
       ],
      "link-dependencies-latest": [
         "xpm run link-dependencies",
@@ -213,7 +225,9 @@
         "xpm run link-dependencies --config qemu-cortex-m4f-cmake-gcc-debug",
         "xpm run link-dependencies --config qemu-cortex-m4f-cmake-gcc-release",
         "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm run link-dependencies --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run link-dependencies --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run link-dependencies --config qemu-cortex-m33-cmake-gcc-release"
       ],
       "test-latest": [
         "{% if os.platform == 'linux' %}xpm run test-native-cmake-gcc{% endif %}",
@@ -221,9 +235,9 @@
         "xpm run test-qemu-cortex-m0-cmake",
         "xpm run test-qemu-cortex-m3-cmake",
         "xpm run test-qemu-cortex-m4f-cmake",
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run test-qemu-cortex-m7f-cmake",
+        "xpm run test-qemu-cortex-m33-cmake"
       ],
-
 
       "install-qemu-cortex-latest": [
         "xpm install",
@@ -234,13 +248,16 @@
         "xpm install --config qemu-cortex-m4f-cmake-gcc-debug",
         "xpm install --config qemu-cortex-m4f-cmake-gcc-release",
         "xpm install --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm install --config qemu-cortex-m7f-cmake-gcc-release"
+        "xpm install --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm install --config qemu-cortex-m33-cmake-gcc-release"
       ],
       "run-qemu-cortex-latest": [
         "xpm run test-qemu-cortex-m0-cmake",
         "xpm run test-qemu-cortex-m3-cmake",
         "xpm run test-qemu-cortex-m4f-cmake",
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run test-qemu-cortex-m7f-cmake",
+        "xpm run test-qemu-cortex-m33-cmake"
       ],
 
       "install-all": [
@@ -397,7 +414,8 @@
         "xpm run test-qemu-cortex-m0-cmake",
         "xpm run test-qemu-cortex-m3-cmake",
         "xpm run test-qemu-cortex-m4f-cmake",
-        "xpm run test-qemu-cortex-m7f-cmake"
+        "xpm run test-qemu-cortex-m7f-cmake",
+        "xpm run test-qemu-cortex-m33-cmake"
       ],
       "test-qemu-cortex-m0-cmake": [
         "xpm run prepare --config qemu-cortex-m0-cmake-gcc-debug",
@@ -430,6 +448,14 @@
         "xpm run prepare --config qemu-cortex-m7f-cmake-gcc-release",
         "xpm run build --config qemu-cortex-m7f-cmake-gcc-release",
         "xpm run test --config qemu-cortex-m7f-cmake-gcc-release"
+      ],
+      "test-qemu-cortex-m33-cmake": [
+        "xpm run prepare --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run build --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run test --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run prepare --config qemu-cortex-m33-cmake-gcc-release",
+        "xpm run build --config qemu-cortex-m33-cmake-gcc-release",
+        "xpm run test --config qemu-cortex-m33-cmake-gcc-release"
       ],
       "test-raspberrypi-pico-cmake": [
         "xpm run prepare --config raspberrypi-pico-cmake-gcc-debug",
@@ -502,10 +528,16 @@
         "xpm run clean --config qemu-cortex-m4f-cmake-gcc-release --ignore-errors",
         "xpm run clean --config qemu-cortex-m7f-cmake-gcc-debug --ignore-errors",
         "xpm run clean --config qemu-cortex-m7f-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config qemu-cortex-m33-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config qemu-cortex-m33-cmake-gcc-release --ignore-errors",
         "xpm run clean --config raspberrypi-pico-cmake-gcc-debug --ignore-errors",
         "xpm run clean --config raspberrypi-pico-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config nucleo-f411re-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config nucleo-f411re-cmake-gcc-release --ignore-errors",
         "xpm run clean --config nucleo-f767zi-cmake-gcc-debug --ignore-errors",
-        "xpm run clean --config nucleo-f767zi-cmake-gcc-release --ignore-errors"
+        "xpm run clean --config nucleo-f767zi-cmake-gcc-release --ignore-errors",
+        "xpm run clean --config nucleo-h743zi-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config nucleo-h743zi-cmake-gcc-release --ignore-errors"
       ]
     },
     "buildConfigurations": {
@@ -541,43 +573,27 @@
           ],
           "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
-            "xpm link @xpacks/arm-cmsis --config {{ configuration.name }}"
+            "xpm link @xpack-3rd-party/arm-cmsis-core --config {{ configuration.name }}"
           ]
         }
       },
       "native-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@micro-os-plus/posix-arch": {
-            "specifier": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.0.1",
-            "local": "link",
-            "platforms": "all"
-          },
-          "@xpack-3rd-party/libucontext": {
-            "specifier": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-5",
-            "local": "link",
-            "platforms": "all"
-          }
+          "@micro-os-plus/posix-arch": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.0.1",
+          "@xpack-3rd-party/libucontext": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-5"
         }
       },
       "cortexm-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@micro-os-plus/micro-os-plus-iii-cortexm": {
-            "specifier": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.1.0",
-            "local": "link",
-            "platforms": "all"
-          }
+          "@micro-os-plus/micro-os-plus-iii-cortexm": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.1.0"
         }
       },
       "arm-cmsis-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@xpacks/arm-cmsis": {
-            "specifier": "github:xpacks/arm-cmsis#v4.5.0-7",
-            "local": "link",
-            "platforms": "all"
-          }
+          "@xpack-3rd-party/arm-cmsis-core": "5.4.0-7"
         }
       },
       "arm-none-eabi-gcc-dependencies": {
@@ -1108,7 +1124,34 @@
           "shortConfigurationName": "m7fr"
         }
       },
+      "qemu-cortex-m33-cmake-gcc-debug": {
+        "inherit": [
+          "cortexm-actions",
+          "cmake-actions",
+          "cortexm-dependencies",
+          "arm-cmsis-dependencies",
+          "arm-none-eabi-gcc-dependencies",
+          "qemu-arm-dependencies",
+          "short-win-paths-properties"
+        ],
+        "properties": {
+          "buildType": "Debug",
+          "platformName": "qemu-cortex-m33",
+          "toolchainFileName": "arm-none-eabi-gcc.cmake",
+          "shortConfigurationName": "m33d"
+        }
+      },
+      "qemu-cortex-m33-cmake-gcc-release": {
+        "inherit": [
+          "qemu-cortex-m33-cmake-gcc-debug"
+        ],
+        "properties": {
+          "buildType": "MinSizeRel",
+          "shortConfigurationName": "m33r"
+        }
+      },
       "raspberrypi-pico-cmake-gcc-debug": {
+        "hidden": true,
         "inherit": [
           "cortexm-actions",
           "cmake-actions",
@@ -1124,11 +1167,7 @@
           "shortConfigurationName": "rpd"
         },
         "devDependencies": {
-          "@xpack-3rd-party/raspberrypi-pico-sdk": {
-            "specifier": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#v1.5.1-1",
-            "local": "link",
-            "platforms": "all"
-          }
+          "@xpack-3rd-party/raspberrypi-pico-sdk": "github:xpack-3rd-party/raspberrypi-pico-sdk-xpack#v1.5.1-1"
         },
         "actions": {
           "link-dependencies": [
@@ -1138,6 +1177,7 @@
         }
       },
       "raspberrypi-pico-cmake-gcc-release": {
+        "hidden": true,
         "inherit": [
           "raspberrypi-pico-cmake-gcc-debug"
         ],
@@ -1167,16 +1207,8 @@
           ]
         },
         "devDependencies": {
-          "@xpack-segger/rtt": {
-            "specifier": "github:xpack-3rd-party/segger-rtt-xpack#v8.56.1-2",
-            "local": "link",
-            "platforms": "all"
-          },
-          "@xpack-segger/system-view": {
-            "specifier": "github:xpack-3rd-party/segger-system-view-xpack#v3.60.5-2",
-            "local": "link",
-            "platforms": "all"
-          }
+          "@xpack-segger/rtt": "github:xpack-3rd-party/segger-rtt-xpack#v8.56.1-2",
+          "@xpack-segger/system-view": "github:xpack-3rd-party/segger-system-view-xpack#v3.60.5-2"
         }
       },
       "nucleo-f411re-cmake-gcc-release": {
