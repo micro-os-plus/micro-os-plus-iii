@@ -11,7 +11,9 @@ and close existing issues and pull requests.
 * #157: on Armv8-M and Armv8.1-M (Cortex-M23, M33, M55, M85), the main
   (interrupts) stack is protected by the hardware stack limit register
   `MSPLIM`, set at the beginning of `_start()`, instead of overflowing
-  silently into the heap; the overflow is reported by the `HardFault` or
+  silently into the heap, and the thread stacks by `PSPLIM`, set by the
+  Cortex-M port at every context switch, instead of overflowing into the
+  adjacent memory; the overflow is reported by the `HardFault` or
   `UsageFault` handlers (`STKOF`). It needs the ports to provide
   `port::interrupts::set_stack_limit()` (an empty inline function when
   there is no hardware support; the Cortex-M, POSIX, AArch32, and

@@ -715,6 +715,43 @@ namespace
 
     return nullptr;
   }
+
+  // --------------------------------------------------------------------------
+
+// Armv8-M and Armv8.1-M Mainline (M33, M55, M85).
+#if defined(__ARM_ARCH_PROFILE) && (__ARM_ARCH_PROFILE == 'M') \
+    && (__ARM_ARCH >= 8) && (__ARM_ARCH_ISA_THUMB == 2)
+
+  // The PSPLIM that the port sets for a thread: after the stack magic
+  // word at the bottom, rounded up to 8 bytes.
+  uint32_t
+  expected_psplim (thread& th)
+  {
+    return (reinterpret_cast<uint32_t> (th.stack ().bottom ())
+            + static_cast<uint32_t> (sizeof (thread::stack::element_t)) + 7U)
+           & ~7U;
+  }
+
+  uint32_t
+  read_psplim (void)
+  {
+    uint32_t psplim;
+    __asm__ volatile ("mrs %0, psplim" : "=r"(psplim));
+    return psplim;
+  }
+
+  uint32_t volatile psplim_thread_value;
+  uint32_t volatile psplim_thread_expected;
+
+  void*
+  psplim_func (void* args __attribute__ ((unused)))
+  {
+    psplim_thread_value = read_psplim ();
+    psplim_thread_expected = expected_psplim (this_thread::thread ());
+    return nullptr;
+  }
+
+#endif
 } // namespace
 
 // ----------------------------------------------------------------------------
@@ -1533,6 +1570,49 @@ test_unit_rtos (void)
       }
     printf ("%s - MSPLIM at the bottom of the interrupt stack ok\n",
             test_name);
+  }
+
+  {
+    // The port sets PSPLIM from the bottom of the stack of the running
+    // thread, when entering the first thread and at every context switch.
+    // The current thread (the first one entered, running here) must
+    // have its own limit, and must get it back after other threads ran.
+    thread& crt = this_thread::thread ();
+    if (read_psplim () != expected_psplim (crt))
+      {
+        printf ("%s - PSPLIM %08X, expected %08X\n", test_name,
+                static_cast<unsigned int> (read_psplim ()),
+                static_cast<unsigned int> (expected_psplim (crt)));
+        return 1;
+      }
+
+    // Above the current thread, so that it runs, and switches, at once.
+    thread::attributes attr;
+    attr.th_priority = thread::priority::above_normal;
+    thread th{ "th-psplim", psplim_func, nullptr, attr };
+    th.join ();
+
+    if (psplim_thread_value != psplim_thread_expected)
+      {
+        printf ("%s - thread PSPLIM %08X, expected %08X\n", test_name,
+                static_cast<unsigned int> (psplim_thread_value),
+                static_cast<unsigned int> (psplim_thread_expected));
+        return 1;
+      }
+    if (psplim_thread_value == read_psplim ())
+      {
+        printf ("%s - the threads have the same PSPLIM %08X\n", test_name,
+                static_cast<unsigned int> (psplim_thread_value));
+        return 1;
+      }
+    if (read_psplim () != expected_psplim (crt))
+      {
+        printf ("%s - PSPLIM %08X, expected %08X, after the switches\n",
+                test_name, static_cast<unsigned int> (read_psplim ()),
+                static_cast<unsigned int> (expected_psplim (crt)));
+        return 1;
+      }
+    printf ("%s - PSPLIM at the bottom of the thread stacks ok\n", test_name);
   }
 #endif
 
