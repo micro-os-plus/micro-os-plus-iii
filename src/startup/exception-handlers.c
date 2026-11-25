@@ -182,6 +182,15 @@ dump_exception_stack (exception_stack_frame_t* frame, uint32_t cfsr,
   trace_printf (" DFSR = %08X\n", SCB->DFSR);
   trace_printf (" AFSR = %08X\n", SCB->AFSR);
 
+#if (__ARM_ARCH >= 8)
+  // UFSR.STKOF; the stack frame above may be invalid, since the
+  // hardware does not write it below the stack limit.
+  if (cfsr & (1UL << 20))
+    {
+      trace_printf (" STKOF: stack overflow (the frame may be invalid)\n");
+    }
+#endif
+
   if (cfsr & (1UL << 7))
     {
       trace_printf (" MMFAR= %08X\n", mmfar);
@@ -419,6 +428,25 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
 
 #endif
 
+// Armv8-M and Armv8.1-M Mainline (M33, M55, M85): after a stack overflow
+// (UFSR.STKOF, bit 20 of CFSR) SP is at MSPLIM, and the first push of the
+// handler would fault again, locking up the processor. The handlers
+// that report faults start by clearing MSPLIM in this case; they never
+// return to the interrupted code, so the check is not needed later.
+// Clobbers r3, which is saved in the exception stack frame.
+#if (__ARM_ARCH >= 8)
+#define OS_EXCEPTION_CLEAR_MSPLIM_ON_STKOF \
+  " ldr r3,=0xE000ED28 \n" \
+  " ldr r3,[r3]        \n" \
+  " tst r3,#0x100000   \n" \
+  " beq 1f             \n" \
+  " movs r3,#0         \n" \
+  " msr msplim,r3      \n" \
+  "1:                  \n"
+#else
+#define OS_EXCEPTION_CLEAR_MSPLIM_ON_STKOF ""
+#endif
+
 // Hard Fault handler wrapper in assembly.
 // Extract the location of the stack frame and pass it to the C
 // handler as a pointer. Also pass the LR value as second
@@ -429,7 +457,8 @@ is_semihosting (exception_stack_frame_t* frame, uint16_t opCode)
 void __attribute__ ((section (".after_vectors"), weak, naked))
 HardFault_Handler (void)
 {
-  __asm__ volatile (" tst lr,#4       \n"
+  __asm__ volatile (OS_EXCEPTION_CLEAR_MSPLIM_ON_STKOF
+                    " tst lr,#4       \n"
                     " ite eq          \n"
                     " mrseq r0,msp    \n"
                     " mrsne r0,psp    \n"
@@ -641,7 +670,8 @@ BusFault_Handler_C (exception_stack_frame_t* frame __attribute__ ((unused)),
 void __attribute__ ((section (".after_vectors"), weak, naked))
 UsageFault_Handler (void)
 {
-  __asm__ volatile (" tst lr,#4       \n"
+  __asm__ volatile (OS_EXCEPTION_CLEAR_MSPLIM_ON_STKOF
+                    " tst lr,#4       \n"
                     " ite eq          \n"
                     " mrseq r0,msp    \n"
                     " mrsne r0,psp    \n"

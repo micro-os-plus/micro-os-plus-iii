@@ -6,6 +6,17 @@ Please check
 [GitHub](https://github.com/micro-os-plus/micro-os-plus-iii/issues)
 and close existing issues and pull requests.
 
+## 2026-11-25
+
+* #157: on Armv8-M and Armv8.1-M (Cortex-M23, M33, M55, M85), the main
+  (interrupts) stack is protected by the hardware stack limit register
+  `MSPLIM`, set at the beginning of `_start()`, instead of overflowing
+  silently into the heap; the overflow is reported by the `HardFault` or
+  `UsageFault` handlers (`STKOF`). It needs the ports to provide
+  `port::interrupts::set_stack_limit()` (an empty inline function when
+  there is no hardware support; the Cortex-M, POSIX, AArch32, and
+  AArch64 ports do).
+
 ## 2026-11-23
 
 * A context switch requested while the scheduler is locked (for example

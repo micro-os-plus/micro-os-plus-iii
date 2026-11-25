@@ -268,6 +268,12 @@ _start (void)
 
   // --------------------------------------------------------------------------
 
+  // Enable the hardware check of the main stack overflow, if the
+  // architecture has one (Armv8-M); otherwise this does nothing.
+  // It must be the first step, to cover all the startup code, and it
+  // must not use any global variable, since the BSS is not yet cleared.
+  rtos::port::interrupts::set_stack_limit (&_Heap_Limit);
+
   // Initialise hardware right after reset, to switch clock to higher
   // frequency and have the rest of the initialisations run faster.
   //

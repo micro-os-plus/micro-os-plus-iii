@@ -74,6 +74,9 @@ namespace
 // The top of the interrupt stack, from the linker script.
 extern "C" unsigned int __stack;
 
+// The bottom of the interrupt stack, from the linker script.
+extern "C" unsigned long int _Heap_Limit;
+
 extern "C" void
 NMI_Handler (void);
 
@@ -1509,6 +1512,27 @@ test_unit_rtos (void)
         return 1;
       }
     printf ("%s - interrupt stack at __stack ok\n", test_name);
+  }
+#endif
+
+// Armv8-M and Armv8.1-M, Baseline and Mainline (M23, M33, M55, M85).
+#if (__ARM_ARCH >= 8) && (__ARM_ARCH_ISA_THUMB == 2)
+  {
+    // `_start()` sets the hardware limit of the interrupt stack to its
+    // bottom, before anything else runs (the linker script aligns
+    // `_Heap_Limit`). Only the Mainline can read it back as non-secure.
+    uint32_t msplim;
+    __asm__ volatile ("mrs %0, msplim" : "=r"(msplim));
+    uint32_t expected = reinterpret_cast<uint32_t> (&_Heap_Limit);
+    if (msplim != expected)
+      {
+        printf ("%s - MSPLIM %08X, _Heap_Limit %08X\n", test_name,
+                static_cast<unsigned int> (msplim),
+                static_cast<unsigned int> (expected));
+        return 1;
+      }
+    printf ("%s - MSPLIM at the bottom of the interrupt stack ok\n",
+            test_name);
   }
 #endif
 

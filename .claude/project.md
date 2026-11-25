@@ -71,7 +71,10 @@ The interface the core expects from a port is declared in the
 `os::rtos::port` namespace in
 [include/cmsis-plus/rtos/os-decls.h](include/cmsis-plus/rtos/os-decls.h)
 (sub-namespaces such as `port::clock`, `port::interrupts`,
-`port::scheduler`, `port::thread`).
+`port::scheduler`, `port::thread`). `port::interrupts::set_stack_limit()`
+is called at the beginning of `_start()`, before the BSS is cleared (it
+must not use globals); it is an empty inline function on ports without a
+hardware stack limit.
 
 When changing anything in `namespace port`, in the `port/*.h` includes,
 or in the semantics of scheduler/thread/clock internals, **check and

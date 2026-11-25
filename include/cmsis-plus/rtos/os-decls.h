@@ -836,6 +836,27 @@ namespace os
         bool
         in_handler_mode (void);
 
+        /**
+         * @brief Set the hardware limit of the main (interrupts) stack.
+         *
+         * @param [in] bottom Address of the lowest byte of the main
+         * stack (the end of the memory area, towards the heap).
+         *
+         * @details
+         * Called once, at the very beginning of `_start()`, before the
+         * DATA and BSS initialisation, with the bottom of the stack
+         * that is used since reset and, after the scheduler is started,
+         * by the interrupt handlers. Ports with a hardware stack limit
+         * register (Armv8-M) use it to turn a stack overflow into a
+         * fault, instead of silently overwriting the memory below the
+         * stack; the other ports provide an empty inline function.
+         *
+         * Since it runs before the static data is initialised, an
+         * implementation must not use any global variable.
+         */
+        void
+        set_stack_limit (const void* bottom);
+
         // ====================================================================
 
         class critical_section
