@@ -47,31 +47,28 @@ critical sections.
 
 ## Tests
 
-This overrides the default: the tests folder has no `test-selected`
-action, and `xpm run test -C tests` runs the QEMU Cortex-M7F tests, not
-the tests built with the system compiler.
+This overrides the default: `xpm run test -C tests` runs the native
+tests with the system compiler (`test-native-cmake-sys`), and the
+default QEMU platform is the Cortex-M33.
 
-- After minor changes, run the native tests with clang and the QEMU
-  Cortex-M7F tests:
+- After minor changes, run the native tests with clang:
 
   ```sh
   xpm run test-native-cmake-clang -C tests
-  xpm run test-qemu-cortex-m7f-cmake -C tests
   ```
 
 - After major changes (the scheduler, the synchronisation objects, the
-  clocks, the startup, the C API, or the port contract), also run
-  Armv6-M (Baseline) and Armv7-M:
+  clocks, the startup, the C API, or the port contract), run
+  `xpm run test-selected -C tests`, which runs the native tests with
+  clang and the QEMU Cortex-M0 (Armv6-M Baseline), Cortex-M7F
+  (Armv7E-M Mainline), and Cortex-M33 (Armv8-M Mainline) tests.
+
+- For wide changes, `test-latest` runs the
+  tests on all platforms.
 
   ```sh
-  xpm run test-qemu-cortex-m0-cmake -C tests
-  xpm run test-qemu-cortex-m3-cmake -C tests
+  xpm run test-latest -C tests
   ```
-
-  and, for wide changes, `test-native-cmake-gcc` and
-  `test-qemu-cortex-m4f-cmake`. `xpm run test-ci -C tests` runs the
-  same set as the GitHub Actions CI; `xpm run test-all -C tests` runs
-  every compiler version (GCC 11 to 14, clang 13 to 19).
 
 - A change limited to the Cortex-M port, or to code compiled only for
   Cortex-M, needs only the QEMU tests; a change limited to the POSIX
@@ -117,7 +114,8 @@ node .github/skills/review-and-fix/scripts/build-probe.mjs \
 - Build the test folder first
   (`xpm run build --config <name> -C tests`). Use
   `native-cmake-clang-debug` (or `native-cmake-gcc-debug`)
-  natively, `qemu-cortex-m7f-cmake-gcc-debug` for Armv7E-M, and
+  natively, `qemu-cortex-m7f-cmake-gcc-debug` for Armv7E-M,
+  `qemu-cortex-m33-cmake-gcc-debug` for Armv8-M Mainline, and
   `qemu-cortex-m0-cmake-gcc-debug` for Armv6-M; the QEMU probes run
   exactly as `ctest` runs `unit-test`.
 - `--no-run` only compiles and links; extra compiler flags for the

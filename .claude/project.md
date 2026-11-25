@@ -150,17 +150,17 @@ from the `tests` folder with xpm (Node.js >= 20, xpm >= 0.20.8).
 Build folders are `tests/build/<configuration>`.
 
 ```sh
-# Top dependencies and default tests (QEMU Cortex-M7F)
+# Top dependencies and the default tests.
 xpm run install -C tests
 xpm run test -C tests
 
-# Native (synthetic POSIX) tests with the system compiler
-xpm run install-native-cmake-sys -C tests
-xpm run test-native-cmake-sys -C tests
+# Selected tests.
+xpm run install-selected -C tests
+xpm run test-selected -C tests
 
-# QEMU Cortex-M tests with the latest toolchain
-xpm run install-qemu-cortex-latest -C tests
-xpm run test-qemu-cortex-latest -C tests
+# Tests with latest toolchain.
+xpm run install-latest -C tests
+xpm run test-latest -C tests
 
 # Everything (all GCC/clang versions, all platforms)
 xpm run install-all -C tests
@@ -190,10 +190,10 @@ for example `native-cmake-clang17-release` or
 
 - `native` - runs on the host using the POSIX port and `libucontext`
 - `qemu-cortex-m0`, `qemu-cortex-m3`, `qemu-cortex-m4f`,
-  `qemu-cortex-m7f` - Cortex-M port on QEMU (MPS2 boards, see
-  `tests/device-qemu-cortexm/`)
-- `nucleo-f411re`, `nucleo-f767zi`, `nucleo-h743zi`,
-  `raspberrypi-pico` - physical boards (manual)
+  `qemu-cortex-m7f`, `qemu-cortex-m33` - Cortex-M port on QEMU (MPS2
+  boards, see `tests/device-qemu-cortexm/`); `qemu-cortex-m33` is the
+  default platform
+- `nucleo-f411re`, `nucleo-f767zi`, `nucleo-h743zi` - physical boards (manual)
 
 (the raspberrypi-pico is not yet functional)
 
