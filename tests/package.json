@@ -34,15 +34,17 @@
       "@xpacks/chan-fatfs": "github:xpacks/chan-fatfs#v0.13.1-5"
     },
     "properties": {
+      "buildVerbose": "false",
       "buildFolderRelativePath": "{{ 'build' | path_join: configuration.name | to_filename | downcase }}",
       "buildFolderRelativePathPosix": "{{ 'build' | path_posix_join: configuration.name | downcase }}",
-      "commandCMakePrepare": "{{ properties.commandCMakeReconfigure }} --log-level=VERBOSE",
-      "commandCMakePrepareWithToolchain": "{{ properties.commandCMakePrepare }} -D CMAKE_TOOLCHAIN_FILE=xpacks/@micro-os-plus/build-helper/cmake/toolchains/{{ properties.toolchainFileName }}",
-      "commandCMakeReconfigure": "cmake -S . -B {{ properties.buildFolderRelativePathPosix }} -G Ninja -D CMAKE_BUILD_TYPE={{ properties.buildType }} -D PLATFORM_NAME={{ properties.platformName }}",
-      "commandCMakeBuild": "cmake --build {{ properties.buildFolderRelativePathPosix }}",
-      "commandCMakeBuildVerbose": "cmake --build {{ properties.buildFolderRelativePathPosix }} --verbose",
+      "commandClearBuildFolder": "node scripts/clear-build-folder.mjs {{ properties.buildFolderRelativePathPosix }}",
+      "commandCMakeGenerateNativePosix": "{{ properties.commandCMakeRefresh }} --log-level=VERBOSE",
+      "commandCMakeGenerateNativePosixWithToolchain": "{{ properties.commandCMakeGenerateNativePosix }} -D CMAKE_TOOLCHAIN_FILE=cmake/toolchains/{{ properties.toolchainFileName }}",
+      "commandCMakeGenerateCross": "{{ properties.commandCMakeRefresh }} --log-level=VERBOSE -D CMAKE_TOOLCHAIN_FILE={% if os.platform == 'win32' %}%CD%/cmake/toolchains/{{ properties.toolchainFileName }}{% else %}$(pwd)/cmake/toolchains/{{ properties.toolchainFileName }}{% endif %}",
+      "commandCMakeRefresh": "cmake -S . -B {{ properties.buildFolderRelativePathPosix }} -G Ninja{% if os.platform == 'win32' %} -D CMAKE_MAKE_PROGRAM=ninja.cmd{% endif %} -D CMAKE_BUILD_TYPE={{ properties.buildType }} -D PLATFORM_NAME={{ properties.platformName }} -D CMAKE_EXPORT_COMPILE_COMMANDS=ON",
+      "commandCMakeBuild": "cmake --build {{ properties.buildFolderRelativePathPosix }}{% if properties.buildVerbose == 'true' %} --verbose{% endif %}",
       "commandCMakeClean": "cmake --build {{ properties.buildFolderRelativePathPosix }} --target clean",
-      "commandCMakePerformTests": "cd {{ properties.buildFolderRelativePath }} && ctest -V"
+      "commandCMakePerformTests": "ctest -V --test-dir {{ properties.buildFolderRelativePath }}"
     },
     "actions": {
       "git-clone-deps": [
@@ -299,114 +301,114 @@
         "xpm run link-dependencies --config native-cmake-sys-release"
       ],
       "test-native-cmake-sys": [
-        "xpm run prepare --config native-cmake-sys-debug",
+        "xpm run setup --config native-cmake-sys-debug",
         "xpm run build --config native-cmake-sys-debug",
         "xpm run test --config native-cmake-sys-debug",
-        "xpm run prepare --config native-cmake-sys-release",
+        "xpm run setup --config native-cmake-sys-release",
         "xpm run build --config native-cmake-sys-release",
         "xpm run test --config native-cmake-sys-release"
       ],
       "test-native-cmake-gcc": [
-        "xpm run prepare --config native-cmake-gcc-debug",
+        "xpm run setup --config native-cmake-gcc-debug",
         "xpm run build --config native-cmake-gcc-debug",
         "xpm run test --config native-cmake-gcc-debug",
-        "xpm run prepare --config native-cmake-gcc-release",
+        "xpm run setup --config native-cmake-gcc-release",
         "xpm run build --config native-cmake-gcc-release",
         "xpm run test --config native-cmake-gcc-release"
       ],
       "test-native-cmake-gcc11": [
-        "xpm run prepare --config native-cmake-gcc11-debug",
+        "xpm run setup --config native-cmake-gcc11-debug",
         "xpm run build --config native-cmake-gcc11-debug",
         "xpm run test --config native-cmake-gcc11-debug",
-        "xpm run prepare --config native-cmake-gcc11-release",
+        "xpm run setup --config native-cmake-gcc11-release",
         "xpm run build --config native-cmake-gcc11-release",
         "xpm run test --config native-cmake-gcc11-release"
       ],
       "test-native-cmake-gcc12": [
-        "xpm run prepare --config native-cmake-gcc12-debug",
+        "xpm run setup --config native-cmake-gcc12-debug",
         "xpm run build --config native-cmake-gcc12-debug",
         "xpm run test --config native-cmake-gcc12-debug",
-        "xpm run prepare --config native-cmake-gcc12-release",
+        "xpm run setup --config native-cmake-gcc12-release",
         "xpm run build --config native-cmake-gcc12-release",
         "xpm run test --config native-cmake-gcc12-release"
       ],
       "test-native-cmake-gcc13": [
-        "xpm run prepare --config native-cmake-gcc13-debug",
+        "xpm run setup --config native-cmake-gcc13-debug",
         "xpm run build --config native-cmake-gcc13-debug",
         "xpm run test --config native-cmake-gcc13-debug",
-        "xpm run prepare --config native-cmake-gcc13-release",
+        "xpm run setup --config native-cmake-gcc13-release",
         "xpm run build --config native-cmake-gcc13-release",
         "xpm run test --config native-cmake-gcc13-release"
       ],
       "test-native-cmake-gcc14": [
-        "xpm run prepare --config native-cmake-gcc14-debug",
+        "xpm run setup --config native-cmake-gcc14-debug",
         "xpm run build --config native-cmake-gcc14-debug",
         "xpm run test --config native-cmake-gcc14-debug",
-        "xpm run prepare --config native-cmake-gcc14-release",
+        "xpm run setup --config native-cmake-gcc14-release",
         "xpm run build --config native-cmake-gcc14-release",
         "xpm run test --config native-cmake-gcc14-release"
       ],
       "test-native-cmake-clang": [
-        "xpm run prepare --config native-cmake-clang-debug",
+        "xpm run setup --config native-cmake-clang-debug",
         "xpm run build --config native-cmake-clang-debug",
         "xpm run test --config native-cmake-clang-debug",
-        "xpm run prepare --config native-cmake-clang-release",
+        "xpm run setup --config native-cmake-clang-release",
         "xpm run build --config native-cmake-clang-release",
         "xpm run test --config native-cmake-clang-release"
       ],
       "test-native-cmake-clang13": [
-        "xpm run prepare --config native-cmake-clang13-debug",
+        "xpm run setup --config native-cmake-clang13-debug",
         "xpm run build --config native-cmake-clang13-debug",
         "xpm run test --config native-cmake-clang13-debug",
-        "xpm run prepare --config native-cmake-clang13-release",
+        "xpm run setup --config native-cmake-clang13-release",
         "xpm run build --config native-cmake-clang13-release",
         "xpm run test --config native-cmake-clang13-release"
       ],
       "test-native-cmake-clang14": [
-        "xpm run prepare --config native-cmake-clang14-debug",
+        "xpm run setup --config native-cmake-clang14-debug",
         "xpm run build --config native-cmake-clang14-debug",
         "xpm run test --config native-cmake-clang14-debug",
-        "xpm run prepare --config native-cmake-clang14-release",
+        "xpm run setup --config native-cmake-clang14-release",
         "xpm run build --config native-cmake-clang14-release",
         "xpm run test --config native-cmake-clang14-release"
       ],
       "test-native-cmake-clang15": [
-        "xpm run prepare --config native-cmake-clang15-debug",
+        "xpm run setup --config native-cmake-clang15-debug",
         "xpm run build --config native-cmake-clang15-debug",
         "xpm run test --config native-cmake-clang15-debug",
-        "xpm run prepare --config native-cmake-clang15-release",
+        "xpm run setup --config native-cmake-clang15-release",
         "xpm run build --config native-cmake-clang15-release",
         "xpm run test --config native-cmake-clang15-release"
       ],
       "test-native-cmake-clang16": [
-        "xpm run prepare --config native-cmake-clang16-debug",
+        "xpm run setup --config native-cmake-clang16-debug",
         "xpm run build --config native-cmake-clang16-debug",
         "xpm run test --config native-cmake-clang16-debug",
-        "xpm run prepare --config native-cmake-clang16-release",
+        "xpm run setup --config native-cmake-clang16-release",
         "xpm run build --config native-cmake-clang16-release",
         "xpm run test --config native-cmake-clang16-release"
       ],
       "test-native-cmake-clang17": [
-        "xpm run prepare --config native-cmake-clang17-debug",
+        "xpm run setup --config native-cmake-clang17-debug",
         "xpm run build --config native-cmake-clang17-debug",
         "xpm run test --config native-cmake-clang17-debug",
-        "xpm run prepare --config native-cmake-clang17-release",
+        "xpm run setup --config native-cmake-clang17-release",
         "xpm run build --config native-cmake-clang17-release",
         "xpm run test --config native-cmake-clang17-release"
       ],
       "test-native-cmake-clang18": [
-        "xpm run prepare --config native-cmake-clang18-debug",
+        "xpm run setup --config native-cmake-clang18-debug",
         "xpm run build --config native-cmake-clang18-debug",
         "xpm run test --config native-cmake-clang18-debug",
-        "xpm run prepare --config native-cmake-clang18-release",
+        "xpm run setup --config native-cmake-clang18-release",
         "xpm run build --config native-cmake-clang18-release",
         "xpm run test --config native-cmake-clang18-release"
       ],
       "test-native-cmake-clang19": [
-        "xpm run prepare --config native-cmake-clang19-debug",
+        "xpm run setup --config native-cmake-clang19-debug",
         "xpm run build --config native-cmake-clang19-debug",
         "xpm run test --config native-cmake-clang19-debug",
-        "xpm run prepare --config native-cmake-clang19-release",
+        "xpm run setup --config native-cmake-clang19-release",
         "xpm run build --config native-cmake-clang19-release",
         "xpm run test --config native-cmake-clang19-release"
       ],
@@ -418,74 +420,74 @@
         "xpm run test-qemu-cortex-m33-cmake"
       ],
       "test-qemu-cortex-m0-cmake": [
-        "xpm run prepare --config qemu-cortex-m0-cmake-gcc-debug",
+        "xpm run setup --config qemu-cortex-m0-cmake-gcc-debug",
         "xpm run build --config qemu-cortex-m0-cmake-gcc-debug",
         "xpm run test --config qemu-cortex-m0-cmake-gcc-debug",
-        "xpm run prepare --config qemu-cortex-m0-cmake-gcc-release",
+        "xpm run setup --config qemu-cortex-m0-cmake-gcc-release",
         "xpm run build --config qemu-cortex-m0-cmake-gcc-release",
         "xpm run test --config qemu-cortex-m0-cmake-gcc-release"
       ],
       "test-qemu-cortex-m3-cmake": [
-        "xpm run prepare --config qemu-cortex-m3-cmake-gcc-debug",
+        "xpm run setup --config qemu-cortex-m3-cmake-gcc-debug",
         "xpm run build --config qemu-cortex-m3-cmake-gcc-debug",
         "xpm run test --config qemu-cortex-m3-cmake-gcc-debug",
-        "xpm run prepare --config qemu-cortex-m3-cmake-gcc-release",
+        "xpm run setup --config qemu-cortex-m3-cmake-gcc-release",
         "xpm run build --config qemu-cortex-m3-cmake-gcc-release",
         "xpm run test --config qemu-cortex-m3-cmake-gcc-release"
       ],
       "test-qemu-cortex-m4f-cmake": [
-        "xpm run prepare --config qemu-cortex-m4f-cmake-gcc-debug",
+        "xpm run setup --config qemu-cortex-m4f-cmake-gcc-debug",
         "xpm run build --config qemu-cortex-m4f-cmake-gcc-debug",
         "xpm run test --config qemu-cortex-m4f-cmake-gcc-debug",
-        "xpm run prepare --config qemu-cortex-m4f-cmake-gcc-release",
+        "xpm run setup --config qemu-cortex-m4f-cmake-gcc-release",
         "xpm run build --config qemu-cortex-m4f-cmake-gcc-release",
         "xpm run test --config qemu-cortex-m4f-cmake-gcc-release"
       ],
       "test-qemu-cortex-m7f-cmake": [
-        "xpm run prepare --config qemu-cortex-m7f-cmake-gcc-debug",
+        "xpm run setup --config qemu-cortex-m7f-cmake-gcc-debug",
         "xpm run build --config qemu-cortex-m7f-cmake-gcc-debug",
         "xpm run test --config qemu-cortex-m7f-cmake-gcc-debug",
-        "xpm run prepare --config qemu-cortex-m7f-cmake-gcc-release",
+        "xpm run setup --config qemu-cortex-m7f-cmake-gcc-release",
         "xpm run build --config qemu-cortex-m7f-cmake-gcc-release",
         "xpm run test --config qemu-cortex-m7f-cmake-gcc-release"
       ],
       "test-qemu-cortex-m33-cmake": [
-        "xpm run prepare --config qemu-cortex-m33-cmake-gcc-debug",
+        "xpm run setup --config qemu-cortex-m33-cmake-gcc-debug",
         "xpm run build --config qemu-cortex-m33-cmake-gcc-debug",
         "xpm run test --config qemu-cortex-m33-cmake-gcc-debug",
-        "xpm run prepare --config qemu-cortex-m33-cmake-gcc-release",
+        "xpm run setup --config qemu-cortex-m33-cmake-gcc-release",
         "xpm run build --config qemu-cortex-m33-cmake-gcc-release",
         "xpm run test --config qemu-cortex-m33-cmake-gcc-release"
       ],
       "test-raspberrypi-pico-cmake": [
-        "xpm run prepare --config raspberrypi-pico-cmake-gcc-debug",
+        "xpm run setup --config raspberrypi-pico-cmake-gcc-debug",
         "xpm run build --config raspberrypi-pico-cmake-gcc-debug",
         "xpm run test --config raspberrypi-pico-cmake-gcc-debug",
-        "xpm run prepare --config raspberrypi-pico-cmake-gcc-release",
+        "xpm run setup --config raspberrypi-pico-cmake-gcc-release",
         "xpm run build --config raspberrypi-pico-cmake-gcc-release",
         "xpm run test --config raspberrypi-pico-cmake-gcc-release"
       ],
       "test-nucleo-f411re-cmake": [
-        "xpm run prepare --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run setup --config nucleo-f411re-cmake-gcc-debug",
         "xpm run build --config nucleo-f411re-cmake-gcc-debug",
         "xpm run test --config nucleo-f411re-cmake-gcc-debug",
-        "xpm run prepare --config nucleo-f411re-cmake-gcc-release",
+        "xpm run setup --config nucleo-f411re-cmake-gcc-release",
         "xpm run build --config nucleo-f411re-cmake-gcc-release",
         "xpm run test --config nucleo-f411re-cmake-gcc-release"
       ],
       "test-nucleo-f767zi-cmake": [
-        "xpm run prepare --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run setup --config nucleo-f767zi-cmake-gcc-debug",
         "xpm run build --config nucleo-f767zi-cmake-gcc-debug",
         "xpm run test --config nucleo-f767zi-cmake-gcc-debug",
-        "xpm run prepare --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run setup --config nucleo-f767zi-cmake-gcc-release",
         "xpm run build --config nucleo-f767zi-cmake-gcc-release",
         "xpm run test --config nucleo-f767zi-cmake-gcc-release"
       ],
       "test-nucleo-h743zi-cmake": [
-        "xpm run prepare --config nucleo-h743zi-cmake-gcc-debug",
+        "xpm run setup --config nucleo-h743zi-cmake-gcc-debug",
         "xpm run build --config nucleo-h743zi-cmake-gcc-debug",
         "xpm run test --config nucleo-h743zi-cmake-gcc-debug",
-        "xpm run prepare --config nucleo-h743zi-cmake-gcc-release",
+        "xpm run setup --config nucleo-h743zi-cmake-gcc-release",
         "xpm run build --config nucleo-h743zi-cmake-gcc-release",
         "xpm run test --config nucleo-h743zi-cmake-gcc-release"
       ],
@@ -544,9 +546,9 @@
       "cmake-actions": {
         "hidden": true,
         "actions": {
-          "prepare": "{{ properties.commandCMakePrepareWithToolchain }}",
+          "setup": "{{ properties.commandCMakeGenerateNativePosixWithToolchain }}",
           "build": [
-            "{{ properties.commandCMakeReconfigure }}",
+            "{{ properties.commandCMakeRefresh }}",
             "{{ properties.commandCMakeBuild }}"
           ],
           "test": "{{ properties.commandCMakePerformTests }}",
@@ -558,10 +560,6 @@
         "actions": {
           "install": [
             "xpm install --config {{ configuration.name }}"
-          ],
-          "link-dependencies": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
-            "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}"
           ]
         }
       },
@@ -570,10 +568,6 @@
         "actions": {
           "install": [
             "xpm install --config {{ configuration.name }}"
-          ],
-          "link-dependencies": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
-            "xpm link @xpack-3rd-party/arm-cmsis-core --config {{ configuration.name }}"
           ]
         }
       },
@@ -582,18 +576,25 @@
         "devDependencies": {
           "@micro-os-plus/posix-arch": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.0.1",
           "@xpack-3rd-party/libucontext": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-5"
+        },
+        "actions": {
+          "link-dependencies": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-posix-arch --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/libucontext --config {{ configuration.name }}"
+          ]
         }
       },
       "cortexm-dependencies": {
         "hidden": true,
         "devDependencies": {
-          "@micro-os-plus/micro-os-plus-iii-cortexm": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.1.0"
-        }
-      },
-      "arm-cmsis-dependencies": {
-        "hidden": true,
-        "devDependencies": {
+          "@micro-os-plus/micro-os-plus-iii-cortexm": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.1.0",
           "@xpack-3rd-party/arm-cmsis-core": "5.4.0-7"
+        },
+        "actions": {
+          "link-dependencies": [
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/arm-cmsis-core --config {{ configuration.name }}"
+          ]
         }
       },
       "arm-none-eabi-gcc-dependencies": {
@@ -736,7 +737,7 @@
           "platformName": "native"
         },
         "actions": {
-          "prepare": "{{ properties.commandCMakePrepare }}"
+          "setup": "{{ properties.commandCMakeGenerateNativePosix }}"
         }
       },
       "native-cmake-sys-release": {
@@ -749,8 +750,8 @@
       },
       "native-cmake-gcc-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "gcc-latest-dependencies"
         ],
@@ -770,8 +771,8 @@
       },
       "native-cmake-gcc11-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "gcc11-dependencies"
         ],
@@ -791,8 +792,8 @@
       },
       "native-cmake-gcc12-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "gcc12-dependencies"
         ],
@@ -812,8 +813,8 @@
       },
       "native-cmake-gcc13-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "gcc13-dependencies"
         ],
@@ -833,8 +834,8 @@
       },
       "native-cmake-gcc14-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "gcc14-dependencies"
         ],
@@ -854,8 +855,8 @@
       },
       "native-cmake-clang-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang-latest-dependencies"
         ],
@@ -875,8 +876,8 @@
       },
       "native-cmake-clang13-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang13-dependencies"
         ],
@@ -896,8 +897,8 @@
       },
       "native-cmake-clang14-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang14-dependencies"
         ],
@@ -917,8 +918,8 @@
       },
       "native-cmake-clang15-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang15-dependencies"
         ],
@@ -938,8 +939,8 @@
       },
       "native-cmake-clang16-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang16-dependencies"
         ],
@@ -959,8 +960,8 @@
       },
       "native-cmake-clang17-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang17-dependencies"
         ],
@@ -980,8 +981,8 @@
       },
       "native-cmake-clang18-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang18-dependencies"
         ],
@@ -1001,8 +1002,8 @@
       },
       "native-cmake-clang19-debug": {
         "inherit": [
-          "native-actions",
           "cmake-actions",
+          "native-actions",
           "native-dependencies",
           "clang19-dependencies"
         ],
@@ -1022,10 +1023,9 @@
       },
       "qemu-cortex-m0-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
-          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -1048,10 +1048,9 @@
       },
       "qemu-cortex-m3-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
-          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -1074,10 +1073,9 @@
       },
       "qemu-cortex-m4f-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
-          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -1100,10 +1098,9 @@
       },
       "qemu-cortex-m7f-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
-          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -1126,10 +1123,9 @@
       },
       "qemu-cortex-m33-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
-          "arm-cmsis-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "qemu-arm-dependencies",
           "short-win-paths-properties"
@@ -1153,8 +1149,8 @@
       "raspberrypi-pico-cmake-gcc-debug": {
         "hidden": true,
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "openocd-dependencies",
@@ -1172,6 +1168,7 @@
         "actions": {
           "link-dependencies": [
             "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/arm-cmsis-core --config {{ configuration.name }}",
             "xpm link @xpack-3rd-party/raspberrypi-pico-sdk --config {{ configuration.name }}"
           ]
         }
@@ -1188,8 +1185,8 @@
       },
       "nucleo-f411re-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "openocd-dependencies",
@@ -1203,7 +1200,10 @@
         },
         "actions": {
           "link-dependencies": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm @xpack-segger/rtt @xpack-segger/system-view --config {{ configuration.name }}"
+            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}",
+            "xpm link @xpack-3rd-party/arm-cmsis-core --config {{ configuration.name }}",
+            "xpm link @xpack-segger/rtt --config {{ configuration.name }}",
+            "xpm link @xpack-segger/system-view --config {{ configuration.name }}"
           ]
         },
         "devDependencies": {
@@ -1222,8 +1222,8 @@
       },
       "nucleo-f767zi-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "openocd-dependencies",
@@ -1234,11 +1234,6 @@
           "platformName": "nucleo-f767zi",
           "toolchainFileName": "arm-none-eabi-gcc.cmake",
           "shortConfigurationName": "nf7d"
-        },
-        "actions": {
-          "link-dependencies": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
-          ]
         }
       },
       "nucleo-f767zi-cmake-gcc-release": {
@@ -1252,8 +1247,8 @@
       },
       "nucleo-h743zi-cmake-gcc-debug": {
         "inherit": [
-          "cortexm-actions",
           "cmake-actions",
+          "cortexm-actions",
           "cortexm-dependencies",
           "arm-none-eabi-gcc-dependencies",
           "openocd-dependencies",
@@ -1264,11 +1259,6 @@
           "platformName": "nucleo-h743zi",
           "toolchainFileName": "arm-none-eabi-gcc.cmake",
           "shortConfigurationName": "nh7d"
-        },
-        "actions": {
-          "link-dependencies": [
-            "xpm link @micro-os-plus/micro-os-plus-iii-cortexm --config {{ configuration.name }}"
-          ]
         }
       },
       "nucleo-h743zi-cmake-gcc-release": {

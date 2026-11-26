@@ -184,7 +184,7 @@ xpm run deep-clean -C tests
 A single configuration can be driven step by step:
 
 ```sh
-xpm run prepare --config native-cmake-gcc-debug -C tests
+xpm run setup   --config native-cmake-gcc-debug -C tests
 xpm run build   --config native-cmake-gcc-debug -C tests
 xpm run test    --config native-cmake-gcc-debug -C tests
 ```
