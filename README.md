@@ -247,7 +247,7 @@ scenarios, regression tests of the fixed bugs)
 - `tests/cmsis-os-validator` - the Arm CMSIS OS validator
 
 The Arm CMSIS RTOS validator is available from the separate project
-[xpacks/arm-cmsis-rtos-validator](https://github.com/xpacks/arm-cmsis-rtos-validator).
+[xpack-3rd-party/arm-cmsis-rtos-validator-xpack](https://github.com/xpack-3rd-party/arm-cmsis-rtos-validator-xpack).
 
 ## Documentation
 
