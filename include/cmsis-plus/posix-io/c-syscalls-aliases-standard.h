@@ -141,8 +141,8 @@ extern "C"
   raise (int sig);
 
   CMSIS_PLUS_POSIX_IO_RW_RETURN_TYPE
-      __attribute__ ((weak, alias ("__posix_read")))
-      read (int fildes, void* buf, size_t nbyte);
+  __attribute__ ((weak, alias ("__posix_read")))
+  read (int fildes, void* buf, size_t nbyte);
 
   struct dirent* __attribute__ ((weak, alias ("__posix_readdir")))
   readdir (DIR* dirp);
@@ -259,8 +259,8 @@ extern "C"
   wait (int* stat_loc);
 
   CMSIS_PLUS_POSIX_IO_RW_RETURN_TYPE
-      __attribute__ ((weak, alias ("__posix_write")))
-      write (int fildes, const void* buf, size_t nbyte);
+  __attribute__ ((weak, alias ("__posix_write")))
+  write (int fildes, const void* buf, size_t nbyte);
 
   ssize_t __attribute__ ((weak, alias ("__posix_writev")))
   writev (int fildes, const struct iovec* iov, int iovcnt);

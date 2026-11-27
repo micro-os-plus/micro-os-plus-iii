@@ -20,6 +20,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -1044,6 +1047,7 @@ namespace os
     mutex::internal_mark_owner_dead_ (void)
     {
       // May return error if not the rightful owner.
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s() @%p %s\n", __func__, this, name ());
 
       if (robustness_ == mutex::robustness::robust)

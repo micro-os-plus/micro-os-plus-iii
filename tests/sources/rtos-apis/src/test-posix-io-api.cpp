@@ -34,6 +34,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -50,6 +53,7 @@ my_memcpy (void* dst, const void* src, std::size_t n)
 {
   // os::trace::printf ("%s(%p, %p, %u)\n", __func__, dst, src,
   //                    static_cast<std::size_t> (n));
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   return memcpy (dst, src, n);
 }
 
@@ -201,6 +205,7 @@ my_block_impl::my_block_impl (std::size_t bsize, std::size_t esize,
       = (esize + sizeof (elem_t) - 1) & (~(sizeof (elem_t) - 1));
 
   arena_ = new elem_t[nblocks * bsize / sizeof (elem_t)];
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   memset (static_cast<void*> (arena_), 0xFF,
           nblocks * bsize / sizeof (elem_t));
 }
@@ -359,6 +364,7 @@ test_posix_io_api (bool extra __attribute__ ((unused)))
 
   std::size_t bsz = 0;
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Block device partitions - C++ API\n", test_name);
   {
     posix::block_device::blknum_t bks = 0;
@@ -382,6 +388,7 @@ test_posix_io_api (bool extra __attribute__ ((unused)))
     p2.configure (bks - nr, nr);
   }
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Block device locked - C++ API\n", test_name);
   {
     res = p2.open ();
@@ -404,6 +411,7 @@ test_posix_io_api (bool extra __attribute__ ((unused)))
 
     for (std::size_t i = 0; i < p2.blocks (); ++i)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         memset (buff, 0xFF, bsz);
         res = p2.read_block (buff, i);
         assert (res >= 0);
@@ -425,6 +433,7 @@ test_posix_io_api (bool extra __attribute__ ((unused)))
     p2.close ();
   }
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Block device unlocked - C++ API\n", test_name);
   {
     res = p1.open ();
@@ -434,6 +443,7 @@ test_posix_io_api (bool extra __attribute__ ((unused)))
     assert (res >= 0);
   }
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Block device - intermixed opens - C++ API\n", test_name);
   {
     int res1 = p1.open ();

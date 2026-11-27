@@ -21,6 +21,18 @@
 #include <cstdio>
 #include <cstring>
 
+// ----------------------------------------------------------------------------
+
+#if defined(__GNUC__)
+#if defined(__clang__)
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
+#endif // defined(__clang__)
+#endif // defined(__GNUC__)
+
+// ----------------------------------------------------------------------------
+
 #ifndef OS_INTEGER_TRACE_PRINTF_TMP_ARRAY_SIZE
 #define OS_INTEGER_TRACE_PRINTF_TMP_ARRAY_SIZE (200)
 #endif
@@ -61,6 +73,7 @@ namespace os
       std::va_list args;
       va_start (args, format);
 
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       int ret = vprintf (format, args);
 
       va_end (args);
@@ -88,6 +101,7 @@ namespace os
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wformat-nonliteral"
 #endif
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       int ret = ::vsnprintf (buf, sizeof (buf), format, args);
 #pragma GCC diagnostic pop
       if (ret > 0)
@@ -101,6 +115,7 @@ namespace os
     int __attribute__ ((weak))
     puts (const char* s)
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       int ret = static_cast<int> (write (s, strlen (s)));
       if (ret >= 0)
         {
@@ -216,6 +231,7 @@ trace_printf (const char* format, ...)
   std::va_list args;
   va_start (args, format);
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   int ret = trace::vprintf (format, args);
 
   va_end (args);
@@ -225,12 +241,14 @@ trace_printf (const char* format, ...)
 int
 trace_vprintf (const char* format, va_list args)
 {
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   return trace::vprintf (format, args);
 }
 
 int
 trace_puts (const char* s)
 {
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   return trace::puts (s);
 }
 

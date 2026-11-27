@@ -34,6 +34,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 21)
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif // (__clang_major__ >= 21)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -561,6 +564,7 @@ namespace os
     int
     file_lockable<T, L>::close (void)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::close ();
@@ -570,6 +574,7 @@ namespace os
     ssize_t
     file_lockable<T, L>::read (void* buf, std::size_t nbyte)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::read (buf, nbyte);
@@ -579,6 +584,7 @@ namespace os
     ssize_t
     file_lockable<T, L>::write (const void* buf, std::size_t nbyte)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::write (buf, nbyte);
@@ -588,6 +594,7 @@ namespace os
     ssize_t
     file_lockable<T, L>::writev (const /* struct */ iovec* iov, int iovcnt)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::writev (iov, iovcnt);
@@ -597,6 +604,7 @@ namespace os
     int
     file_lockable<T, L>::vfcntl (int cmd, std::va_list args)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::vfcntl (cmd, args);
@@ -611,6 +619,7 @@ namespace os
     int
     file_lockable<T, L>::fstat (struct stat* buf)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::fstat (buf);
@@ -621,6 +630,7 @@ namespace os
     off_t
     file_lockable<T, L>::lseek (off_t offset, int whence)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::lseek (offset, whence);
@@ -630,6 +640,7 @@ namespace os
     int
     file_lockable<T, L>::ftruncate (off_t length)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::ftruncate (length);
@@ -639,6 +650,7 @@ namespace os
     int
     file_lockable<T, L>::fsync (void)
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return file::fsync ();

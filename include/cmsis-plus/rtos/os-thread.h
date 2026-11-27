@@ -37,6 +37,9 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -2450,6 +2453,7 @@ namespace os
             {
               // The `\n` is intentional, to make the message more readable,
               // since it can occur inside another message.
+              // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
               trace::printf ("\n%s() @%p %s\n", __func__, this, name ());
               assert (stack ().check_bottom_magic ());
               abort ();

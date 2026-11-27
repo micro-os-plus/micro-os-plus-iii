@@ -36,6 +36,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 21)
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif // (__clang_major__ >= 21)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -330,6 +333,7 @@ namespace os
     inline void
     condition_variable_any::notify_one () noexcept
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<mutex> lock (*mx_);
       cv_.notify_one ();
     }
@@ -337,6 +341,7 @@ namespace os
     inline void
     condition_variable_any::notify_all () noexcept
     {
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<mutex> lock (*mx_);
       cv_.notify_all ();
     }

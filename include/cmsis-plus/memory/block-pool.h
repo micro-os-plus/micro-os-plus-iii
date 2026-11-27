@@ -25,6 +25,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -479,6 +482,7 @@ namespace os
                                    std::size_t bytes)
         : rtos::memory::memory_resource{ name }
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s(%u,%u,%p,%u) @%p %s\n", __func__, blocks,
                      block_size_bytes, addr, bytes, this, this->name ());
 
@@ -498,6 +502,7 @@ namespace os
         const char* name)
         : block_pool{ name }
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 
       internal_construct_ (blocks, sizeof (value_type), &arena_[0],
@@ -507,6 +512,7 @@ namespace os
     template <typename T, std::size_t N>
     block_pool_typed_inclusive<T, N>::~block_pool_typed_inclusive ()
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
     }
 
@@ -524,6 +530,7 @@ namespace os
         const char* name, std::size_t blocks, const allocator_type& allocator)
         : block_pool{ name }
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s(%u,%p) @%p %s\n", __func__, blocks, &allocator, this,
                      this->name ());
 
@@ -544,6 +551,7 @@ namespace os
     template <typename T, typename A>
     block_pool_typed_allocated<T, A>::~block_pool_typed_allocated ()
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s() @%p %s\n", __func__, this, this->name ());
 
       // Skip in case a derived class did the deallocation.

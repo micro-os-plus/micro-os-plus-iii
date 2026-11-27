@@ -28,6 +28,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wsuggest-final-methods"
 #endif
@@ -639,9 +642,23 @@ namespace os
 #pragma GCC diagnostic pop
             {
               // Validate the device name by checking duplicates.
+              // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
               if (std::strcmp (path, fs.mounted_path_) == 0)
                 {
+                  // --------------------------------------------------------
+#if defined(__GNUC__)
+#pragma GCC diagnostic push
+#if defined(__clang__)
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
+#endif // defined(__clang__)
+#endif // defined(__GNUC__)
+                  // --------------------------------------------------------
                   trace::printf ("Path \"%s\" already mounted.", path);
+#if defined(__GNUC__)
+#pragma GCC diagnostic pop
+#endif // defined(__GNUC__)
 
                   errno = EBUSY;
                   instrumentation::posix::file_system::vmount_retval (this,
@@ -654,6 +671,7 @@ namespace os
       char* p = const_cast<char*> (path);
       if (p != nullptr)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           if (strcmp ("/", path) == 0)
             {
               p = nullptr;
@@ -741,9 +759,11 @@ namespace os
       for (auto&& fs : mounted_list__)
 #pragma GCC diagnostic pop
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           auto len = std::strlen (fs.mounted_path_);
 
           // Check if path1 starts with the mounted path.
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           if (std::strncmp (fs.mounted_path_, *path1, len) == 0)
             {
 #pragma GCC diagnostic push

@@ -35,6 +35,9 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#if (__clang_major__ >= 21)
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif // (__clang_major__ >= 21)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -585,6 +588,7 @@ namespace os
       trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return directory::read ();
@@ -598,6 +602,7 @@ namespace os
       trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return directory::rewind ();
@@ -611,6 +616,7 @@ namespace os
       trace::printf ("directory_lockable::%s() @%p\n", __func__, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return directory::close ();

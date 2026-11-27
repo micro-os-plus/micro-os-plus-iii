@@ -23,6 +23,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -245,12 +248,14 @@ namespace os
         }
       catch (std::exception const& e)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           trace::printf ("%s() @%p %s top exception \"%s\"\n", __func__,
                          thread, thread->name (), e.what ());
           exit_ptr = nullptr;
         }
       catch (...)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           trace::printf ("%s() @%p %s top exception\n", __func__, thread,
                          thread->name ());
           exit_ptr = nullptr;
@@ -1308,6 +1313,7 @@ namespace os
         {
           if (!stack ().check_bottom_magic () || !stack ().check_top_magic ())
             {
+              // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
               trace::printf ("%s() @%p %s\n", __func__, this, name ());
               assert (stack ().check_bottom_magic ());
               assert (stack ().check_top_magic ());

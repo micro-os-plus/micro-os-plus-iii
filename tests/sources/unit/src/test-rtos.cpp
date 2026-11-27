@@ -31,6 +31,19 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__clang__)
+#pragma clang diagnostic ignored "-Wc++98-compat"
+#pragma clang diagnostic ignored "-Wformat-pedantic"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
+#elif defined(__GNUC__)
+#pragma GCC diagnostic ignored "-Waggregate-return"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
+
+// ----------------------------------------------------------------------------
+
 // The largest backwards step of the high resolution clock, in cycles,
 // accepted by the clock monotonicity test. It is 0 (strict) by default.
 // QEMU raises the SysTick pending flag some time after the counter
@@ -38,16 +51,6 @@
 // running on QEMU define a small tolerance, far below one tick.
 #if !defined(OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES)
 #define OS_TEST_HRCLOCK_BACKWARDS_TOLERANCE_CYCLES 0
-#endif
-
-// ----------------------------------------------------------------------------
-
-#if defined(__clang__)
-#pragma clang diagnostic ignored "-Wc++98-compat"
-#pragma clang diagnostic ignored "-Wformat-pedantic"
-#elif defined(__GNUC__)
-#pragma GCC diagnostic ignored "-Waggregate-return"
-#pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
 
 // ----------------------------------------------------------------------------
@@ -225,6 +228,7 @@ namespace
   int
   test_lost_wakeup (const char* name)
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - Thread event flags raised from interrupts\n", name);
 
     lost_wakeup_progress = 0;
@@ -253,12 +257,14 @@ namespace
 
     if (lost != 0)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - %u lost wake-ups in %u iterations\n", name,
                 static_cast<unsigned int> (lost),
                 static_cast<unsigned int> (lost_wakeup_iterations));
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - no lost wake-ups in %u iterations\n", name,
             static_cast<unsigned int> (lost_wakeup_iterations));
     return 0;
@@ -478,11 +484,13 @@ namespace
     result_t expected = interrupt ? EINTR : ETIMEDOUT;
     if (a.res != expected || lost || c.res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - %s: first waiter returned %d, next waiter %s\n", name,
                 what, static_cast<int> (a.res), lost ? "not woken" : "woken");
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - %s passes the wake-up on ok\n", name, what);
     return 0;
   }
@@ -505,6 +513,7 @@ namespace
     // Without blocking, well before the timeout.
     if (res != EINTR || elapsed >= pi_timeout / 2)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - interrupted %s returned %d after %u ticks\n", name, what,
                 static_cast<int> (res), static_cast<unsigned int> (elapsed));
         return false;
@@ -533,6 +542,7 @@ namespace
   int
   test_pending_interrupt (const char* name)
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - Pending interrupts\n", name);
 
     thread& crt = this_thread::thread ();
@@ -574,6 +584,7 @@ namespace
     crt.interrupt (false);
     if (res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - interrupted semaphore timed_wait() with a token "
                 "returned %d\n",
                 name, static_cast<int> (res));
@@ -584,6 +595,7 @@ namespace
     res = sem.timed_wait (2);
     if (res != ETIMEDOUT)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - semaphore timed_wait() after interrupt(false) returned "
                 "%d\n",
                 name, static_cast<int> (res));
@@ -606,6 +618,7 @@ namespace
       th.join ();
       if (res != result::ok)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("%s - semaphore wait() after interrupt(false) returned "
                   "%d\n",
                   name, static_cast<int> (res));
@@ -671,6 +684,7 @@ namespace
         }
     }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - pending interrupts ok\n", name);
     return 0;
   }
@@ -759,10 +773,12 @@ namespace
 int
 test_unit_rtos (void)
 {
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - started\n", test_name);
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Threads\n", test_name);
 
   {
@@ -770,12 +786,14 @@ test_unit_rtos (void)
     static_thread.join ();
     if (!static_thread_ran || !static_thread_ran_started)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - thread created by a static constructor ran %s the "
                 "scheduler was started\n",
                 test_name,
                 static_thread_ran ? "before" : "neither before nor after");
         return 1;
       }
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - thread created by a static constructor ok\n", test_name);
   }
 
@@ -799,6 +817,7 @@ test_unit_rtos (void)
 #endif
     thread th{ "th-small-stack", kill_quick_func, nullptr, attr };
     th.join ();
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - thread with a %u bytes stack ok\n", test_name,
             static_cast<unsigned int> (attr.th_stack_size_bytes));
   }
@@ -831,10 +850,12 @@ test_unit_rtos (void)
     delete pth;
     if (ticks_seen < 5)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - thread created in a critical section saw %u ticks\n",
                 test_name, static_cast<unsigned int> (ticks_seen));
         return 1;
       }
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - thread created in a critical section ok\n", test_name);
   }
 
@@ -847,6 +868,7 @@ test_unit_rtos (void)
     result_t res = th.kill ();
     if (res != result::ok || th.state () != thread::state::destroyed)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - kill() of a waiting thread returned %d, state %u\n",
                 test_name, static_cast<int> (res),
                 static_cast<unsigned int> (th.state ()));
@@ -864,6 +886,7 @@ test_unit_rtos (void)
 
     if (th.state () != thread::state::terminated)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - self-terminated thread state %u\n", test_name,
                 static_cast<unsigned int> (th.state ()));
         return 1;
@@ -872,6 +895,7 @@ test_unit_rtos (void)
     result_t res = th.kill ();
     if (res != result::ok || th.state () != thread::state::destroyed)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - kill() of a terminated thread returned %d, state %u\n",
                 test_name, static_cast<int> (res),
                 static_cast<unsigned int> (th.state ()));
@@ -882,6 +906,7 @@ test_unit_rtos (void)
     res = th.kill ();
     if (res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - kill() of a destroyed thread returned %d\n", test_name,
                 static_cast<int> (res));
         return 1;
@@ -891,6 +916,7 @@ test_unit_rtos (void)
     // it must not be destroyed again.
     sysclock.sleep_for (2);
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - kill() ok\n", test_name);
   }
 
@@ -904,6 +930,7 @@ test_unit_rtos (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Condition variables\n", test_name);
 
   {
@@ -921,6 +948,7 @@ test_unit_rtos (void)
     if (res != EPERM
         || this_thread::thread ().state () != thread::state::running)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - wait() with a mutex not owned returned %d, state %u\n",
                 test_name, static_cast<int> (res),
                 static_cast<unsigned int> (this_thread::thread ().state ()));
@@ -931,6 +959,7 @@ test_unit_rtos (void)
     if (res != EPERM
         || this_thread::thread ().state () != thread::state::running)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf (
             "%s - timed_wait() with a mutex not owned returned %d, state %u\n",
             test_name, static_cast<int> (res),
@@ -942,6 +971,7 @@ test_unit_rtos (void)
     this_thread::yield ();
     sysclock.sleep_for (1);
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - wait() with a mutex not owned ok\n", test_name);
   }
 
@@ -954,6 +984,7 @@ test_unit_rtos (void)
     result_t res = cv.timed_wait (mx, 2);
     if (res != ETIMEDOUT || mx.owner () != &this_thread::thread ())
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - timed_wait() not signalled returned %d\n", test_name,
                 static_cast<int> (res));
         return 1;
@@ -981,17 +1012,20 @@ test_unit_rtos (void)
 
     if (args.res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - timed_wait() signalled before the deadline returned "
                 "%d\n",
                 test_name, static_cast<int> (args.res));
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - timed_wait() ok\n", test_name);
   }
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Mutexes\n", test_name);
 
   {
@@ -1013,6 +1047,7 @@ test_unit_rtos (void)
       thread th{ "th-pi0", mx_timed_lock_func, &a, th_attr };
       if (crt.priority () != thread::priority::high)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("%s - mutex owner not boosted (%u)\n", test_name,
                   static_cast<unsigned int> (crt.priority ()));
           return 1;
@@ -1021,6 +1056,7 @@ test_unit_rtos (void)
       sysclock.sleep_for (2 * a.timeout);
       if (a.res != ETIMEDOUT || crt.priority () != prio)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("%s - timed_lock() timeout returned %d, owner prio %u\n",
                   test_name, static_cast<int> (a.res),
                   static_cast<unsigned int> (crt.priority ()));
@@ -1047,6 +1083,7 @@ test_unit_rtos (void)
       if (a1.res != ETIMEDOUT
           || crt.priority () != thread::priority::above_normal)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("%s - timed_lock() timeout returned %d, owner prio %u\n",
                   test_name, static_cast<int> (a1.res),
                   static_cast<unsigned int> (crt.priority ()));
@@ -1058,6 +1095,7 @@ test_unit_rtos (void)
       th2.join ();
       if (a2.res != result::ok || crt.priority () != prio)
         {
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("%s - after unlock() waiter returned %d, owner prio %u\n",
                   test_name, static_cast<int> (a2.res),
                   static_cast<unsigned int> (crt.priority ()));
@@ -1065,6 +1103,7 @@ test_unit_rtos (void)
         }
     }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - timed_lock() priority inheritance ok\n", test_name);
   }
 
@@ -1116,12 +1155,14 @@ test_unit_rtos (void)
 
     if (a.res != ETIMEDOUT || lost || c.res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - timed out waiter returned %d, next waiter %s\n",
                 test_name, static_cast<int> (a.res),
                 lost ? "not woken" : "woken");
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - timed_lock() timeout passes the wake-up on ok\n", test_name);
   }
 
@@ -1142,6 +1183,7 @@ test_unit_rtos (void)
     sysclock.sleep_for (1);
     if (crt.priority () != thread::priority::high)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - mutex owner not boosted (%u)\n", test_name,
                 static_cast<unsigned int> (crt.priority ()));
         return 1;
@@ -1154,6 +1196,7 @@ test_unit_rtos (void)
     if (!a.done || a.res != EINTR || crt.priority () != prio
         || mx.owner () != &crt)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - interrupted lock() returned %d, owner prio %u\n",
                 test_name, static_cast<int> (a.res),
                 static_cast<unsigned int> (crt.priority ()));
@@ -1162,6 +1205,7 @@ test_unit_rtos (void)
     mx.unlock ();
     tha.join ();
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - interrupted lock() priority inheritance ok\n", test_name);
   }
 
@@ -1207,17 +1251,20 @@ test_unit_rtos (void)
 
     if (a.res != EINTR || lost || c.res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - interrupted waiter returned %d, next waiter %s\n",
                 test_name, static_cast<int> (a.res),
                 lost ? "not woken" : "woken");
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - interrupted lock() passes the wake-up on ok\n", test_name);
   }
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Semaphores, memory pools and message queues\n", test_name);
 
   // A waiter woken by a single wake-up and then leaving (timeout,
@@ -1282,6 +1329,7 @@ test_unit_rtos (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Cooperative scheduler and timers\n", test_name);
 
   {
@@ -1299,10 +1347,12 @@ test_unit_rtos (void)
 
     if (end - begin < 2)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - cooperative sleep_for(2) returned after %u ticks\n",
                 test_name, static_cast<unsigned int> (end - begin));
         return 1;
       }
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - cooperative sleep_for() ok\n", test_name);
   }
 
@@ -1318,6 +1368,7 @@ test_unit_rtos (void)
     result_t res = tm.stop ();
     if (count < 4 || res != result::ok)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - periodic timer called %u times, stop() returned %d\n",
                 test_name, static_cast<unsigned int> (count),
                 static_cast<int> (res));
@@ -1328,6 +1379,7 @@ test_unit_rtos (void)
     res = tm.stop ();
     if (tm_count != count || res != EAGAIN)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - stopped periodic timer called %u more times, stop() "
                 "returned %d\n",
                 test_name, static_cast<unsigned int> (tm_count - count),
@@ -1347,17 +1399,20 @@ test_unit_rtos (void)
     result_t res = tm.stop ();
     if (tm_count != 1 || res != EAGAIN)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - one-shot timer called %u times, stop() returned %d\n",
                 test_name, static_cast<unsigned int> (tm_count),
                 static_cast<int> (res));
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - periodic and one-shot timers ok\n", test_name);
   }
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Clocks\n", test_name);
 
   {
@@ -1426,8 +1481,10 @@ test_unit_rtos (void)
 
     if (backwards != 0)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - hrclock went backwards %u times\n", test_name,
                 static_cast<unsigned int> (backwards));
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - round %d, previous %" PRIu64 ", now %" PRIu64
                 ", cycles per tick %" PRIu64 "\n",
                 test_name, fail_round, static_cast<uint64_t> (fail_prev),
@@ -1437,16 +1494,19 @@ test_unit_rtos (void)
       }
     if (crossed == 0)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - hrclock monotonic, but no tick was held pending\n",
                 test_name);
       }
     else
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - hrclock monotonic ok (%u rounds over a tick)\n",
                 test_name, static_cast<unsigned int> (crossed));
       }
     if (tolerated != 0)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - %u small backwards steps tolerated (<= %u cycles)\n",
                 test_name, static_cast<unsigned int> (tolerated),
                 static_cast<unsigned int> (
@@ -1456,6 +1516,7 @@ test_unit_rtos (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Scheduler lock\n", test_name);
 
   {
@@ -1477,6 +1538,7 @@ test_unit_rtos (void)
     th.join ();
     if (!at_once)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - waiter woken by unlock() did not run at once\n",
                 test_name);
         return 1;
@@ -1502,12 +1564,14 @@ test_unit_rtos (void)
     th.join ();
     if (!at_once)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         printf ("%s - thread woken in a scheduler critical section did not "
                 "run at once\n",
                 test_name);
         return 1;
       }
 
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - deferred context switch at unlock ok\n", test_name);
   }
 
@@ -1625,6 +1689,7 @@ test_unit_rtos (void)
       return 1;
     }
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - done\n", test_name);
 
   return 0;

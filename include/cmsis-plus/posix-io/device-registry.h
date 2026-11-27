@@ -34,6 +34,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -162,6 +165,7 @@ namespace os
       for (auto&& d : registry_list__)
         {
           // Validate the device name by checking duplicates.
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           if (std::strcmp (device->name (), d.name ()) == 0)
             {
               trace::puts ("Duplicate device name. Abort.");
@@ -174,6 +178,7 @@ namespace os
 
       registry_list__.link (*device);
 
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("Device '%s%s' linked\n", value_type::device_prefix (),
                      device->name ());
     }
@@ -188,6 +193,7 @@ namespace os
       assert (path != nullptr);
 
       auto prefix = value_type::device_prefix ();
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       if (std::strncmp (prefix, path, std::strlen (prefix)) != 0)
         {
           // The device prefix does not match, not a device.

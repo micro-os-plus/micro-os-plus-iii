@@ -23,6 +23,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -36,6 +39,7 @@ namespace os
 
     lifo::~lifo ()
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("lifo::%s() @%p %s\n", __func__, this, this->name ());
     }
 

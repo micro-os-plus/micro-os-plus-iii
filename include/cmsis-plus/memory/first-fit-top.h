@@ -26,6 +26,9 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -497,6 +500,7 @@ namespace os
                                          std::size_t bytes)
         : rtos::memory::memory_resource{ name }
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
                      this->name ());
 

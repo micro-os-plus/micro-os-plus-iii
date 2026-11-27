@@ -24,6 +24,16 @@
 
 // ----------------------------------------------------------------------------
 
+#if defined(__GNUC__)
+#if defined(__clang__)
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
+#endif // defined(__clang__)
+#endif // defined(__GNUC__)
+
+// ----------------------------------------------------------------------------
+
 namespace os
 {
   namespace posix
@@ -112,6 +122,7 @@ namespace os
 #if defined(OS_TRACE_POSIX_IO_DIRECTORY)
       trace::printf ("directory_impl::%s()=%p\n", __func__, this);
 #endif
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       memset (&dir_entry_, 0, sizeof (/* struct */ dirent));
     }
 

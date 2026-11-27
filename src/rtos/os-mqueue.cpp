@@ -20,6 +20,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -725,6 +728,7 @@ namespace os
         // interrupts::uncritical_section iucs;
 
         // Copy message from user buffer to queue storage.
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         std::memcpy (dest, msg, nbytes);
         if (nbytes < msg_size_bytes_)
           {
@@ -861,6 +865,7 @@ namespace os
         interrupts::uncritical_section iucs;
 
         // Copy message from queue to user buffer.
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         memcpy (msg, src, nbytes);
         if (mprio != nullptr)
           {

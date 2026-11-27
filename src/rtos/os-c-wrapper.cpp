@@ -25,6 +25,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
@@ -4583,6 +4586,7 @@ osPoolCAlloc (osPoolId pool_id)
   ret = (reinterpret_cast<memory_pool&> (*pool_id)).try_alloc ();
   if (ret != nullptr)
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       memset (ret, 0,
               (reinterpret_cast<memory_pool&> (*pool_id)).block_size ());
     }
@@ -4995,6 +4999,7 @@ osMailCAlloc (osMailQId mail_id, uint32_t millisec)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wstrict-aliasing"
 #endif
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       memset (ret, 0,
               (reinterpret_cast<memory_pool&> (mail_id->pool)).block_size ());
 #pragma GCC diagnostic pop

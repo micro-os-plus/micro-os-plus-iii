@@ -29,6 +29,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 21)
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif // (__clang_major__ >= 21)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -487,6 +490,7 @@ namespace os
                      request, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device_partition::vioctl (request, args);
@@ -503,6 +507,7 @@ namespace os
                      __func__, buf, blknum, nblocks, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device_partition::read_block (buf, blknum, nblocks);
@@ -519,6 +524,7 @@ namespace os
                      __func__, buf, blknum, nblocks, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device_partition::write_block (buf, blknum, nblocks);

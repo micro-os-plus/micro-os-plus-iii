@@ -35,10 +35,15 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #elif defined(__GNUC__)
 // The casts to unsigned int are needed on 64-bit hosts.
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #endif
+
+// ----------------------------------------------------------------------------
 
 namespace
 {
@@ -66,6 +71,7 @@ test_unit_memory (void)
         printf ("%s - malloc() failed\n", __func__);
         return 1;
       }
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     memcpy (p, text, sizeof (text));
 
 #if defined(OS_IS_CROSS_BUILD)
@@ -93,6 +99,7 @@ test_unit_memory (void)
         free (p);
         return 1;
       }
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     if (memcmp (q, text, sizeof (text)) != 0)
       {
         printf ("%s - realloc() lost the contents\n", __func__);

@@ -29,6 +29,9 @@
 
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -219,6 +222,7 @@ namespace os
       assert (name != nullptr);
       assert (name_ != nullptr);
 
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       return (std::strcmp (name, name_) == 0);
     }
 

@@ -25,6 +25,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -365,6 +368,7 @@ namespace os
     inline lifo::lifo (void* addr, std::size_t bytes)
         : first_fit_top{ nullptr, addr, bytes }
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
                      this->name ());
     }
@@ -372,6 +376,7 @@ namespace os
     inline lifo::lifo (const char* name, void* addr, std::size_t bytes)
         : first_fit_top{ name, addr, bytes }
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       trace::printf ("%s(%p,%u) @%p %s\n", __func__, addr, bytes, this,
                      this->name ());
     }

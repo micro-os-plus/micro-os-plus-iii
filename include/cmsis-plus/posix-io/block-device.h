@@ -29,6 +29,9 @@
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 21)
+#pragma clang diagnostic ignored "-Wthread-safety-negative"
+#endif // (__clang_major__ >= 21)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -548,6 +551,7 @@ namespace os
       trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::close ();
@@ -562,6 +566,7 @@ namespace os
                      buf, nbyte, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::read (buf, nbyte);
@@ -576,6 +581,7 @@ namespace os
                      buf, nbyte, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::write (buf, nbyte);
@@ -591,6 +597,7 @@ namespace os
                      iov, iovcnt, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::writev (iov, iovcnt);
@@ -605,6 +612,7 @@ namespace os
                      this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::vfcntl (cmd, args);
@@ -619,6 +627,7 @@ namespace os
                      this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::vioctl (request, args);
@@ -633,6 +642,7 @@ namespace os
                      offset, whence, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::lseek (offset, whence);
@@ -648,6 +658,7 @@ namespace os
                      buf, blknum, nblocks, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::read_block (buf, blknum, nblocks);
@@ -663,6 +674,7 @@ namespace os
                      buf, blknum, nblocks, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::write_block (buf, blknum, nblocks);
@@ -676,6 +688,7 @@ namespace os
       trace::printf ("block_device_lockable::%s() @%p\n", __func__, this);
 #endif
 
+      // #pragma clang diagnostic ignored "-Wthread-safety-negative"
       std::lock_guard<L> lock{ locker_ };
 
       return block_device::sync ();

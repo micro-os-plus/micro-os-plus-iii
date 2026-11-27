@@ -38,6 +38,9 @@
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wextra-semi-stmt"
 #pragma clang diagnostic ignored "-Wunused-but-set-variable"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
 #endif
@@ -69,6 +72,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
 
   for (int i = 0; i < 3; ++i)
     {
+      // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
       printf ("\n%s - 512/512 fat12, step %d\n", test_name, i);
 
       using my_block = posix::block_device_implementable<my_block_impl>;
@@ -103,6 +107,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
     }
 
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 512/512 fat12 mutex\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -141,6 +146,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
 // so can be executed only on the synthetic platform.
 #if !defined(OS_IS_CROSS_BUILD)
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 512/512 fat16\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -175,6 +181,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
   }
 
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 512/512 fat32\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -209,6 +216,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
   }
 
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 512/512 exfat\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -242,6 +250,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
   }
 
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 1024/1024 fat\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -276,6 +285,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
   }
 
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 4096/4096 fat\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -310,6 +320,7 @@ test_chan_fatfs (bool extra __attribute__ ((unused)))
   }
 
   {
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("\n%s - 512/4096 fat\n", test_name);
 
     using my_block = posix::block_device_implementable<my_block_impl>;
@@ -477,6 +488,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             {
               break;
             }
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("\"%s\"\n", dp->d_name);
         };
 
@@ -495,6 +507,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             {
               break;
             }
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("\"%s\"\n", dp->d_name);
         };
 
@@ -572,6 +585,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             {
               break;
             }
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("\"%s\"\n", dp->d_name);
         };
 
@@ -590,6 +604,7 @@ test_fs (posix::file_system& fs, uint8_t* buff, std::size_t buff_size)
             {
               break;
             }
+          // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
           printf ("\"%s\"\n", dp->d_name);
         };
 

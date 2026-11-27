@@ -34,6 +34,9 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wformat-pedantic"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Waggregate-return"
 #pragma GCC diagnostic ignored "-Wuseless-cast"
@@ -75,6 +78,7 @@ func (void* args);
 void*
 func (void* args __attribute__ ((unused)))
 {
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("> %s() on thread %s\n", __func__, this_thread::thread ().name ());
   // fflush(stdout);
 
@@ -184,6 +188,7 @@ test_cpp_api (void)
 {
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - started\n", test_name);
   // fflush(stdout);
 
@@ -212,6 +217,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Memory managers\n", test_name);
   // fflush(stdout);
 
@@ -293,6 +299,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Threads\n", test_name);
   // fflush(stdout);
 
@@ -429,6 +436,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Thread stack\n", test_name);
   // fflush(stdout);
 
@@ -453,6 +461,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Thread event flags\n", test_name);
   // fflush(stdout);
 
@@ -471,6 +480,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Message queues\n", test_name);
   // fflush(stdout);
 
@@ -642,6 +652,7 @@ test_cpp_api (void)
 
   my_blk_t* blk;
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Memory pools\n", test_name);
   // fflush(stdout);
 
@@ -821,6 +832,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Condition variables\n", test_name);
   // fflush(stdout);
 
@@ -882,6 +894,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Event flags\n", test_name);
   // fflush(stdout);
 
@@ -938,6 +951,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Mutexes\n", test_name);
   // fflush(stdout);
 
@@ -1078,6 +1092,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Semaphores\n", test_name);
   // fflush(stdout);
 
@@ -1157,6 +1172,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Timers\n", test_name);
   // fflush(stdout);
 
@@ -1262,16 +1278,19 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Clocks\n", test_name);
 
   {
     uint32_t freq = hrclock.input_clock_frequency_hz ();
+    // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
     printf ("%s - hrclock %u Hz\n", test_name,
             static_cast<unsigned int> (freq));
   }
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Critical sections\n", test_name);
 
   {
@@ -1286,6 +1305,7 @@ test_cpp_api (void)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - done\n", test_name);
   // fflush(stdout);
 

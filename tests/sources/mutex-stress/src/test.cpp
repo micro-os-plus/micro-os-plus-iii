@@ -27,8 +27,13 @@
 using namespace os;
 using namespace os::rtos;
 
+// ----------------------------------------------------------------------------
+
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -90,6 +95,7 @@ mutex_test::mutex_test (const char* name)
     : th_{ name, [] (void* attr) -> void*
   { return static_cast<mutex_test*> (attr)->object_main (); }, this }
 {
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   trace::printf ("%s @%p %s\n", __func__, this, name);
 }
 
@@ -210,6 +216,7 @@ periodic::object_main (void)
             sum += cnt;
 
             // os::core::timer::ticks_t ticks = pTask->getTicks();
+            // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
             printf ("%s:%-4u ", m->thread ().name (), cnt);
           }
         unsigned int count = sizeof (mt) / sizeof (mt[0]);

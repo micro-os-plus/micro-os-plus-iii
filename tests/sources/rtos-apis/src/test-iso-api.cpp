@@ -26,16 +26,21 @@
 
 // ----------------------------------------------------------------------------
 
-#define OS_INCLUDE_RTC_TEST
-
-static const char* test_name = "Test ISO C++ API";
-
 #pragma GCC diagnostic push
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
+
+// ----------------------------------------------------------------------------
+
+#define OS_INCLUDE_RTC_TEST
+
+static const char* test_name = "Test ISO C++ API";
 
 // ----------------------------------------------------------------------------
 
@@ -80,6 +85,7 @@ task3 (void* args)
 void
 task4 (int n, const char* str)
 {
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("%s(%d,%s)\n", __func__, n, str);
 }
 
@@ -114,6 +120,7 @@ test_iso_api (bool extra)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Threads\n", test_name);
   {
     {
@@ -196,6 +203,7 @@ test_iso_api (bool extra)
   }
 
   // ==========================================================================
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Mutexes\n", test_name);
 
   {
@@ -324,6 +332,7 @@ test_iso_api (bool extra)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Condition variables\n", test_name);
   {
     estd::condition_variable cv11;
@@ -449,6 +458,7 @@ test_iso_api (bool extra)
 
   // ==========================================================================
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Chrono\n", test_name);
 
 #pragma GCC diagnostic push
@@ -558,6 +568,7 @@ test_iso_api (bool extra)
 
   my_sleep (70);
 
+  // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
   printf ("\n%s - Done\n", test_name);
   return 0;
 }

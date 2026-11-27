@@ -35,6 +35,9 @@
 #if defined(__clang__)
 #pragma clang diagnostic ignored "-Wc++98-compat"
 #pragma clang diagnostic ignored "-Wdocumentation-unknown-command"
+#if (__clang_major__ >= 20)
+#pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
+#endif // (__clang_major__ >= 20)
 #endif
 
 // ----------------------------------------------------------------------------
@@ -1421,6 +1424,7 @@ namespace os
       inline out_of_memory_handler_t
       memory_resource::out_of_memory_handler (out_of_memory_handler_t handler)
       {
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         trace::printf ("%s(%p) @%p %s\n", __func__, handler, this, name ());
 
         out_of_memory_handler_t tmp = out_of_memory_handler_;
@@ -1491,6 +1495,7 @@ namespace os
       memory_resource::trace_print_statistics (void)
       {
 #if defined(TRACE)
+        // #pragma clang diagnostic ignored "-Wunsafe-buffer-usage-in-libc-call"
         trace::printf ("Memory '%s' @%p: \n"
                        "\ttotal: %u bytes, \n"
                        "\tallocated: %u bytes in %u chunk(s), \n"
