@@ -84,9 +84,15 @@ target_compile_definitions (
 set (
   xpack_platform_common_options
   -Werror
-  # Apple clang 13 does not support -Wunused-but-set-variable
+  # -Wno-unknown-warning-option is no longer needed: the pragmas that
+  # name warnings not known to all clang versions (for example
+  # -Wunsafe-buffer-usage-in-libc-call, -Wthread-safety-negative,
+  # -Wimplicit-void-ptr-cast, -Wpre-c11-compat) are now guarded with
+  # `#if (__clang_major__ >= N)`, so older compilers (Apple clang 13
+  # does not know -Wunused-but-set-variable either) never see them.
+  # Keeping the option disabled makes any unguarded pragma fail the build.
   # $<$<PLATFORM_ID:Darwin>:-Wno-unknown-warning-option>
-  $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-unknown-warning-option>
+  # $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-unknown-warning-option>
   $<$<C_COMPILER_ID:Clang,AppleClang>:-Wno-documentation>
   $<$<PLATFORM_ID:Darwin>:-Wno-missing-include-dirs>
 )
