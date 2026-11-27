@@ -37,7 +37,7 @@
       "dependencies-releases": {
         "@micro-os-plus/posix-arch": "github:micro-os-plus/micro-os-plus-iii-posix-arch#v1.1.0",
         "@micro-os-plus/micro-os-plus-iii-cortexm": "github:micro-os-plus/micro-os-plus-iii-cortexm#v1.2.0",
-        "@xpack-3rd-party/libucontext": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-6",
+        "@xpack-3rd-party/libucontext": "github:xpack-3rd-party/libucontext-xpack#v1.2.0-7",
         "@xpack-3rd-party/arm-cmsis-core": "5.4.0-7",
         "@xpack-3rd-party/raspberrypi-pico-sdk": "2.3.0-6",
         "@xpack-segger/rtt": "github:xpack-3rd-party/segger-rtt-xpack#v8.56.1-2",
