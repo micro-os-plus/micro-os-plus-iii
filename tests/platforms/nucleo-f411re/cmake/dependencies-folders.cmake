@@ -36,8 +36,8 @@ set (
   "${CMAKE_BINARY_DIR}/xpacks/@xpack-segger/rtt"
   "${CMAKE_BINARY_DIR}/xpacks/@xpack-segger/system-view"
   # The SOURCE_DIR is the `tests` folder.
-  "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/arm-cmsis-rtos-validator"
-  "${CMAKE_SOURCE_DIR}/xpacks/@xpacks/chan-fatfs"
+  "${CMAKE_SOURCE_DIR}/xpacks/@xpack-3rd-party/arm-cmsis-rtos-validator"
+  "${CMAKE_SOURCE_DIR}/xpacks/@xpack-3rd-party/chan-fatfs"
   # Build configuration dependencies.
   # None.
 )

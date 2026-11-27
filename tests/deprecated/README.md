@@ -17,9 +17,9 @@ git clone https://github.com/xpacks/scripts.git scripts.git
 
 git clone https://github.com/micro-os-plus/micro-os-plus-iii.git micro-os-plus-iii.git
 git clone https://github.com/micro-os-plus/micro-os-plus-iii-cortexm.git micro-os-plus-iii-cortexm.git
-git clone https://github.com/xpacks/arm-cmsis-rtos-validator.git arm-cmsis-rtos-validator.git
+git clone https://github.com/xpack-3rd-party/arm-cmsis-rtos-validator-xpack.git arm-cmsis-rtos-validator.git
 git clone https://github.com/micro-os-plus/posix-arch.git posix-arch.git
-git clone https://github.com/xpacks/chan-fatfs.git chan-fatfs.git
+git clone https://github.com/xpack-3rd-party/chan-fatfs-xpack.git chan-fatfs.git
 
 git clone https://github.com/micro-os-plus/eclipse-test-projects.git eclipse-test-projects.git
 
