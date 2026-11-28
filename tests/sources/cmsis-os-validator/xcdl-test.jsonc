@@ -1,0 +1,20 @@
+{
+  "$schema": "https://xpack.github.io/xcdl/schemas/xcdl-2.0.0.json",
+  "minimumXcdlRequired": "2.0.0",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Liviu Ionescu. All rights reserved.",
+  "cdlComponents": [
+    {
+      "id": "test.cmsis-os-validator",
+      "display": "CMSIS OS Validator Test",
+      "description": "The configuration for the Arm CMSIS RTOS validator test",
+      "publicIncludeFolders": [
+        "include"
+      ],
+      "sourceFiles": [],
+      "dependencies": [
+        "micro-os-plus.iii"
+      ]
+    }
+  ]
+}

@@ -1,9 +1,9 @@
 # -----------------------------------------------------------------------------
-# DO NOT EDIT!
-# Automatically generated from build-helper/templates.
+# DO NOT EDIT! Automatically generated from template file:
+# build-helper/templates/common/_micro-os-plus/tests/cmake/tests-main-liquid.cmake
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
-# Copyright (c) 2022-2025 Liviu Ionescu. All rights reserved.
+# Copyright (c) 2022-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -12,13 +12,6 @@
 # obtained from https://opensource.org/licenses/mit.
 #
 # -----------------------------------------------------------------------------
-
-# Generate the compile_commands.json file to feed the indexer.
-# Highly recommended, to help IDEs construct the index.
-set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
-# Enable this to see the dependency graph.
-# set_property(GLOBAL PROPERTY GLOBAL_DEPENDS_DEBUG_MODE 1)
 
 # -----------------------------------------------------------------------------
 
@@ -30,39 +23,94 @@ endif ()
 # -----------------------------------------------------------------------------
 # Non-target specific definitions.
 
-# The globals must be included in this scope, before creating any targets.
-# The compile options, symbols and include folders apply to all
-# compiled sources, from all libraries.
+# The globals must be included in this scope, before creating any targets. The
+# compile options, symbols and include folders apply to all compiled sources,
+# from all libraries.
 if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
   set (extension ".cmd")
 endif ()
 
-# Define `micro-os-plus::common-options` with the compile & link options
-# common to all platforms.
-include ("cmake/common-options.cmake")
+# Define functions like add_cross_test_executable().
+include ("cmake/common-functions.cmake")
 
-# Platform specific definitions.
-include ("platforms/${PLATFORM_NAME}/cmake/definitions.cmake")
+# Define `micro-os-plus::common-options` with the compile & link options common
+# to all platforms.
+include ("cmake/common-options-library.cmake")
 
+# -----------------------------------------------------------------------------
+# Dependencies.
+
+# Optionally, override the project definitions with platform specific values.
+if (EXISTS
+    "${CMAKE_SOURCE_DIR}/platforms/${PLATFORM_NAME}/cmake/definitions.cmake"
+)
+  message (VERBOSE "") # Separator for readability
+  include ("platforms/${PLATFORM_NAME}/cmake/definitions.cmake")
+endif ()
+
+message (VERBOSE "") # Separator for readability
 # Set `xpack_dependencies_folders` with the platform specific dependencies.
 include ("platforms/${PLATFORM_NAME}/cmake/dependencies-folders.cmake")
 
+foreach (folder ${xpack_dependencies_folders})
+  file (RELATIVE_PATH relative_folder "${CMAKE_SOURCE_DIR}" "${folder}")
+  message (VERBOSE "  ${relative_folder}")
+endforeach ()
+
 # Iterate the platform dependencies and `add_subdirectory()`.
+message (VERBOSE "") # Separator for readability
+message (VERBOSE "Adding dependencies libraries...")
 xpack_add_dependencies_subdirectories (
-  "${xpack_dependencies_folders}" "xpacks-bin"
+  "${xpack_dependencies_folders}" "dependencies-bin"
 )
+
+message (VERBOSE "") # Separator for readability
+# Define the generic `micro-os-plus::architecture` alias.
+include ("platforms/${PLATFORM_NAME}/cmake/architecture-alias.cmake")
+
+message (VERBOSE "") # Separator for readability
+# Set `xpack_dependencies_libraries` with the platform specific libraries.
+include ("platforms/${PLATFORM_NAME}/cmake/dependencies-libraries.cmake")
+foreach (library ${xpack_dependencies_libraries})
+  message (VERBOSE "  ${library}")
+endforeach ()
+
+# -----------------------------------------------------------------------------
+
+# Add the platform library. The artefacts are created in the
+# `platform-bin` folder.
+message (VERBOSE "") # Separator for readability
+message (VERBOSE "Adding platform library...")
+message (VERBOSE "") # Separator for readability
+add_subdirectory ("platforms/${PLATFORM_NAME}" "platform-bin")
 
 # -----------------------------------------------------------------------------
 
 # Add the project library, defined one level above.
+message (VERBOSE "") # Separator for readability
 message (VERBOSE "Adding top library...")
+message (VERBOSE "") # Separator for readability
 add_subdirectory (".." "top-bin")
 
 # -----------------------------------------------------------------------------
-# Platform specifics.
 
-# Add the platform specific targets and tests.
-# For consistency, the binaries are created in the `platform-bin` folder.
-add_subdirectory ("platforms/${PLATFORM_NAME}" "platform-bin")
+# Iterate the folders from `project-definitions.cmake` and `add_subdirectory()`.
+message (VERBOSE "") # Separator for readability
+message (VERBOSE "Adding tests libraries...")
+xpack_add_dependencies_subdirectories (
+  "${xpack_dependencies_tests_folders}" "tests-bin"
+)
+
+# -----------------------------------------------------------------------------
+
+# With all libraries processed, include the artefacts and tests definitions.
+message (VERBOSE "") # Separator for readability
+message (VERBOSE "Adding tests artefacts...")
+message (VERBOSE "") # Separator for readability
+include ("platforms/${PLATFORM_NAME}/cmake/artefacts.cmake")
+
+# -----------------------------------------------------------------------------
+
+message (VERBOSE "") # Separator for readability
 
 # -----------------------------------------------------------------------------

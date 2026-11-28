@@ -1,0 +1,30 @@
+{
+  "$schema": "https://xpack.github.io/xcdl/schemas/xcdl-2.0.0.json",
+  "minimumXcdlRequired": "2.0.0",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Liviu Ionescu. All rights reserved.",
+  "cdlComponents": [
+    {
+      "id": "test.rtos-apis",
+      "display": "RTOS APIs Test",
+      "description": "The source code for the RTOS APIs test",
+      "publicIncludeFolders": [
+        "include"
+      ],
+      "sourceFiles": [
+        "src/main.cpp",
+        "src/test-c-api.c",
+        "src/test-chan-fatfs.cpp",
+        "src/test-cmsis-os1.cpp",
+        "src/test-cpp-api.cpp",
+        "src/test-cpp-mem.cpp",
+        "src/test-iso-api.cpp",
+        "src/test-posix-io-api.cpp",
+        "src/instrumentation-config.cpp"
+      ],
+      "dependencies": [
+        "micro-os-plus.iii"
+      ]
+    }
+  ]
+}

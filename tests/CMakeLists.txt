@@ -1,7 +1,9 @@
 # -----------------------------------------------------------------------------
+# DO NOT EDIT! Automatically generated from template file:
+# build-helper/templates/common/_micro-os-plus/tests/CMakeLists-liquid.txt
 #
-# This file is part of the µOS++ project (https://micro-os-plus.github.io/).
-# Copyright (c) 2022-2025 Liviu Ionescu. All rights reserved.
+# This file is part of the µOS++ project (https:///micro-os-plus.github.io/)
+# Copyright (c) 2022-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -17,7 +19,11 @@
 # https://cmake.org/cmake/help/v3.20/
 cmake_minimum_required (VERSION 3.20)
 
-project (micro-os-plus-micro-os-plus-iii-tests DESCRIPTION "µOS++ IIIe tests")
+project (
+  micro-os-plus-micro-os-plus-iii-tests
+  DESCRIPTION "µOS++ IIIe tests"
+  LANGUAGES CXX
+)
 
 # -----------------------------------------------------------------------------
 # Project wide setup.
@@ -37,6 +43,16 @@ set (CMAKE_CXX_EXTENSIONS OFF)
 
 # -----------------------------------------------------------------------------
 
+# Generate the compile_commands.json file to feed the indexer. Highly
+# recommended, to help IDEs construct the index.
+set (CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
+# Enable this to see the dependency graph.
+#
+# set_property(GLOBAL PROPERTY GLOBAL_DEPENDS_DEBUG_MODE 1)
+
+# -----------------------------------------------------------------------------
+
 # Must be called from the project root folder.
 enable_testing ()
 
@@ -51,17 +67,16 @@ if (CMAKE_BINARY_DIR STREQUAL CMAKE_SOURCE_DIR)
 endif ()
 
 # The build-helper is a devDependency, available only after `xpm install`.
-list (APPEND CMAKE_MODULE_PATH
-      "${CMAKE_CURRENT_SOURCE_DIR}/xpacks/@micro-os-plus/build-helper/cmake"
-)
+list (APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include ("micro-os-plus-build-helper")
 
 xpack_display_greetings ("${CMAKE_CURRENT_SOURCE_DIR}/../package.json")
 
 # -----------------------------------------------------------------------------
 
-# Global definitions.
-include ("cmake/global-definitions.cmake")
+# Project specific definitions and functions.
+include ("cmake/project-definitions.cmake")
+include ("cmake/project-functions.cmake")
 
 # -----------------------------------------------------------------------------
 

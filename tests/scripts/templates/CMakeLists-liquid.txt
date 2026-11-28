@@ -1,0 +1,108 @@
+{%- assign packageScope = package.name | remove_first: '@' | split: '/' | first %}
+{%- assign packageName = package.name | remove_first: '@' | split: '/' | last -%}
+# -----------------------------------------------------------------------------
+# DO NOT EDIT! Automatically generated from template file:
+# {{jsonFilePath}}
+#
+# This file is part of the µOS++ project (https://micro-os-plus.github.io/).
+# Copyright (c) 2021-2026 Liviu Ionescu. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose is hereby granted, under the terms of the MIT license.
+#
+# If a copy of the license was not distributed with this file, it can be
+# obtained from https://opensource.org/licenses/mit.
+#
+# -----------------------------------------------------------------------------
+
+# This file is intended to be used by applications via:
+#
+# `add_subdirectory("{{outputFolderPath}}")`
+#
+# This creates interface libraries that can be linked to a target with:
+#
+# ~~~
+{%- for component in xcdl.cdlComponents %}
+{%- assign nameDoubleColon = component.id | replace_first: '.', '::' | replace: '.', '-' %}
+# target_link_libraries(your-target PUBLIC {{nameDoubleColon}})
+{%- endfor %}
+# ~~~
+
+# -----------------------------------------------------------------------------
+
+message (VERBOSE "Processing 'tests/{{outputFolderPath}}/'...")
+
+# -----------------------------------------------------------------------------
+
+{%- for component in xcdl.cdlComponents %}
+{%- assign nameDash = component.id | replace: '.', '-' %}
+{%- assign nameDoubleColon = component.id | replace_first: '.', '::' | replace: '.', '-' %}
+{%- if component.description %}
+
+# {{component.description}}.
+{%- endif %}
+
+# https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#interface-libraries
+# Visibility keywords: INTERFACE passes properties up to targets that link
+# against it.
+add_library ({{nameDash}}-interface INTERFACE EXCLUDE_FROM_ALL)
+{%- if component.publicIncludeFolders and component.publicIncludeFolders.size > 0 %}
+
+target_include_directories (
+  {{nameDash}}-interface 
+  INTERFACE{% for folder in component.publicIncludeFolders %}{% if forloop.first %} {% else %}
+            {% endif %}"{{folder}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.sourceFiles and component.sourceFiles.size > 0 %}
+
+target_sources (
+  {{nameDash}}-interface
+  INTERFACE{% for file in component.sourceFiles %}{% if forloop.first %} {% else %}
+            {% endif %}"{{file}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.publicDefines and component.publicDefines.size > 0 %}
+
+target_compile_definitions (
+  {{nameDash}}-interface 
+  INTERFACE{% for define in component.publicDefines %}{% if forloop.first %} {% else %}
+            {% endif %}"{{define}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.publicCompilerOptions and component.publicCompilerOptions.size > 0 %}
+
+target_compile_options (
+  {{nameDash}}-interface 
+  INTERFACE{% for option in component.publicCompilerOptions %}{% if forloop.first %} {% else %}
+            {% endif %}"{{option}}"{% endfor %}
+)
+{%- endif %}
+{%- if component.dependencies and component.dependencies.size > 0 %}
+
+target_link_libraries (
+  {{nameDash}}-interface 
+  INTERFACE{% for dependency in component.dependencies %}{% assign dependencyDoubleColon = dependency | replace_first: '.', '::' | replace: '.', '-' %}{% if forloop.first %} {% else %}
+            {% endif %}"{{dependencyDoubleColon}}"{% endfor %}
+)
+{%- endif %}
+
+xpack_display_target_lists ({{nameDash}}-interface)
+
+# -----------------------------------------------------------------------------
+# Alias.
+
+# Export an alias target using namespaced syntax (Project::Target). This is the
+# canonical pattern for consumption via target_link_libraries(), whether the
+# dependency is added via add_subdirectory(), FetchContent, or an installed
+# package via find_package(). Using "::" lets CMake detect an invalid or
+# misspelled target name at configure time, rather than silently passing it
+# through to the linker as a plain string or flag. Note: alias targets are
+# read-only; properties must be set on the underlying target, not on the alias
+# itself.
+# https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
+add_library ({{nameDoubleColon}} ALIAS {{nameDash}}-interface)
+message (VERBOSE "> {{nameDoubleColon}} -> {{nameDash}}-interface")
+
+# -----------------------------------------------------------------------------
+{%- endfor %}

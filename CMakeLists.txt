@@ -41,8 +41,9 @@ if (COMMAND xpack_get_package_name_and_version)
   xpack_get_package_name_and_version (
     "${CMAKE_CURRENT_SOURCE_DIR}/package.json"
   )
-  message (VERBOSE
-           "Processing xpm package ${PACKAGE_JSON_NAME}@${PACKAGE_JSON_VERSION}..."
+  message (
+    VERBOSE
+    "Processing xpm package ${PACKAGE_JSON_NAME}@${PACKAGE_JSON_VERSION}..."
   )
 endif ()
 
@@ -61,17 +62,13 @@ endif ()
 # read-only; properties must be set on the underlying target, not on the alias
 # itself.
 
-
-
 # https://cmake.org/cmake/help/v3.20/command/add_library.html?highlight=interface#interface-libraries
 # Visibility keywords: PRIVATE applies to the target itself; INTERFACE passes
 # properties up to targets that link against it; PUBLIC does both.
 add_library (micro-os-plus-iii-interface INTERFACE EXCLUDE_FROM_ALL)
 
 target_include_directories (
-  micro-os-plus-iii-interface 
-  INTERFACE "include"
-            "include/cmsis-plus/legacy"
+  micro-os-plus-iii-interface INTERFACE "include" "include/cmsis-plus/legacy"
 )
 
 target_sources (
@@ -149,12 +146,7 @@ endif ()
 # Alias.
 
 # https://cmake.org/cmake/help/v3.20/command/add_library.html#alias-libraries
-add_library (
-  micro-os-plus::iii ALIAS micro-os-plus-iii-interface
-)
-message (
-  VERBOSE
-  "> micro-os-plus::iii -> micro-os-plus-iii-interface"
-)
+add_library (micro-os-plus::iii ALIAS micro-os-plus-iii-interface)
+message (VERBOSE "> micro-os-plus::iii -> micro-os-plus-iii-interface")
 
 # -----------------------------------------------------------------------------

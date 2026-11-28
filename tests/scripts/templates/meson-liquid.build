@@ -1,0 +1,136 @@
+{%- assign packageScope = package.name | remove_first: '@' | split: '/' | first %}
+{%- assign packageName = package.name | remove_first: '@' | split: '/' | last -%}
+# -----------------------------------------------------------------------------
+# DO NOT EDIT! Automatically generated from template file:
+# {{jsonFilePath}}
+#
+# This file is part of the µOS++ project (https://micro-os-plus.github.io/).
+# Copyright (c) 2022-2026 Liviu Ionescu. All rights reserved.
+#
+# Permission to use, copy, modify, and/or distribute this software for any
+# purpose is hereby granted, under the terms of the MIT license.
+#
+# If a copy of the license was not distributed with this file, it can be
+# obtained from https://opensource.org/licenses/mit.
+#
+# -----------------------------------------------------------------------------
+
+# This file is intended to be used by applications via:
+#
+# `subdir('{{outputFolderPath}}')`
+#
+# This creates dependencies that can be linked to a target with:
+#
+{% for component in xcdl.cdlComponents -%}
+{%- assign nameUnderscore = component.id | replace: '-', '_' | replace: '.', '_' -%}
+# `dependencies: [{{nameUnderscore}}_dependency],`
+{% endfor %}
+# Note: the Meson configuration is provided only as a proof of concept;
+# for production it might need some refinements.
+
+# -----------------------------------------------------------------------------
+
+message('Processing \'tests/{{outputFolderPath}}/\'...')
+
+# -----------------------------------------------------------------------------
+
+# Meson's DSL does not provide introspection methods on dependency objects
+# to retrieve their properties after creation. The `_local_*` variables
+# therefore serve a dual purpose: populating the dependency object and
+# iterating over its components for the `message()` calls at the end.
+
+# -----------------------------------------------------------------------------
+
+{%- for component in xcdl.cdlComponents %}
+{%- assign nameUnderscore = component.id | replace: '-', '_' | replace: '.', '_' %}
+{%- if component.description %}
+
+# {{component.description}}.
+{%- endif %}
+
+_local_compile_args = [] # Common C/C++ args.
+_local_compile_c_args = [] # C only args.
+_local_compile_cpp_args = [] # C++ only args.
+_local_include_directories = []
+_local_sources = []
+_local_compile_definitions = []
+_local_dependencies = []
+_local_link_args = []
+_local_link_with = []
+{%- if component.publicIncludeFolders and component.publicIncludeFolders.size > 0 %}
+
+_local_include_directories += [
+{%- for path in component.publicIncludeFolders %}
+  '{{path}}',
+{%- endfor %}
+]
+{%- endif %}
+{%- if component.sourceFiles and component.sourceFiles.size > 0 %}
+
+_local_sources += [
+{%- for path in component.sourceFiles %}
+  '{{path}}',
+{%- endfor %}
+]
+{%- endif %}
+{%- if component.publicDefines and component.publicDefines.size > 0 %}
+
+_local_compile_definitions += [
+{%- for define in component.publicDefines %}
+  '-D{{define}}',
+{%- endfor %}
+]
+{%- endif %}
+{%- if component.publicCompilerOptions and component.publicCompilerOptions.size > 0 %}
+
+_local_compile_args += [
+{%- for option in component.publicCompilerOptions %}
+  '{{option}}',
+{%- endfor %}
+]
+{%- endif %}
+{%- if component.dependencies and component.dependencies.size > 0 %}
+
+# The dependencies are single objects; enclose them in brackets,
+# to append them as elements of the list.
+_local_dependencies += [
+{%- for dependency in component.dependencies %}
+{%- assign dependencyUnderscore = dependency | replace: '.static-library', '' | replace: '.objects-library', '' | replace: '-', '_' | replace: '.', '_' %}
+  {{dependencyUnderscore}}_dependency,
+{%- endfor %}
+]
+
+# The dependencies' C/C++ args are lists; add them without brackets,
+# to concatenate their elements rather than nest the lists.
+{%- for dependency in component.dependencies %}
+{%- assign dependencyUnderscore = dependency | replace: '.static-library', '' | replace: '.objects-library', '' | replace: '-', '_' | replace: '.', '_' %}
+_local_compile_c_args += {{dependencyUnderscore}}_dependency_compile_c_args
+_local_compile_cpp_args += {{dependencyUnderscore}}_dependency_compile_cpp_args
+{%- endfor %}
+{%- endif %}
+
+# https://mesonbuild.com/Reference-manual_functions.html#declare_dependency
+{{nameUnderscore}}_dependency = declare_dependency(
+  include_directories: include_directories(_local_include_directories),
+  compile_args: _local_compile_args + _local_compile_definitions,
+  sources: files(_local_sources),
+  dependencies: _local_dependencies,
+  link_args: _local_link_args,
+  link_with: _local_link_with,
+)
+
+# Meson dependencies cannot differentiate between C and C++ compile args;
+# they are therefore exposed as separate variables alongside the dependency.
+{{nameUnderscore}}_dependency_compile_c_args = _local_compile_c_args
+{{nameUnderscore}}_dependency_compile_cpp_args = _local_compile_cpp_args
+
+foreach name : _local_include_directories
+  message('+ -I ' + name)
+endforeach
+foreach name : _local_sources + _local_compile_definitions + _local_compile_args + _local_compile_c_args + _local_compile_cpp_args + _local_link_args
+  message('+ ' + name)
+endforeach
+message('> {{nameUnderscore}}_dependency')
+
+# -----------------------------------------------------------------------------
+{%- endfor %}

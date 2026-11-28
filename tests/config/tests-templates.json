@@ -1,0 +1,35 @@
+{
+   "platforms": [
+    "synthetic-posix",
+    "qemu-cortex-m0",
+    "qemu-cortex-m3",
+    "qemu-cortex-m4f",
+    "qemu-cortex-m7f",
+    "qemu-cortex-m33",
+    "nucleo-f411re",
+    "nucleo-f767zi",
+    "nucleo-h745zi"
+  ],
+  "tests": [
+    "rtos-apis",
+    "unit",
+    "mutex-stress",
+    "cmsis-os-validator"
+  ],
+  "boards": [
+    "nucleo-f411re",
+    "nucleo-f767zi",
+    "nucleo-h745zi",
+    "raspberry-pi-pico",
+    "raspberry-pi-pico-2-arm",
+    "raspberry-pi-pico-2-riscv"
+  ],
+  "boardConfigurations": [
+    "nucleo-f411re",
+    "nucleo-f767zi",
+    "nucleo-h745zi",
+    "raspberry-pi-pico",
+    "raspberry-pi-pico-2-arm",
+    "raspberry-pi-pico-2-riscv"
+  ]
+}

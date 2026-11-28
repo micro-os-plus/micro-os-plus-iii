@@ -1,0 +1,25 @@
+{
+  "$schema": "https://xpack.github.io/xcdl/schemas/xcdl-2.0.0.json",
+  "minimumXcdlRequired": "2.0.0",
+  "license": "MIT",
+  "copyright": "Copyright (c) 2026 Liviu Ionescu. All rights reserved.",
+  "cdlComponents": [
+    {
+      "id": "test.unit",
+      "display": "Unit Test",
+      "description": "The source code for the unit tests",
+      "publicIncludeFolders": [
+        "include"
+      ],
+      "sourceFiles": [
+        "src/main.cpp",
+        "src/test-c-api.c",
+        "src/test-memory.cpp",
+        "src/test-rtos.cpp"
+      ],
+      "dependencies": [
+        "micro-os-plus.iii"
+      ]
+    }
+  ]
+}

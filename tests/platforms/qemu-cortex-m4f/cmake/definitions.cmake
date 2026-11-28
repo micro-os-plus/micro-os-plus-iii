@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
-# Copyright (c) 2022-2025 Liviu Ionescu. All rights reserved.
+# Copyright (c) 2022-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -15,16 +15,15 @@
 
 # -----------------------------------------------------------------------------
 
-message (VERBOSE
-         "Including tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake..."
+message (
+  VERBOSE
+  "Including 'tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake'..."
 )
 
 # -----------------------------------------------------------------------------
 
-# Required in devices-qemu-cortexm.
+# Required by `tests/device-qemu-cortexm`.
 set (xpack_device_compile_definition "MICRO_OS_PLUS_DEVICE_QEMU_CORTEX_M4")
-
-set (xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_QEMU_CORTEX_M4F")
 
 set (xpack_device_linker_script_file_name "mem-mps2-an386.ld")
 

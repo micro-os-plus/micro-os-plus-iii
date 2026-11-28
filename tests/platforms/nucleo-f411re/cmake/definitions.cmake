@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
-# Copyright (c) 2023-2025 Liviu Ionescu. All rights reserved.
+# Copyright (c) 2022-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -15,19 +15,27 @@
 
 # -----------------------------------------------------------------------------
 
-message (VERBOSE
-         "Including tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake..."
+message (
+  VERBOSE
+  "Including 'tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake'..."
 )
 
 # -----------------------------------------------------------------------------
 
-# Required in devices-qemu-cortexm.
+# Required by the platform `device` folder.
 set (xpack_device_compile_definition "MICRO_OS_PLUS_DEVICE_STM32F411XE")
 
-set (xpack_platform_compile_definition "MICRO_OS_PLUS_PLATFORM_NUCLEO_F411RE")
+# Create the listing files.
+set (XPACK_ENABLE_CREATE_LISTING true)
 
 # Platform specific tests.
-set (ENABLE_BLINKY_TEST true)
-set (ENABLE_INSTRUMENTATION_TEST true)
+set (XPACK_ENABLE_BLINKY_TEST true)
+list (APPEND xpack_dependencies_tests_folders
+      "${CMAKE_SOURCE_DIR}/sources/blinky"
+)
+set (XPACK_ENABLE_INSTRUMENTATION_TEST true)
+list (APPEND xpack_dependencies_tests_folders
+      "${CMAKE_SOURCE_DIR}/sources/instrumentation"
+)
 
 # -----------------------------------------------------------------------------

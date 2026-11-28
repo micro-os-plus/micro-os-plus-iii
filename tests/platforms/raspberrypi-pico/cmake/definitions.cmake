@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 #
 # This file is part of the µOS++ project (https://micro-os-plus.github.io/).
-# Copyright (c) 2023-2025 Liviu Ionescu. All rights reserved.
+# Copyright (c) 2022-2026 Liviu Ionescu. All rights reserved.
 #
 # Permission to use, copy, modify, and/or distribute this software for any
 # purpose is hereby granted, under the terms of the MIT license.
@@ -15,17 +15,14 @@
 
 # -----------------------------------------------------------------------------
 
-message (VERBOSE
-         "Including tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake..."
+message (
+  VERBOSE
+  "Including 'tests/platforms/${PLATFORM_NAME}/cmake/definitions.cmake'..."
 )
 
 # -----------------------------------------------------------------------------
 
-# Required in devices-qemu-cortexm.
+# Required by the platform `device` folder.
 set (xpack_device_compile_definition "MICRO_OS_PLUS_DEVICE_RASPBERRYPI_RP2040")
-
-set (xpack_platform_compile_definition
-     "MICRO_OS_PLUS_PLATFORM_RASPBERRYPI_PICO"
-)
 
 # -----------------------------------------------------------------------------

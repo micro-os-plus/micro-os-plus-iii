@@ -2,34 +2,52 @@
   "name": "tests",
   "version": "0.0.0",
   "description": "Tests",
-  "license": "MIT",
   "author": {
     "name": "Liviu Ionescu",
     "email": "ilg@livius.net",
     "url": "https://github.com/ilg-ul"
   },
+  "license": "MIT",
+  "$dependenciesUrls": {
+    "build-helper": "https://github.com/micro-os-plus/build-helper.git",
+    "npm-packages-helper": "https://github.com/xpack/npm-packages-helper.git",
+    "del-cli": "https://www.npmjs.com/package/del-cli",
+    "json": "https://www.npmjs.com/package/json",
+    "json5": "https://www.npmjs.com/package/json5",
+    "liquidjs": "https://www.npmjs.com/package/liquidjs",
+    "tap-parser": "https://www.npmjs.com/package/tap-parser",
+    "glob": "https://www.npmjs.com/package/glob"
+  },
   "dependencies": {},
   "devDependencies": {
-    "del-cli": "^8.0.1"
+    "@micro-os-plus/build-helper": "github:micro-os-plus/build-helper-xpack",
+    "@xpack/npm-packages-helper": "github:xpack/npm-packages-helper",
+    "del-cli": "^8.0.1",
+    "json": "^11.0.0",
+    "json5": "^2.2.3",
+    "liquidjs": "^10.28.0",
+    "tap-parser": "^18.3.4",
+    "glob": "^14.0.4"
   },
   "scripts": {
+    "generate-tests-commons": "node node_modules/@micro-os-plus/build-helper/maintenance/scripts/generate-tests-commons.mjs --micro-os-plus",
     "npm-ci": "npm ci",
     "npm-install": "npm install",
+    "npm-link-helpers": "npm link @micro-os-plus/build-helper @xpack/npm-packages-helper",
     "npm-outdated": "npm outdated",
     "deep-clean": "del-cli build node_modules xpacks package-json.json"
   },
   "xpack": {
     "minimumXpmRequired": "0.23.2",
-    "dependencies": {},
     "$devDependenciesUrls": [
       "https://github.com/micro-os-plus",
       "https://github.com/xpack-3rd-party",
       "https://github.com/xpack-dev-tools"
     ],
+    "dependencies": {},
     "devDependencies": {
       "@xpack-dev-tools/cmake": "3.26.5-1.1",
       "@xpack-dev-tools/ninja-build": "1.11.1-3.1",
-      "@micro-os-plus/build-helper": "^2.17.0",
       "@xpack-3rd-party/arm-cmsis-rtos-validator": "github:xpack-3rd-party/arm-cmsis-rtos-validator-xpack#v1.0.0-5",
       "@xpack-3rd-party/chan-fatfs": "github:xpack-3rd-party/chan-fatfs-xpack#v0.13.1-6"
     },
@@ -430,7 +448,7 @@
         },
         "template": [
           "xpm run test-synthetic-posix-{{ matrix.builder }}-sys{% if os.platform != 'darwin' %} --ignore-errors{% endif %}",
-          "{% assign native-gcc-versions = properties.native-gcc-versions | split_lines %}{% for version in native-gcc-versions %}{% if os.platform == 'darwin' %}echo {% endif %}xpm run test-synthetic-posix-{{ matrix.builder }}-gcc{{ version }}{{ os.EOL }}{% endfor %}",
+          "{% assign native-gcc-versions = properties.native-gcc-versions | split_lines %}{% for version in native-gcc-versions %}{% if os.platform == 'darwin' or os.platform == 'win32' %}echo {% endif %}xpm run test-synthetic-posix-{{ matrix.builder }}-gcc{{ version }}{{ os.EOL }}{% endfor %}",
           "{% assign native-clang-versions = properties.native-clang-versions | split_lines %}{% for version in native-clang-versions %}xpm run test-synthetic-posix-{{ matrix.builder }}-clang{{ version }}{{ os.EOL }}{% endfor %}"
         ]
       },
@@ -512,7 +530,100 @@
         "template": [
           "{% assign config = 'qemu-cortex-' | append: matrix.qemu-cortex-variant | append: '-' | append: matrix.builder | append: '-gcc' | append: matrix.arm-none-eabi-gcc-version %}{{ properties.actions-setup-build-test-for-config }}"
         ]
-      }
+      },
+      "clear-nucleo-f411re-cmake-gcc": [
+        "xpm run clear --config nucleo-f411re-cmake-gcc-debug --ignore-errors",
+        "xpm run clear --config nucleo-f411re-cmake-gcc-release --ignore-errors"
+      ],
+      "install-nucleo-f411re-cmake-gcc": [
+        "xpm install --config nucleo-f411re-cmake-gcc-debug",
+        "xpm install --config nucleo-f411re-cmake-gcc-release"
+      ],
+      "link-dependencies-nucleo-f411re-cmake-gcc": [
+        "xpm run link-dependencies --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run link-dependencies --config nucleo-f411re-cmake-gcc-release"
+      ],
+      "build-nucleo-f411re-cmake-gcc": [
+        "xpm run setup --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run build --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run setup --config nucleo-f411re-cmake-gcc-release",
+        "xpm run build --config nucleo-f411re-cmake-gcc-release"
+      ],
+      "test-nucleo-f411re-cmake-gcc": [
+        "xpm run setup --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run build --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run test --config nucleo-f411re-cmake-gcc-debug",
+        "xpm run setup --config nucleo-f411re-cmake-gcc-release",
+        "xpm run build --config nucleo-f411re-cmake-gcc-release",
+        "xpm run test --config nucleo-f411re-cmake-gcc-release",
+        "{% if os.platform == 'darwin' %}say done{% endif %}"
+      ],
+      "clean-nucleo-f411re-cmake-gcc": [
+        "xpm run clean --config nucleo-f411re-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config nucleo-f411re-cmake-gcc-release --ignore-errors"
+      ],
+      "clear-nucleo-f767zi-cmake-gcc": [
+        "xpm run clear --config nucleo-f767zi-cmake-gcc-debug --ignore-errors",
+        "xpm run clear --config nucleo-f767zi-cmake-gcc-release --ignore-errors"
+      ],
+      "install-nucleo-f767zi-cmake-gcc": [
+        "xpm install --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm install --config nucleo-f767zi-cmake-gcc-release"
+      ],
+      "link-dependencies-nucleo-f767zi-cmake-gcc": [
+        "xpm run link-dependencies --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run link-dependencies --config nucleo-f767zi-cmake-gcc-release"
+      ],
+      "build-nucleo-f767zi-cmake-gcc": [
+        "xpm run setup --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run build --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run setup --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run build --config nucleo-f767zi-cmake-gcc-release"
+      ],
+      "test-nucleo-f767zi-cmake-gcc": [
+        "xpm run setup --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run build --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run test --config nucleo-f767zi-cmake-gcc-debug",
+        "xpm run setup --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run build --config nucleo-f767zi-cmake-gcc-release",
+        "xpm run test --config nucleo-f767zi-cmake-gcc-release",
+        "{% if os.platform == 'darwin' %}say done{% endif %}"
+      ],
+      "clean-nucleo-f767zi-cmake-gcc": [
+        "xpm run clean --config nucleo-f767zi-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config nucleo-f767zi-cmake-gcc-release --ignore-errors"
+      ],
+      "clear-nucleo-h745zi-cmake-gcc": [
+        "xpm run clear --config nucleo-h745zi-cmake-gcc-debug --ignore-errors",
+        "xpm run clear --config nucleo-h745zi-cmake-gcc-release --ignore-errors"
+      ],
+      "install-nucleo-h745zi-cmake-gcc": [
+        "xpm install --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm install --config nucleo-h745zi-cmake-gcc-release"
+      ],
+      "link-dependencies-nucleo-h745zi-cmake-gcc": [
+        "xpm run link-dependencies --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm run link-dependencies --config nucleo-h745zi-cmake-gcc-release"
+      ],
+      "build-nucleo-h745zi-cmake-gcc": [
+        "xpm run setup --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm run build --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm run setup --config nucleo-h745zi-cmake-gcc-release",
+        "xpm run build --config nucleo-h745zi-cmake-gcc-release"
+      ],
+      "test-nucleo-h745zi-cmake-gcc": [
+        "xpm run setup --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm run build --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm run test --config nucleo-h745zi-cmake-gcc-debug",
+        "xpm run setup --config nucleo-h745zi-cmake-gcc-release",
+        "xpm run build --config nucleo-h745zi-cmake-gcc-release",
+        "xpm run test --config nucleo-h745zi-cmake-gcc-release",
+        "{% if os.platform == 'darwin' %}say done{% endif %}"
+      ],
+      "clean-nucleo-h745zi-cmake-gcc": [
+        "xpm run clean --config nucleo-h745zi-cmake-gcc-debug --ignore-errors",
+        "xpm run clean --config nucleo-h745zi-cmake-gcc-release --ignore-errors"
+      ]
     },
     "buildConfigurations": {
       "cmake-synthetic-posix-actions": {
@@ -950,7 +1061,7 @@
           "shortConfigurationName": "nf7r"
         }
       },
-      "nucleo-h743zi-cmake-gcc-debug": {
+      "nucleo-h745zi-cmake-gcc-debug": {
         "inherit": [
           "cmake-cross-actions",
           "cortexm-actions",
@@ -961,14 +1072,14 @@
         ],
         "properties": {
           "buildType": "Debug",
-          "platformName": "nucleo-h743zi",
+          "platformName": "nucleo-h745zi",
           "toolchainFileName": "arm-none-eabi-gcc.cmake",
           "shortConfigurationName": "nh7d"
         }
       },
-      "nucleo-h743zi-cmake-gcc-release": {
+      "nucleo-h745zi-cmake-gcc-release": {
         "inherit": [
-          "nucleo-h743zi-cmake-gcc-debug"
+          "nucleo-h745zi-cmake-gcc-debug"
         ],
         "properties": {
           "buildType": "MinSizeRel",
