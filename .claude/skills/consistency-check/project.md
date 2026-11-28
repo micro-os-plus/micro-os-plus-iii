@@ -21,12 +21,12 @@ match `tests/package.json`:
   toolchain has both a debug and a release configuration.
 - Each platform and toolchain has one `test-<platform>-cmake[-<toolchain>]`
   action, which prepares, builds, and tests both configurations; the
-  groups are `test-native-cmake`, `test-cortex-cmake`, and the cleaning
-  actions `clean-native-cmake` and `clean-cortex-cmake`.
+  groups are `test-synthetic-posix-cmake`, `test-cortex-cmake`, and the cleaning
+  actions `clean-synthetic-posix-cmake` and `clean-cortex-cmake`.
 - Installation and linking are composite actions, with one line per
   configuration: `install`, `install-ci`, `install-all`,
-  `install-native-cmake-sys`, `install-qemu-cortex-latest`,
-  `link-deps-all`, and `link-deps-native-cmake-sys`. Check that each
+  `install-synthetic-posix-cmake-sys`, `install-qemu-cortex-latest`,
+  `link-deps-all`, and `link-deps-synthetic-posix-cmake-sys`. Check that each
   list names every configuration it should, exactly once, and none
   that does not exist (`install-all`, `link-deps-all`, and `clean-all`
   cover all the configurations; `install-ci` matches `test-ci`).

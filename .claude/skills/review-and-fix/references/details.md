@@ -65,8 +65,8 @@ Negative check:
 S=<scratchpad>
 cp src/rtos/<file>.cpp $S/<file>.cpp.fixed
 git show HEAD:src/rtos/<file>.cpp > src/rtos/<file>.cpp   # or the previous fix
-xpm run build --config native-cmake-clang-debug -C tests
-./tests/build/native-cmake-clang-debug/platform-bin/unit-test | grep <marker>
+xpm run build --config synthetic-posix-cmake-clang-debug -C tests
+./tests/build/synthetic-posix-cmake-clang-debug/platform-bin/unit-test | grep <marker>
 cp $S/<file>.cpp.fixed src/rtos/<file>.cpp
 ```
 
@@ -98,7 +98,7 @@ macOS) of every test binary in the release configurations.
   C files where `true` in `#if` is 0 before C23.
 - Message queue elements must be at least pointer sized
   (`std::uintptr_t`).
-- `native-cmake-gcc` on macOS uses `/usr/bin/g++`, which is Apple
+- `synthetic-posix-cmake-gcc` on macOS uses `/usr/bin/g++`, which is Apple
   clang with libc++.
 - QEMU test binaries end in `.elf`; native ones have no extension.
 - Python scripts that rewrite sources must assert the exact number of

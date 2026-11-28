@@ -17,7 +17,7 @@
 // The µOS++ IIIe sources cannot be built alone: they need a port, the
 // application configuration, and the platform files. The probe therefore
 // reuses a configured and built test folder (for example
-// `tests/build/native-cmake-clang-debug`): it is compiled with the flags of
+// `tests/build/synthetic-posix-cmake-clang-debug`): it is compiled with the flags of
 // the `unit` test (`tests/sources/unit/src/test-rtos.cpp`, which includes the
 // `unit` `os-app-config.h`), and linked with all the objects of `unit-test`,
 // except those of the `unit` test itself. The probe defines `os_main()`.

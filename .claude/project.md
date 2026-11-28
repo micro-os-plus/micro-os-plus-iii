@@ -184,13 +184,13 @@ xpm run deep-clean -C tests
 A single configuration can be driven step by step:
 
 ```sh
-xpm run setup   --config native-cmake-gcc-debug -C tests
-xpm run build   --config native-cmake-gcc-debug -C tests
-xpm run test    --config native-cmake-gcc-debug -C tests
+xpm run setup   --config synthetic-posix-cmake-gcc-debug -C tests
+xpm run build   --config synthetic-posix-cmake-gcc-debug -C tests
+xpm run test    --config synthetic-posix-cmake-gcc-debug -C tests
 ```
 
 Configuration names follow `<platform>-cmake-<toolchain>-<debug|release>`,
-for example `native-cmake-clang17-release` or
+for example `synthetic-posix-cmake-clang17-release` or
 `qemu-cortex-m3-cmake-gcc-debug`.
 
 ### Test platforms (`tests/platforms/`)
@@ -235,7 +235,7 @@ xpm link -C ../micro-os-plus-iii-cortexm.git
 # Link them into the per-configuration xpacks folders
 xpm run link-deps-all -C tests
 # or, for one configuration
-xpm run link-deps --config native-cmake-sys-debug -C tests
+xpm run link-deps --config synthetic-posix-cmake-sys-debug -C tests
 ```
 
 `xpm run git-clone-deps -C tests` does the same, but clones fresh

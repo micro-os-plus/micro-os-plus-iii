@@ -25,7 +25,7 @@ fi
 TMP=$(mktemp -t hash-builds)
 : > "$OUT"
 
-for c in native-cmake-clang-release \
+for c in synthetic-posix-cmake-clang-release \
   qemu-cortex-m0-cmake-gcc-release qemu-cortex-m3-cmake-gcc-release \
   qemu-cortex-m4f-cmake-gcc-release qemu-cortex-m7f-cmake-gcc-release; do
   (cd "$T" && xpm run build --config $c > /dev/null 2>&1) \

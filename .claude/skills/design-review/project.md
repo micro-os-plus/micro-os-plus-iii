@@ -78,7 +78,7 @@ The headers need the application configuration, the platform, and a
 port; take the flags from the `unit` test of a native test build:
 
 ```sh
-B=tests/build/native-cmake-clang-debug
+B=tests/build/synthetic-posix-cmake-clang-debug
 FLAGS=$(node -e 'const c = require(process.argv[1] +
   "/compile_commands.json").find((e) =>
   e.file.endsWith("unit/src/test-rtos.cpp"));

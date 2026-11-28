@@ -18,7 +18,7 @@ on all supported platforms; for details see
 
 The supported platforms for running the µOS++ IIIe tests are:
 
-- `platforms/native` - run the test applications as native process
+- `platforms/synthetic-posix` - run the test applications as native process
   on the development machine, compiled with gcc or clang
 - `platforms/qemu-cortex-m7f` - run the tests as fully semihosted applications
   on a QEMU mps2-an500 emulated board (an Arm Cortex-M7F development board)

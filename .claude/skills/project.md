@@ -48,13 +48,13 @@ critical sections.
 ## Tests
 
 This overrides the default: `xpm run test -C tests` runs the native
-tests with the system compiler (`test-native-cmake-sys`), and the
+tests with the system compiler (`test-synthetic-posix-cmake-sys`), and the
 default QEMU platform is the Cortex-M33.
 
 - After minor changes, run the native tests with clang:
 
   ```sh
-  xpm run test-native-cmake-clang -C tests
+  xpm run test-synthetic-posix-cmake-clang -C tests
   ```
 
 - After major changes (the scheduler, the synchronisation objects, the
@@ -106,14 +106,14 @@ folder, linked with the objects of `unit-test` (except those of the
 
 ```sh
 node .github/skills/review-and-fix/scripts/build-probe.mjs \
-  tests/build/native-cmake-clang-debug <scratch>/probe/p1.cpp
+  tests/build/synthetic-posix-cmake-clang-debug <scratch>/probe/p1.cpp
 ```
 
 - The probe defines `int os_main (int argc, char* argv[])`, and reports
   with `trace::printf()`; its exit status is that of `os_main()`.
 - Build the test folder first
   (`xpm run build --config <name> -C tests`). Use
-  `native-cmake-clang-debug` (or `native-cmake-gcc-debug`)
+  `synthetic-posix-cmake-clang-debug` (or `synthetic-posix-cmake-gcc-debug`)
   natively, `qemu-cortex-m7f-cmake-gcc-debug` for Armv7E-M,
   `qemu-cortex-m33-cmake-gcc-debug` for Armv8-M Mainline, and
   `qemu-cortex-m0-cmake-gcc-debug` for Armv6-M; the QEMU probes run
@@ -124,8 +124,8 @@ node .github/skills/review-and-fix/scripts/build-probe.mjs \
   test build, so a probe cannot change a configuration macro of the
   library (that needs a test configuration, or a temporary change to
   the `unit` `os-app-config.h`, reverted afterwards).
-- On macOS, `native-cmake-gcc` uses `/usr/bin/g++`, which is Apple
-  clang; GCC itself is tested by the `native-cmake-gcc<N>`
+- On macOS, `synthetic-posix-cmake-gcc` uses `/usr/bin/g++`, which is Apple
+  clang; GCC itself is tested by the `synthetic-posix-cmake-gcc<N>`
   configurations (or on the Linux test host).
 - The native port is non-preemptive (cooperative, on `libucontext`);
   a race that depends on preemption by the tick must be probed on

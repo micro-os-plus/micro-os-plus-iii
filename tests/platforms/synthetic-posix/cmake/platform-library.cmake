@@ -64,15 +64,15 @@ endif ()
 # -----------------------------------------------------------------------------
 
 # Define the platform library.
-add_library (platform-native-interface INTERFACE EXCLUDE_FROM_ALL)
+add_library (platform-synthetic-posix-interface INTERFACE EXCLUDE_FROM_ALL)
 
-target_include_directories (platform-native-interface INTERFACE "include")
+target_include_directories (platform-synthetic-posix-interface INTERFACE "include")
 
-target_sources (platform-native-interface INTERFACE # None.
+target_sources (platform-synthetic-posix-interface INTERFACE # None.
 )
 
 target_compile_definitions (
-  platform-native-interface
+  platform-synthetic-posix-interface
   INTERFACE
     "${xpack_platform_compile_definition}"
     # Full POSIX conformance:
@@ -148,13 +148,13 @@ endif ()
 # ~~^
 # 2 errors generated.
 target_compile_options (
-  platform-native-interface INTERFACE ${xpack_platform_common_options}
+  platform-synthetic-posix-interface INTERFACE ${xpack_platform_common_options}
 )
 
 # On macOS, GCC 11 gets confused.
 # dyld[72401]: Symbol not found: (__ZNKSt3_V214error_category10_M_messageB5cxx11Ei)
 target_link_options (
-  platform-native-interface
+  platform-synthetic-posix-interface
   INTERFACE
   # When `-flto` is used, the compile options must be passed to the linker too.
   ${xpack_platform_common_options}
@@ -173,25 +173,25 @@ target_link_options (
 if ("${CMAKE_C_COMPILER_ID}" STREQUAL "Clang")
   # https://clang.llvm.org/docs/Toolchain.html#compiler-runtime
   target_link_options (
-    platform-native-interface INTERFACE -rtlib=compiler-rt
+    platform-synthetic-posix-interface INTERFACE -rtlib=compiler-rt
     $<$<PLATFORM_ID:Linux>:-lunwind>
     $<$<PLATFORM_ID:Linux,Darwin>:-fuse-ld=lld>
   )
 endif ()
 
 target_link_libraries (
-  platform-native-interface INTERFACE micro-os-plus::iii-posix-arch
+  platform-synthetic-posix-interface INTERFACE micro-os-plus::iii-posix-arch
                                       xpack-3rd-party::libucontext
 )
 
 if (COMMAND xpack_display_target_lists)
-  xpack_display_target_lists (platform-native-interface)
+  xpack_display_target_lists (platform-synthetic-posix-interface)
 endif ()
 
 # -----------------------------------------------------------------------------
 
 # Aliases.
-add_library (micro-os-plus::platform ALIAS platform-native-interface)
-message (VERBOSE "> micro-os-plus::platform -> platform-native-interface")
+add_library (micro-os-plus::platform ALIAS platform-synthetic-posix-interface)
+message (VERBOSE "> micro-os-plus::platform -> platform-synthetic-posix-interface")
 
 # -----------------------------------------------------------------------------

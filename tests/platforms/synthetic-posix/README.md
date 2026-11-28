@@ -1,4 +1,4 @@
-# platforms/native
+# platforms/synthetic-posix
 
 Support files for building application to run as native processes
 on GNU/Linux and macOS.

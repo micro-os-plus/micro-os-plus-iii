@@ -669,7 +669,7 @@
         ],
         "properties": {
           "buildType": "Debug",
-          "platformName": "native"
+          "platformName": "synthetic-posix"
         },
         "actions": {
           "setup": "{{ properties.commandCMakeGenerateNativePosix }}"
@@ -692,7 +692,7 @@
         ],
         "properties": {
           "buildType": "Debug",
-          "platformName": "native",
+          "platformName": "synthetic-posix",
           "toolchainFileName": "gcc.cmake"
         }
       },
@@ -745,7 +745,7 @@
         ],
         "properties": {
           "buildType": "Debug",
-          "platformName": "native",
+          "platformName": "synthetic-posix",
           "toolchainFileName": "clang.cmake"
         }
       },

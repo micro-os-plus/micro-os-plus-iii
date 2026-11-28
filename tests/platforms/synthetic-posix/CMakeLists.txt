@@ -13,7 +13,7 @@
 
 # This file creates the platform specific test executables.
 
-message (VERBOSE "Processing 'tests/platforms/native'...")
+message (VERBOSE "Processing 'tests/platforms/synthetic-posix'...")
 
 # -----------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@ function (add_test_executable name)
   add_executable (${name})
 
   # https://cmake.org/cmake/help/v3.20/manual/cmake-generator-expressions.7.html
-  # The link options were defined in `platform-native-interface`.
+  # The link options were defined in `platform-synthetic-posix-interface`.
   target_link_options (
     ${name} PRIVATE
     $<$<PLATFORM_ID:Linux,Windows>:-Wl,-Map,platform-bin/${name}-map.txt>
